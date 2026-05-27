@@ -1,0 +1,169 @@
+FUNCIONES SOPORTADAS POR LA BASE DE DATOS PostgreSQL
+inDrive+ - Motor Tarifario Inteligente
+
+--------------------------------------------------
+
+1. GESTIÓN DE USUARIOS
+
+La base de datos permite:
+
+- Registro de pasajeros
+- Registro de conductores
+- Registro de administradores
+- Inicio de sesión
+- Validación de correos únicos
+- Activación y desactivación de cuentas
+- Gestión de roles del sistema
+
+--------------------------------------------------
+
+2. GESTIÓN DE ROLES
+
+Roles soportados:
+
+- passenger
+- driver
+- admin
+
+Funciones:
+
+- Control de acceso según tipo de usuario
+- Separación de permisos
+- Administración diferenciada del sistema
+
+--------------------------------------------------
+
+3. GESTIÓN DE VEHÍCULOS
+
+La base de datos permite:
+
+- Registrar vehículos
+- Asociar vehículos a conductores
+- Validar placas únicas
+- Gestionar marca, modelo, color y año
+- Consultar información vehicular
+
+--------------------------------------------------
+
+4. GESTIÓN DE VIAJES
+
+La base de datos permite:
+
+- Crear solicitudes de viaje
+- Asignar conductores
+- Registrar origen y destino
+- Registrar distancia recorrida
+- Gestionar información del trayecto
+
+--------------------------------------------------
+
+5. GESTIÓN DE ESTADOS DEL VIAJE
+
+Estados soportados:
+
+- SEARCHING
+- ASSIGNED
+- IN_PROGRESS
+- COMPLETED
+- CANCELLED
+
+Funciones:
+
+- Buscar conductor
+- Asignar viaje
+- Iniciar viaje
+- Finalizar viaje
+- Cancelar viaje
+
+--------------------------------------------------
+
+6. GESTIÓN TARIFARIA
+
+La base de datos permite:
+
+- Registrar tarifa base
+- Registrar tarifa mínima
+- Registrar tarifa máxima
+- Registrar tarifa final
+- Validar precios positivos
+- Gestionar lógica tarifaria básica
+
+--------------------------------------------------
+
+7. HISTORIAL DE VIAJES
+
+La base de datos permite:
+
+- Consultar viajes realizados
+- Consultar historial del pasajero
+- Consultar historial del conductor
+- Revisar viajes completados y cancelados
+
+--------------------------------------------------
+
+8. VALIDACIÓN E INTEGRIDAD DE DATOS
+
+La base de datos garantiza:
+
+- Correos electrónicos únicos
+- Placas únicas
+- Relaciones válidas entre tablas
+- Validación de estados del sistema
+- Validación de precios
+- Consistencia transaccional
+
+--------------------------------------------------
+
+9. GESTIÓN TEMPORAL Y AUDITORÍA
+
+La base de datos permite:
+
+- Registrar fecha de creación
+- Registrar fecha de actualización
+- Registrar inicio del viaje
+- Registrar finalización del viaje
+- Seguimiento temporal de operaciones
+
+--------------------------------------------------
+
+10. OPTIMIZACIÓN Y RENDIMIENTO
+
+La base de datos implementa:
+
+- Índices de optimización
+- Mejora de consultas frecuentes
+- Optimización de búsquedas
+- Escalabilidad inicial del sistema
+
+--------------------------------------------------
+
+11. SOPORTE PARA EL PROYECTO
+
+La base de datos puede ser utilizada por:
+
+- Aplicación móvil de pasajeros
+- Aplicación móvil de conductores
+- Panel administrativo
+- Backend del sistema
+- APIs REST
+- Motor tarifario inteligente
+
+--------------------------------------------------
+
+12. ESCALABILIDAD FUTURA
+
+La estructura permite integrar posteriormente:
+
+- Sistema de pagos
+- Sistema de calificaciones
+- Notificaciones
+- Geolocalización avanzada
+- Inteligencia artificial
+- Métricas y analítica
+- Promociones y descuentos
+
+--------------------------------------------------
+
+CONCLUSIÓN
+
+La base de datos PostgreSQL implementada constituye el núcleo transaccional principal del sistema inDrive+, permitiendo gestionar usuarios, vehículos, viajes y tarifas de manera consistente, escalable y alineada con una arquitectura moderna basada en microservicios.

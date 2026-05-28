@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Este repositorio contiene la configuración de infraestructura local para el proyecto **inDrive+**, una plataforma de transporte basada en microservicios que incorpora un **Motor Tarifario Inteligente** para el cálculo dinámico y transparente de tarifas.
+Esta carpeta contiene la configuración de infraestructura local para el proyecto **inDrive+**, una plataforma de transporte basada en microservicios que incorpora un **Motor Tarifario Inteligente** para el cálculo dinámico y transparente de tarifas.
 
 La finalidad de esta configuración es permitir que cualquier integrante del equipo pueda levantar todos los servicios necesarios en su entorno local mediante Docker, garantizando consistencia entre los entornos de desarrollo.
 

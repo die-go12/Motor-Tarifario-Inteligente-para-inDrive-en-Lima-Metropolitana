@@ -1,54 +1,91 @@
 #  inDrive+ - Infraestructura Docker
 
-## Descripción
+## Descripción General
 
-Esta carpeta contiene la configuración de infraestructura local para el proyecto **inDrive+**, una plataforma de transporte basada en microservicios que incorpora un **Motor Tarifario Inteligente** para el cálculo dinámico y transparente de tarifas.
+Esta carpeta contiene la infraestructura local basada en Docker para el proyecto **Motor Tarifario Inteligente para inDrive en Lima Metropolitana**.
 
-La finalidad de esta configuración es permitir que cualquier integrante del equipo pueda levantar todos los servicios necesarios en su entorno local mediante Docker, garantizando consistencia entre los entornos de desarrollo.
+El objetivo es proporcionar un entorno de desarrollo consistente para todos los integrantes del equipo, permitiendo ejecutar los servicios necesarios sin instalar manualmente PostgreSQL, MongoDB o Redis en cada computadora.
+
+La infraestructura servirá como base para la integración de:
+
+- Aplicación móvil (React Native + Expo)
+- Backend Principal (NestJS)
+- Motor Tarifario Inteligente (NestJS)
+- Bases de Datos Híbridas
+- Servicios de Caché y Comunicación
 
 ---
 
-# Objetivos de la Infraestructura
+# Objetivos
 
-* Estandarizar el entorno de desarrollo.
-* Facilitar la integración entre microservicios.
-* Evitar instalaciones manuales de bases de datos.
-* Permitir pruebas locales antes del despliegue.
-* Reducir problemas de compatibilidad entre equipos.
+- Estandarizar el entorno de desarrollo.
+- Reducir problemas de compatibilidad entre equipos.
+- Facilitar la integración entre microservicios.
+- Simplificar el despliegue local.
+- Preparar la arquitectura para futuras migraciones a AWS y Kubernetes.
 
 ---
 
 # Arquitectura Tecnológica
 
-| Componente                  | Tecnología          |
-| --------------------------- | ------------------- |
-| Aplicación móvil            | React Native + Expo |
-| Panel administrativo        | React + TypeScript  |
-| Backend principal           | NestJS              |
-| Motor tarifario             | NestJS              |
-| Base de datos transaccional | PostgreSQL          |
-| Base de datos documental    | MongoDB             |
-| Caché y sesiones            | Redis               |
-| Contenedorización           | Docker              |
-| Orquestación local          | Docker Compose      |
-| Control de versiones        | GitHub              |
+| Componente | Tecnología |
+|------------|------------|
+| Aplicación Móvil | React Native + Expo |
+| Panel Administrativo | React + TypeScript |
+| Backend Principal | NestJS |
+| Motor Tarifario | NestJS |
+| Base de Datos Relacional | PostgreSQL |
+| Base de Datos Documental | MongoDB |
+| Caché / Memoria | Redis |
+| Infraestructura Local | Docker Compose |
+| Control de Versiones | GitHub |
+| CI/CD (Futuro) | GitHub Actions |
+| Cloud (Futuro) | AWS |
+| Orquestación (Futuro) | Kubernetes |
 
 ---
 
-## Bases de Datos del Proyecto
+# Arquitectura de Bases de Datos
 
-### MongoDB
+## PostgreSQL
 
+Almacena información transaccional:
 
-### PostgreSQL
+- Usuarios
+- Conductores
+- Vehículos
+- Solicitudes de viaje
+- Estados de viaje
+- Historial operativo
 
+---
 
-### Redis
+## MongoDB
 
+Almacena información documental:
 
-# Estructura Inicial de Infraestructura
+- Auditoría de cálculos tarifarios
+- Historial de simulaciones
+- Registro de anomalías
+- Trazabilidad de decisiones
+- Datos históricos para análisis
 
-```text 
+---
+
+## Redis
+
+Almacena información temporal:
+
+- Sesiones activas
+- Caché de consultas
+- Estados temporales de viaje
+- Comunicación rápida entre servicios
+
+---
+
+# Estructura del Proyecto
+
+```text
 infrastructure/
 └── docker/
     ├── docker-compose.yml
@@ -58,23 +95,240 @@ infrastructure/
 
 ---
 
+# Requisitos Previos
 
+Instalar:
 
-# Estado Actual
+- Docker Desktop
+- Git
+- Visual Studio Code (Opcional)
+
+---
+
+# Verificación de Instalación
+
+Comprobar que Docker se encuentra instalado:
+
+```bash
+docker --version
+docker compose version
+```
+
+Ejemplo esperado:
+
+```text
+Docker version XX.X.X
+Docker Compose version XX.X.X
+```
+
+---
+
+# Clonar el Proyecto
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+```
+
+Ingresar al proyecto:
+
+```bash
+cd Motor-Tarifario-Inteligente-para-inDrive-en-Lima-Metropolitana
+```
+
+---
+
+# Cambiar a la Rama Docker
+
+```bash
+git checkout docker-setup
+```
+
+---
+
+# Levantar la Infraestructura
+
+Ubicarse en la carpeta donde se encuentra el archivo Docker Compose:
+
+```bash
+cd infrastructure/docker
+```
+
+Ejecutar:
+
+```bash
+docker compose up -d
+```
+
+Durante la primera ejecución Docker descargará automáticamente:
+
+- PostgreSQL
+- MongoDB
+- Redis
+
+Este proceso puede tardar varios minutos dependiendo de la velocidad de internet.
+
+---
+
+# Verificar Contenedores
+
+```bash
+docker ps
+```
+
+Resultado esperado:
+
+```text
+CONTAINER ID   IMAGE         NAME
+xxxxx          postgres:16   indrive_postgres
+xxxxx          mongo:7       indrive_mongo
+xxxxx          redis:7       indrive_redis
+```
+
+Todos los contenedores deben aparecer en estado:
+
+```text
+Up
+```
+
+---
+
+# Verificación de Servicios
+
+## PostgreSQL
+
+Visualizar logs:
+
+```bash
+docker logs indrive_postgres
+```
+
+Resultado esperado:
+
+```text
+database system is ready to accept connections
+```
+
+---
+
+## MongoDB
+
+Visualizar logs:
+
+```bash
+docker logs indrive_mongo
+```
+
+Resultado esperado:
+
+```text
+Waiting for connections
+```
+
+Estado actual:
+
+✅ Validado correctamente
+
+---
+
+## Redis
+
+Visualizar logs:
+
+```bash
+docker logs indrive_redis
+```
+
+Resultado esperado:
+
+```text
+Ready to accept connections tcp
+```
+
+Estado actual:
+
+✅ Validado correctamente
+
+---
+
+# Administración de Contenedores
+
+## Detener servicios
+
+```bash
+docker compose down
+```
+
+---
+
+## Reiniciar servicios
+
+```bash
+docker compose restart
+```
+
+---
+
+## Reconstruir servicios
+
+```bash
+docker compose up --build
+```
+
+---
+
+## Eliminar contenedores y volúmenes
+
+```bash
+docker compose down -v
+```
+
+⚠️ Este comando elimina toda la información almacenada en los volúmenes Docker.
+
+---
+
+# Estado Actual del Proyecto
 
 ## Completado
 
-* [x] Creación de rama docker-setup.
-* [x] Documentación inicial.
-* [x] Definición de tecnologías base.
-* [x] Definición de arquitectura local.
+- [x] Rama docker-setup creada
+- [x] Documentación inicial
+- [x] Configuración Docker Compose
+- [x] PostgreSQL integrado
+- [x] MongoDB integrado
+- [x] Redis integrado
+- [x] Persistencia mediante volúmenes Docker
 
-## En progreso
+---
 
-* [ ] Configuración de Docker Compose.
-* [ ] Configuración de PostgreSQL.
-* [ ] Configuración de MongoDB.
-* [ ] Configuración de Redis.
+## En Desarrollo
+
+- [ ] Variables de entorno centralizadas
+- [ ] Redes Docker personalizadas
+- [ ] Integración API Base (NestJS)
+- [ ] Integración Pricing Engine (NestJS)
+
+---
+
+## Futuro
+
+- [ ] GitHub Actions
+- [ ] Kubernetes
+- [ ] AWS Deployment
+- [ ] Monitoreo y Observabilidad
+
+---
+
+# Responsabilidades del Módulo Docker
+
+La infraestructura Docker será responsable de:
+
+- Levantar PostgreSQL.
+- Levantar MongoDB.
+- Levantar Redis.
+- Gestionar redes internas.
+- Gestionar persistencia mediante volúmenes.
+- Integrar microservicios NestJS.
+- Facilitar el entorno local para desarrollo.
 
 ---
 

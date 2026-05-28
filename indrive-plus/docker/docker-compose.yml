@@ -53,4 +53,8 @@ volumes:
 
 networks:
   indrive_network:
+<<<<<<< HEAD
     driver: bridge
+=======
+    driver: bridge
+>>>>>>> ea1dc86 (feat: add docker network and environment variables)

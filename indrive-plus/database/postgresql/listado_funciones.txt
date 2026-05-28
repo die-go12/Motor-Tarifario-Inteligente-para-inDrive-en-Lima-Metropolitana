@@ -1,169 +1,140 @@
-FUNCIONES SOPORTADAS POR LA BASE DE DATOS PostgreSQL
-inDrive+ - Motor Tarifario Inteligente
+# Funcionalidad de la Base de Datos PostgreSQL — inDrive+
 
---------------------------------------------------
+La base de datos PostgreSQL del proyecto inDrive+ tiene como objetivo gestionar la información transaccional principal del sistema de transporte inteligente. Su diseño sigue una arquitectura robusta y escalable orientada a microservicios, permitiendo manejar usuarios, autenticación, vehículos y viajes de manera segura y eficiente.
 
-1. GESTIÓN DE USUARIOS
+## Funcionalidades principales
 
-La base de datos permite:
+### 1. Gestión de usuarios
 
-- Registro de pasajeros
-- Registro de conductores
-- Registro de administradores
-- Inicio de sesión
-- Validación de correos únicos
-- Activación y desactivación de cuentas
-- Gestión de roles del sistema
+La tabla `users` permite registrar y administrar los distintos tipos de usuarios del sistema:
 
---------------------------------------------------
+* Pasajeros
+* Conductores
+* Administradores
 
-2. GESTIÓN DE ROLES
+Además, almacena información importante como:
 
-Roles soportados:
+* nombre
+* correo electrónico
+* contraseña encriptada
+* teléfono
+* estado de cuenta activa/inactiva
 
-- passenger
-- driver
-- admin
+Esto permite implementar:
 
-Funciones:
+* registro de usuarios
+* inicio de sesión
+* control de acceso por roles
+* validación de cuentas activas
 
-- Control de acceso según tipo de usuario
-- Separación de permisos
-- Administración diferenciada del sistema
+---
 
---------------------------------------------------
+### 2. Sistema de autenticación y tokens JWT
 
-3. GESTIÓN DE VEHÍCULOS
+La tabla `tokens` permite gestionar la autenticación segura mediante JWT (JSON Web Token).
 
-La base de datos permite:
+Sus funcionalidades incluyen:
 
-- Registrar vehículos
-- Asociar vehículos a conductores
-- Validar placas únicas
-- Gestionar marca, modelo, color y año
-- Consultar información vehicular
+* almacenamiento de tokens de acceso
+* manejo de refresh tokens
+* control de expiración de sesiones
+* cierre de sesión seguro
+* revocación de tokens comprometidos
 
---------------------------------------------------
+Esto mejora la seguridad y permite un control más profesional de sesiones activas dentro del sistema.
 
-4. GESTIÓN DE VIAJES
+---
 
-La base de datos permite:
+### 3. Gestión de vehículos
 
-- Crear solicitudes de viaje
-- Asignar conductores
-- Registrar origen y destino
-- Registrar distancia recorrida
-- Gestionar información del trayecto
+La tabla `vehicles` administra la información de los vehículos asociados a los conductores.
 
---------------------------------------------------
+Permite almacenar:
 
-5. GESTIÓN DE ESTADOS DEL VIAJE
+* marca
+* modelo
+* placa
+* color
+* año del vehículo
 
-Estados soportados:
+Además, garantiza que:
 
-- SEARCHING
-- ASSIGNED
-- IN_PROGRESS
-- COMPLETED
-- CANCELLED
+* un conductor tenga un único vehículo registrado
+* no existan placas duplicadas
+* los datos del vehículo sean válidos
 
-Funciones:
+---
 
-- Buscar conductor
-- Asignar viaje
-- Iniciar viaje
-- Finalizar viaje
-- Cancelar viaje
+### 4. Gestión de viajes
 
---------------------------------------------------
+La tabla `trips` representa el núcleo operacional del sistema.
 
-6. GESTIÓN TARIFARIA
+Permite gestionar:
 
-La base de datos permite:
+* solicitud de viajes
+* asignación de conductores
+* inicio y finalización de trayectos
+* cancelaciones
+* seguimiento de estados del viaje
 
-- Registrar tarifa base
-- Registrar tarifa mínima
-- Registrar tarifa máxima
-- Registrar tarifa final
-- Validar precios positivos
-- Gestionar lógica tarifaria básica
+También almacena información importante como:
 
---------------------------------------------------
+* origen y destino
+* distancia recorrida
+* precio base
+* precio mínimo
+* precio máximo
+* precio final calculado
 
-7. HISTORIAL DE VIAJES
+Esto permite integrar posteriormente el motor tarifario inteligente del proyecto.
 
-La base de datos permite:
+---
 
-- Consultar viajes realizados
-- Consultar historial del pasajero
-- Consultar historial del conductor
-- Revisar viajes completados y cancelados
+### 5. Control de estados del viaje
 
---------------------------------------------------
+El sistema controla múltiples estados del trayecto:
 
-8. VALIDACIÓN E INTEGRIDAD DE DATOS
+* SEARCHING
+* ASSIGNED
+* IN_PROGRESS
+* COMPLETED
+* CANCELLED
 
-La base de datos garantiza:
+Esto facilita:
 
-- Correos electrónicos únicos
-- Placas únicas
-- Relaciones válidas entre tablas
-- Validación de estados del sistema
-- Validación de precios
-- Consistencia transaccional
+* monitoreo del flujo del viaje
+* control operacional
+* trazabilidad del servicio
 
---------------------------------------------------
+---
 
-9. GESTIÓN TEMPORAL Y AUDITORÍA
+### 6. Integridad y validación de datos
 
-La base de datos permite:
+La base de datos implementa buenas prácticas mediante:
 
-- Registrar fecha de creación
-- Registrar fecha de actualización
-- Registrar inicio del viaje
-- Registrar finalización del viaje
-- Seguimiento temporal de operaciones
+* llaves primarias
+* llaves foráneas
+* restricciones CHECK
+* validaciones automáticas
+* índices de optimización
 
---------------------------------------------------
+Esto garantiza:
 
-10. OPTIMIZACIÓN Y RENDIMIENTO
+* consistencia de datos
+* reducción de errores
+* mejor rendimiento de consultas
 
-La base de datos implementa:
+---
 
-- Índices de optimización
-- Mejora de consultas frecuentes
-- Optimización de búsquedas
-- Escalabilidad inicial del sistema
+### 7. Escalabilidad del sistema
 
---------------------------------------------------
+El modelo fue diseñado para permitir futuras ampliaciones como:
 
-11. SOPORTE PARA EL PROYECTO
+* sistema de pagos
+* calificaciones
+* notificaciones
+* geolocalización avanzada
+* historial de estados
+* analítica de viajes
 
-La base de datos puede ser utilizada por:
-
-- Aplicación móvil de pasajeros
-- Aplicación móvil de conductores
-- Panel administrativo
-- Backend del sistema
-- APIs REST
-- Motor tarifario inteligente
-
---------------------------------------------------
-
-12. ESCALABILIDAD FUTURA
-
-La estructura permite integrar posteriormente:
-
-- Sistema de pagos
-- Sistema de calificaciones
-- Notificaciones
-- Geolocalización avanzada
-- Inteligencia artificial
-- Métricas y analítica
-- Promociones y descuentos
-
---------------------------------------------------
-
-CONCLUSIÓN
-
-La base de datos PostgreSQL implementada constituye el núcleo transaccional principal del sistema inDrive+, permitiendo gestionar usuarios, vehículos, viajes y tarifas de manera consistente, escalable y alineada con una arquitectura moderna basada en microservicios.
+Por ello, la arquitectura actual funciona como una base sólida para el crecimiento progresivo del proyecto.

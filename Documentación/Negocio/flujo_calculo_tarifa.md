@@ -1,5 +1,3 @@
-## FLUJO_CALCULO_TARIFA.md (COPIAR Y PEGAR)
-
 # Flujo de Cálculo de Tarifa
 
 ## Motor Tarifario Inteligente — inDrive

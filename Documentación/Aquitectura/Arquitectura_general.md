@@ -629,7 +629,7 @@ flowchart LR
 
 | Atributo | Métrica | SLO |
 |----------|---------|-----|
-| Rendimiento | Tiempo cálculo pre-viaje | <5 segundos |
+| Rendimiento | Tiempo cálculo pre-viaje | <20 segundos |
 | Precisión | Precisión del cálculo tarifario | ≥90% |
 | Disponibilidad | Disponibilidad del sistema | ≥99.5% |
 | Escalabilidad | Solicitudes concurrentes | >10,000 |

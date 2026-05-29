@@ -1,4 +1,4 @@
-# 📐 Decisiones Arquitectónicas (ADR)
+# Decisiones Arquitectónicas (ADR)
 
 ## Motor Tarifario Inteligente — inDrive
 
@@ -12,7 +12,7 @@
 
 <div style="text-align: justify">
 
-## 📋 Índice
+## Índice
 
 1. [Introducción](#1-introducción)
 2. [ADR-001: Arquitectura basada en microservicios](#adr-001-arquitectura-basada-en-microservicios)
@@ -1002,7 +1002,7 @@ Se implementa **autenticación OAuth2 / OIDC** con **JWT** (expiración 1 hora) 
 
 ---
 
-## 📊 Resumen de ADR
+## Resumen de ADR
 
 </div>
 

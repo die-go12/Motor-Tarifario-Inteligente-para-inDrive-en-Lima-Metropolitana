@@ -1,93 +1,205 @@
-# Motor Tarifario Inteligente inDrive
+# Motor Tarifario Inteligente
 
 <p align="center">
- <strong>Pricing Engine inteligente para una negociación justa y transparente</strong>
+  <strong>Pricing Engine inteligente para una negociación justa y transparente en movilidad urbana</strong>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Estado-En%20desarrollo-yellow" />
   <img src="https://img.shields.io/badge/Metodología-Scrum-blue" />
   <img src="https://img.shields.io/badge/Arquitectura-Microservicios-purple" />
-  <img src="https://img.shields.io/badge/Integración-APIs-orange" />
-  <img src="https://img.shields.io/badge/Dominio-Pricing%20Engine-success" />
-  <img src="https://img.shields.io/badge/Base%20de%20Datos-PostgreSQL%20%7C%20MongoDB%20%7C%20Redis-green" />
-  <img src="https://img.shields.io/badge/Tecnologías-Docker-brightgreen" />
-</p>
-
-## Introducción
-
-<p align="justify">
-El proyecto <strong>Motor Tarifario Inteligente</strong> es una solución de software diseñada bajo una arquitectura de microservicios orientada a eventos. El objetivo es optimizar la transparencia, equidad y eficiencia en el cálculo y la negociación de tarifas de transporte urbano dentro de Lima Metropolitana.
-</p>
-<p align="justify">
-Para cumplir con los requerimientos prácticos de evaluación, el sistema está estructurado para ser ejecutado y controlado <strong>de manera 100% local en una sola computadora</strong>. Utilizando la orquestación de contenedores en la laptop, se simula el ecosistema transaccional y el comportamiento de una app de transporte genérica, omitiendo dependencias directas en la nube para facilitar la demostración ante el docente.
+  <img src="https://img.shields.io/badge/Backend-NestJS-red" />
+  <img src="https://img.shields.io/badge/Frontend-React%20Native%20%7C%20React-orange" />
+  <img src="https://img.shields.io/badge/Base%20de%20datos-PostgreSQL%20%7C%20MongoDB%20%7C%20Redis-green" />
+  <img src="https://img.shields.io/badge/Infraestructura-Docker-brightgreen" />
 </p>
 
 ---
 
-## ¿De qué trata el proyecto y por qué la solución?
+## Descripción
 
-### ¿De qué trata el proyecto?
 <p align="justify">
-El sistema plantea la integración de un motor de cálculo algorítmico que interviene en dos fases clave del servicio sin eliminar el modelo de negociación libre, sino acotándolo sobre límites objetivos:
+<strong>Motor Tarifario Inteligente</strong> es una solución diseñada para optimizar el cálculo y la negociación de tarifas dentro de plataformas de movilidad urbana como inDrive. El sistema permite estimar un rango tarifario antes del inicio del viaje considerando múltiples variables operativas y contextuales, facilitando una negociación más equilibrada entre pasajero y conductor dentro de límites establecidos a partir de datos reales.
 </p>
 
 <p align="justify">
-&bull; <strong>Fase Pre-viaje:</strong> El motor pondera internamente <strong>7 variables críticas</strong> (distancia por GPS, precio del combustible de OSINERGMIN, capacidad del vehículo, tráfico en tiempo real, hora del día, tiempo estimado e histórico interno) en menos de 5 segundos. Con esto, genera un rango cerrado denominado bajo los términos oficiales <code>[mínimo, máximo]</code>.
+Además, incorpora una lógica de visualización diferenciada según el rol del usuario. Mientras el pasajero visualiza el precio máximo estimado del trayecto, el conductor accede al ingreso mínimo garantizado. Una vez finalizado el viaje, el sistema recalcula el precio final utilizando la información real del recorrido y aplica una regla de protección económica bilateral orientada a brindar mayor transparencia y equilibrio para ambas partes.
 </p>
 
 <p align="justify">
-&bull; <strong>Visualización Asimétrica:</strong> A través de componentes de frontend controlados por el rol del usuario, el sistema oculta el rango completo a los clientes móviles. El pasajero únicamente visualiza el límite máximo o "techo" ("Este viaje no te costará más de S/ X"), mientras que el conductor solo ve el límite mínimo o "piso" ("Este viaje te pagará al menos S/ Y").
+Este repositorio corresponde al desarrollo del proyecto académico del curso de <strong>Ingeniería de Software</strong>, elaborado bajo la metodología <strong>Scrum</strong> e iniciado con <strong>Sprint 0</strong> como etapa de preparación, organización y planificación técnica. Durante esta fase se definieron los objetivos del producto, el alcance inicial del MVP, la estructura del equipo y la base técnica necesaria para el desarrollo del sistema.
 </p>
-
-<p align="justify">
-&bull; <strong>Fase Post-viaje:</strong> Al finalizar el trayecto, el motor recibe los datos reales del GPS y recalcula el precio exacto aplicando una regla matemática de negocio invariable:
-</p>
-
-$$\text{pago} = \max(\text{mínimo}, \min(\text{precio}_{real}, \text{máximo}))$$
-
-### ¿Por qué esta solución?
-1. **Eliminación del efecto de anclaje:** Si ambas partes vieran el rango completo desde el inicio, el pasajero ofertaría siempre el mínimo y el conductor exigiría el máximo, polarizando y trabando la negociación asistida. La asimetría visual distribuye la información estratégicamente para permitir acuerdos rápidos.
-2. **Protección económica bilateral:** El conductor cuenta con la seguridad de que nunca cobrará menos del costo operativo mínimo garantizado (incluso ante imprevistos en la ruta), y el pasajero tiene la certeza de que jamás pagará más del techo acordado inicialmente.
 
 ---
 
-## Pasos Mapeados para la Ejecución
-Para asegurar un desarrollo modular, el proyecto se divide en las siguientes etapas de trabajo:
+## Tabla de contenidos
 
-### Paso 1: Infraestructura y Orquestación Local (DevOps & Git)
-* Configurar el repositorio en GitHub y definir las políticas de ramificación e integración para los *Pull Requests*.
-* Diseñar el archivo `docker-compose.yml` para levantar e intercomunicar simultáneamente 5 contenedores locales en la laptop: NestJS Base, NestJS Motor Tarifario, PostgreSQL, MongoDB y Redis.
-
-### Paso 2: Desarrollo de la Plataforma Base (Backend Transaccional)
-* Construir en Node.js + NestJS el microservicio encargado de la lógica transaccional común: gestión de perfiles, autenticación y la máquina de estados del trayecto (*Buscando, Asignado, En Curso, Finalizado*).
-* Diseñar el esquema relacional en PostgreSQL para usuarios y vehículos, y configurar Redis para la persistencia intermedia de baja latencia en la asignación de viajes.
-
-### Paso 3: Core Algorítmico y Trazabilidad (Backend Motor Tarifario)
-* Desarrollar el microservicio independiente en NestJS especializado en la lógica matemática core (procesamiento de las 7 variables pre-viaje y regla de pago post-viaje).
-* Configurar MongoDB local para almacenar el payload completo de auditoría y el histórico de viajes validados por el filtro de anomalías.
-
-### Paso 4: Construcción de Interfaces y Control Asimétrico (Frontend)
-* Desarrollar la app móvil única en React Native + TypeScript, integrando `react-native-maps` o Mapbox SDK para trazar rutas y renderizar el vehículo en movimiento.
-* Implementar el Módulo Asimétrico en la app móvil para segmentar la visualización según el rol del usuario autenticado (pasajero ve techo / conductor ve piso).
-* Construir el Panel Administrativo independiente en React + TypeScript para la consola del administrador, permitiendo configurar pesos, topes del multiplicador de tráfico (tope inicial x2.0 para Lima) y visualizar el rango completo.
-
-### Paso 5: Ecosistema de Pruebas e Inyección Local (QA)
-* Diseñar las colecciones de peticiones HTTP en **Thunder Client** directamente en VS Code para simular la inyección de datos de tráfico y combustible de las APIs externas hacia los microservicios locales.
-* Escribir y ejecutar las pruebas unitarias automatizadas a través de GitHub Actions para validar que los cambios en las reglas algorítmicas no rompan la regla de pago antes de actualizar los contenedores locales.
+* [Objetivo del producto](#objetivo-del-producto)
+* [Funcionalidades principales](#funcionalidades-principales)
+* [Alcance MVP](#alcance-mvp)
+* [Tecnologías utilizadas](#tecnologías-utilizadas)
+* [Arquitectura general](#arquitectura-general)
+* [Estructura del proyecto](#estructura-del-proyecto)
+* [Documentación Scrum](#documentación-scrum)
+* [Planificación Scrum](#planificación-scrum)
+* [Equipo](#equipo)
 
 ---
+
+## Objetivo del producto
+
+<p align="justify">
+Desarrollar un motor tarifario inteligente capaz de calcular tarifas más justas, dinámicas y transparentes dentro de una plataforma de transporte urbano, mejorando la experiencia de negociación entre pasajero y conductor sin eliminar el modelo actual de oferta libre.
+</p>
+
+---
+
+## Funcionalidades principales
+
+* Cálculo de rango tarifario pre-viaje `[mínimo, máximo]`
+* Procesamiento de variables tarifarias
+* Visualización asimétrica según rol
+* Negociación asistida entre pasajero y conductor
+* Recalculo tarifario post-viaje
+* Regla automática de pago protegido
+* Registro histórico y trazabilidad de cálculos
+* Validación de anomalías
+* Panel administrativo configurable
+* Integración con APIs externas para mapas, tráfico y contexto operativo
+
+---
+
+## Alcance MVP
+
+### Incluye
+
+* Plataforma base simulada de transporte
+* Motor tarifario independiente
+* Cálculo pre-viaje
+* Cálculo post-viaje
+* Regla automática de pago
+* Visualización diferenciada pasajero / conductor
+* Panel administrativo web
+* Persistencia local en base de datos
+* Simulación local de APIs externas
+* Despliegue mediante Docker
+
+### No incluye
+
+* Despliegue real en producción
+* Integración oficial con inDrive
+* Pagos reales dentro de la aplicación
+* Geolocalización productiva en tiempo real
+* Consumo de APIs comerciales externas en entorno real
+
+---
+
+## Tecnologías utilizadas
+
+| Área          |                 Tecnología | Uso                           |
+| ------------- | -------------------------: | ----------------------------- |
+| App móvil     |  React Native + TypeScript | Interfaz pasajero y conductor |
+| Panel Web     |         React + TypeScript | Configuración administrativa  |
+| Backend       |           Node.js + NestJS | Microservicios                |
+| Base de datos |                 PostgreSQL | Usuarios, viajes y vehículos  |
+| Base de datos |                    MongoDB | Auditoría e histórico         |
+| Cache         |                      Redis | Estado temporal del viaje     |
+| Mapas         | Mapbox / react-native-maps | Visualización de rutas        |
+| Contenedores  |             Docker Compose | Orquestación local            |
+| Testing API   |   Postman / Thunder Client | Validación y pruebas          |
+| Versionado    |               Git + GitHub | Gestión del proyecto          |
+| CI/CD         |             GitHub Actions | Automatización                |
+
+---
+
+## Arquitectura general
+
+<p align="justify">
+El sistema se divide en dos componentes principales: una plataforma base encargada de simular el ecosistema general de transporte y un motor tarifario inteligente responsable del procesamiento, cálculo y validación del rango tarifario antes y después del viaje.
+</p>
+
+### Plataforma Base
+
+* Autenticación
+* Gestión de perfiles
+* Solicitud del viaje
+* Estados del trayecto
+* Asignación de conductor
+
+### Motor Tarifario Inteligente
+
+* Evaluación de variables
+* Generación del rango `[mínimo, máximo]`
+* Lógica de visualización diferenciada
+* Cálculo del precio final
+* Auditoría y trazabilidad histórica
+
+---
+
+## Estructura del proyecto
+
+```bash
+motor-tarifario-inteligente/
+│
+├── docs/
+│   ├── scrum/
+│   ├── backlog/
+│   ├── arquitectura/
+│   └── evidencias/
+│
+├── mobile-app/
+├── admin-panel/
+├── services/
+│   ├── platform-base/
+│   └── pricing-engine/
+│
+├── database/
+├── tests/
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## Documentación Scrum
+
+* Sprint 0
+* Product Backlog
+* Sprint Backlog
+* Historias de Usuario
+* Arquitectura Base
+* Decisiones Técnicas
+* Evidencias por Sprint
+
+---
+## Planificación Scrum
+
+<p align="justify">
+El desarrollo del proyecto se organiza bajo la metodología <strong>Scrum</strong>, mediante iteraciones cortas llamadas <strong>Sprints</strong>. Cada sprint tiene objetivos definidos, entregables concretos y actividades orientadas al desarrollo incremental del producto.
+</p>
+
+| Sprint       | Objetivo                                         | Actividades principales                                                                                                                                                             | Entregables                                                                                      |
+| ------------ | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Sprint 0** | Preparación y planificación inicial del proyecto | Definición del problema, visión del producto, alcance del MVP, organización del equipo, creación del repositorio, definición de arquitectura base y elaboración del Product Backlog | Product Backlog, documentación inicial, estructura del repositorio y planificación general       |
+| **Sprint 1** | Desarrollo inicial del sistema                   | Configuración técnica del entorno, implementación de estructura base del proyecto, desarrollo de funcionalidades principales y avance de componentes iniciales                      | Primer avance funcional del sistema y estructura técnica operativa                               |
+| **Sprint 2** | Integración y consolidación funcional            | Integración de componentes desarrollados, validación funcional, ajustes técnicos, revisión del avance y documentación complementaria                                                | Integración funcional del sistema, evidencias del sprint y consolidación del avance del producto |
+
+---
+
 ## Equipo
 
-|            |              |                 
-|------------|------------|
-|Nardy Liz Condori Mamani |*Scrum Master / Product Owner / QA Git Manager*|
-|Enrique Alejandro Orosco Mendoza| *Developer*|
-|Matias Dario Huerta Cruz |*Developer*|
-|Luis Martin Valenzuela Valer| *Developer*  |
-|Juan Diego Lopez Vega| *Developer*|
+| Integrante                       |                               Rol |
+| -------------------------------- | --------------------------------: |
+| Nardy Liz Condori Mamani         | Scrum Master / Product Owner / QA |
+| Enrique Alejandro Orosco Mendoza |                         Developer |
+| Matias Dario Huerta Cruz         |                         Developer |
+| Luis Martin Valenzuela Valer     |                         Developer |
+| Juan Diego Lopez Vega            |                         Developer |
 
 ---
+
 ## Licencia
 
-Proyecto académico desarrollado como parte del curso de Ingeniería de Software.
+<p align="justify">
+Proyecto académico desarrollado para el curso de Ingeniería de Software.
+</p>

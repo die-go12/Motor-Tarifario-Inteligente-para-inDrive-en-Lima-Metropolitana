@@ -12,6 +12,24 @@
 
 <div style="text-align: justify">
 
+## Características del Producto (CAR)
+
+Las siguientes **10 características funcionales y no funcionales** (CAR-001 a CAR-010) son la base sobre la cual se construyen las decisiones arquitectónicas documentadas en este archivo.
+
+| ID | Característica | Descripción |
+| :--- | :--- | :--- |
+| **CAR-001** | Cálculo del rango pre-viaje | Pondera 7 variables y genera `[mínimo, máximo]` en menos de 5 segundos |
+| **CAR-002** | Visualización asimétrica | Pasajero ve solo el **techo** (máximo) / Conductor ve solo el **piso** (mínimo) + aceptación bilateral |
+| **CAR-003** | Negociación asistida | Negociación libre pero acotada dentro del rango `[mínimo, máximo]`, sin revelar los extremos |
+| **CAR-004** | Cálculo post-viaje + regla de pago | Recalcula con GPS real y aplica `pago = max(mínimo, min(precio_real, máximo))` |
+| **CAR-005** | Filtro de anomalías | Protege el histórico de aprendizaje descartando datos corruptos o inválidos |
+| **CAR-006** | Parametrización | Configuración de reglas de negocio, pesos y multiplicadores desde panel administrativo |
+| **CAR-007** | Registro y trazabilidad | Registro inmutable de todas las fases (pre-viaje y post-viaje) para auditoría |
+| **CAR-008** | Reportes | Generación de métricas para control y toma de decisiones |
+| **CAR-009** | Integración externa | Conexión con Google Maps, OSINERGMIN y APIs de tráfico en tiempo real |
+| **CAR-010** | Tolerancia a fallos | Degradación elegante ante fallos de servicios externos |
+
+---
 ## Índice
 
 1. [Introducción](#1-introducción)

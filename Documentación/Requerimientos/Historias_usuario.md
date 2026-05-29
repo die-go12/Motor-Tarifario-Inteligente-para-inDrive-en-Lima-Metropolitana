@@ -246,16 +246,16 @@ Yo como **administrador** quiero **visualizar reportes y métricas** (demanda po
 
 ## Resumen de Historias de Usuario
 
-| ID | Título | Actor principal | CAR relacionados |
-| :--- | :--- | :--- | :--- |
-| US-001 | Solicitud de viaje con cálculo de rango | Pasajero | CAR-001, CAR-009, CAR-010 |
-| US-002 | Visualización asimétrica del precio | Pasajero / Conductor | CAR-002 |
-| US-003 | Negociación acotada dentro del rango | Pasajero / Conductor | CAR-003, CAR-007 |
-| US-004 | Aceptación bilateral e inicio de viaje | Pasajero / Conductor | CAR-002, CAR-007 |
-| US-005 | Recálculo post-viaje con GPS real | Sistema | CAR-004, CAR-009 |
-| US-006 | Aplicación de la regla de pago invariante | Sistema | CAR-004, CAR-005 |
-| US-007 | Configuración de parámetros desde panel admin | Administrador | CAR-006, CAR-007 |
-| US-008 | Visualización de reportes y métricas | Administrador | CAR-008 |
+| ID | Módulo | Historia de Usuario | Prioridad | Sprint sugerido | Estado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| US-001 | Pre-viaje | Solicitud de viaje con cálculo de rango | 🔴 Alta | Sprint 1 | ✅ Completado |
+| US-002 | Pre-viaje | Visualización asimétrica del precio | 🔴 Alta | Sprint 1 | ✅ Completado |
+| US-003 | Pre-viaje | Negociación acotada dentro del rango | 🔴 Alta | Sprint 1 | ✅ Completado |
+| US-004 | Pre-viaje | Aceptación bilateral e inicio de viaje | 🔴 Alta | Sprint 1 | ✅ Completado |
+| US-005 | Post-viaje | Recálculo post-viaje con GPS real | 🔴 Alta | Sprint 2 | 🟡 En Progreso |
+| US-006 | Post-viaje | Aplicación de la regla de pago invariante | 🔴 Alta | Sprint 2 | 🟡 En Progreso |
+| US-007 | Administración | Configuración de parámetros desde panel admin | 🟠 Media | Sprint 2 | ⚪ Pendiente |
+| US-008 | Administración | Visualización de reportes y métricas | 🟠 Media | Sprint 2 | ⚪ Pendiente |
 
 ---
 

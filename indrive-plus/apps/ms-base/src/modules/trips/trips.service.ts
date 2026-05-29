@@ -1,0 +1,147 @@
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AuthenticatedUser, TripStatus, UserRole } from '@app/shared';
+import { Trip } from './entities/trip.entity';
+import { CreateTripDto } from './dto/create-trip.dto';
+import { assertTransition } from './trip-state-machine';
+import { PricingClient } from '../../clients/pricing.client';
+import { VehiclesService } from '../vehicles/vehicles.service';
+
+@Injectable()
+export class TripsService {
+  constructor(
+    @InjectRepository(Trip)
+    private readonly tripsRepository: Repository<Trip>,
+    private readonly pricingClient: PricingClient,
+    private readonly vehiclesService: VehiclesService,
+  ) {}
+
+  async request(passengerId: number, dto: CreateTripDto): Promise<Trip> {
+    const quote = await this.pricingClient.quote({
+      distanceKm: dto.distanceKm,
+    });
+    const trip = this.tripsRepository.create({
+      passengerId,
+      origin: dto.origin,
+      destination: dto.destination,
+      distanceKm: dto.distanceKm,
+      basePrice: quote.basePrice,
+      minimumPrice: quote.minimumPrice,
+      maximumPrice: quote.maximumPrice,
+      status: TripStatus.SEARCHING,
+    });
+    return this.tripsRepository.save(trip);
+  }
+
+  async assign(tripId: number, driverId: number): Promise<Trip> {
+    const hasVehicle = await this.vehiclesService.existsForDriver(driverId);
+    if (!hasVehicle) {
+      throw new BadRequestException(
+        'Debes registrar un vehículo antes de aceptar viajes',
+      );
+    }
+    await this.findById(tripId);
+    const result = await this.tripsRepository.update(
+      { id: tripId, status: TripStatus.SEARCHING },
+      { driverId, status: TripStatus.ASSIGNED },
+    );
+    if (!result.affected) {
+      throw new BadRequestException('El viaje ya no está disponible');
+    }
+    return this.findById(tripId);
+  }
+
+  async start(tripId: number, driverId: number): Promise<Trip> {
+    const trip = await this.findAssignedDriverTrip(tripId, driverId);
+    assertTransition(trip.status, TripStatus.IN_PROGRESS);
+    trip.status = TripStatus.IN_PROGRESS;
+    trip.startedAt = new Date();
+    return this.tripsRepository.save(trip);
+  }
+
+  async complete(
+    tripId: number,
+    driverId: number,
+    realPrice: number,
+  ): Promise<Trip> {
+    const trip = await this.findAssignedDriverTrip(tripId, driverId);
+    assertTransition(trip.status, TripStatus.COMPLETED);
+    const settlement = await this.pricingClient.settle({
+      minimumPrice: trip.minimumPrice,
+      maximumPrice: trip.maximumPrice,
+      realPrice,
+      tripId: trip.id,
+      route: `${trip.origin} - ${trip.destination}`,
+    });
+    trip.finalPrice = settlement.finalPrice;
+    trip.status = TripStatus.COMPLETED;
+    trip.completedAt = new Date();
+    return this.tripsRepository.save(trip);
+  }
+
+  async cancel(tripId: number, userId: number): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    this.assertParticipant(trip, userId);
+    assertTransition(trip.status, TripStatus.CANCELLED);
+    trip.status = TripStatus.CANCELLED;
+    return this.tripsRepository.save(trip);
+  }
+
+  async findById(tripId: number): Promise<Trip> {
+    const trip = await this.tripsRepository.findOne({ where: { id: tripId } });
+    if (!trip) {
+      throw new NotFoundException(`Viaje ${tripId} no encontrado`);
+    }
+    return trip;
+  }
+
+  async findByIdForViewer(
+    tripId: number,
+    viewer: AuthenticatedUser,
+  ): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    if (viewer.role !== UserRole.ADMIN) {
+      this.assertParticipant(trip, viewer.id);
+    }
+    return trip;
+  }
+
+  findSearching(): Promise<Trip[]> {
+    return this.tripsRepository.find({
+      where: { status: TripStatus.SEARCHING },
+    });
+  }
+
+  findByPassenger(passengerId: number): Promise<Trip[]> {
+    return this.tripsRepository.find({ where: { passengerId } });
+  }
+
+  findByDriver(driverId: number): Promise<Trip[]> {
+    return this.tripsRepository.find({ where: { driverId } });
+  }
+
+  private async findAssignedDriverTrip(
+    tripId: number,
+    driverId: number,
+  ): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    if (trip.driverId !== driverId) {
+      throw new ForbiddenException(
+        'El viaje no está asignado a este conductor',
+      );
+    }
+    return trip;
+  }
+
+  private assertParticipant(trip: Trip, userId: number): void {
+    if (trip.passengerId !== userId && trip.driverId !== userId) {
+      throw new ForbiddenException('No participas en este viaje');
+    }
+  }
+}

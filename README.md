@@ -206,7 +206,7 @@ motor-tarifario-inteligente/
 * [Historias de Usuario](Documentación/Requerimientos/Historias_usuario.md)
 * [Product Backlog](Documentación/Requerimientos/Product_backlog.md)
 * [Sprint Backlog](Documentación/Requerimientos/sprint_backlog.md)
-* [Arquitectura Base](Documentación/Arquitectura/Arquitectura_general.md)
+* [Arquitectura Base](Documentación/Aquitectura/Arquitectura_general.md)
 * [Stack Tecnológico](Documentación/Aquitectura/Stack_Tecnologico.md)
 
 ---

@@ -21,6 +21,8 @@
 9. [Manejo de Errores y Degradación Elegante (CAR-010)](#9-manejo-de-errores-y-degradación-elegante-car-010)
 10. [Entidades Principales](#10-entidades-principales)
 
+--- 
+
 ### 1. Tipo de Solución
 
 El sistema consiste en un **Motor Tarifario Inteligente** para **inDrive** (MVP Lima Metropolitana) que calcula un rango de precio `[mínimo, máximo]` antes del viaje y determina el precio real a pagar al finalizar, aplicando una regla de protección bilateral.

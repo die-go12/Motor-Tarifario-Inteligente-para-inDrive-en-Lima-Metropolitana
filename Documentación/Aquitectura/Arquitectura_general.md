@@ -632,7 +632,7 @@ flowchart LR
 | Rendimiento | Tiempo cálculo pre-viaje | <20 segundos |
 | Precisión | Precisión del cálculo tarifario | ≥90% |
 | Disponibilidad | Disponibilidad del sistema | ≥99.5% |
-| Escalabilidad | Solicitudes concurrentes | >10,000 |
+| Escalabilidad | Solicitudes concurrentes | >10,000 usuarios|
 
 ---
 

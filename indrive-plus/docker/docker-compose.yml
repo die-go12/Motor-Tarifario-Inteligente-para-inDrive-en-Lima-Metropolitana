@@ -1,0 +1,57 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: indrive_postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - indrive_network
+
+  mongo:
+    image: mongo:7
+    container_name: indrive_mongo
+
+    restart: unless-stopped
+
+    ports:
+      - "${MONGO_PORT}:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+    networks:
+      - indrive_network
+
+  redis:
+    image: redis:7
+    container_name: indrive_redis
+
+    restart: unless-stopped
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    networks:
+      - indrive_network
+
+volumes:
+  postgres_data:
+  mongo_data:
+
+networks:
+  indrive_network:
+
+    driver: bridge

@@ -207,7 +207,7 @@ motor-tarifario-inteligente/
 * [Product Backlog](Documentación/Requerimientos/Product_backlog.md)
 * [Sprint Backlog](Documentación/Requerimientos/sprint_backlog.md)
 * [Arquitectura Base](Documentación/Arquitectura/Arquitectura_general.md)
-* [Stack Tecnológico](Documentación/Arquitectura/Stack_Tecnologico.md)
+* [Stack Tecnológico](Documentación/Aquitectura/Stack_Tecnologico.md)
 
 ---
 ## Planificación Scrum

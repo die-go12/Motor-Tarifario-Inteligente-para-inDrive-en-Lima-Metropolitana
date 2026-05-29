@@ -25,7 +25,7 @@
 
 ## Relación con el Flujo de Cálculo
 
-El archivo [`FLUJO_CALCULO_TARIFA.md`](./FLUJO_CALCULO_TARIFA.md) describe **el flujo completo del negocio** (qué pasa en cada etapa). Este archivo (`REGLAS_TARIFAS.md`) se enfoca en el **corazón matemático** del motor: la ponderación de las 7 variables para generar el rango `[mínimo, máximo]`.
+El archivo [`FLUJO CALCULO TARIFA`](Documentación/Negocio/flujo_calculo_tarifa.md) describe **el flujo completo del negocio** (qué pasa en cada etapa). Este archivo (`flujo_calculo_tarifa.md`) se enfoca en el **corazón matemático** del motor: la ponderación de las 7 variables para generar el rango `[mínimo, máximo]`.
 
 ```mermaid
 flowchart LR

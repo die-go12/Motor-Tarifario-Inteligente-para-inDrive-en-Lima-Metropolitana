@@ -141,21 +141,58 @@ El sistema se divide en dos componentes principales: una plataforma base encarga
 ```bash
 motor-tarifario-inteligente/
 │
-├── docs/
-│   ├── scrum/
-│   ├── backlog/
-│   ├── arquitectura/
-│   └── evidencias/
+├── Documentación/
+│   │
+│   ├── Arquitectura/
+│   │   ├── Arquitectura_general.md
+│   │   ├── Stack_Tecnologico.md
+│   │   └── decisiones_arquitectonicas.md
+│   │
+│   ├── Negocio/
+│   │   ├── flujo_calculo_tarifa.md
+│   │   ├── reglas_tarifarias.md
+│   │   └── variables_tarifa.md
+│   │
+│   ├── Requerimientos/
+│   │   ├── Criterios_aceptacion.md
+│   │   ├── Historias_usuario.md
+│   │   ├── Product_backlog.md
+│   │   └── sprint_backlog.md
+│   │
+│   └── Scrum/
+│       ├── daily_scrum/
+│       │   ├── registro_sprint_1.md
+│       │   └── registro_sprint_2.md
+│       │
+│       ├── retrospective.md
+│       ├── sprint_0.md
+│       ├── sprint_1.md
+│       ├── sprint_2.md
+│       ├── sprint_review.md
+│       └── README.md
 │
-├── mobile-app/
-├── admin-panel/
-├── services/
-│   ├── platform-base/
-│   └── pricing-engine/
+├── indrive-plus/
+│   │
+│   ├── database/
+│   │   ├── mongodb/
+│   │   │   └── collections.md
+│   │   ├── postgresql/
+│   │   │   ├── listado_funciones.txt
+│   │   │   └── schema.sql
+│   │   ├── redis/
+│   │   │   └── redis_structure.md
+│   │   └── README.md
+│   │
+│   ├── mobile-app/
+│   ├── admin-panel/
+│   ├── services/
+│   │   ├── platform-base/
+│   │   └── pricing-engine/
+│   │
+│   ├── tests/
+│   ├── docker-compose.yml
+│   └── README.md
 │
-├── database/
-├── tests/
-├── docker-compose.yml
 └── README.md
 ```
 
@@ -163,13 +200,14 @@ motor-tarifario-inteligente/
 
 ## Documentación Scrum
 
-* Sprint 0
-* Product Backlog
-* Sprint Backlog
-* Historias de Usuario
-* Arquitectura Base
-* Decisiones Técnicas
-* Evidencias por Sprint
+* [Sprint 0](Documentación/Scrum/sprint_0.md)
+* [Sprint 1](Documentación/Scrum/sprint_1.md)
+* [Sprint 2](Documentación/Scrum/sprint_2.md)
+* [Historias de Usuario](Documentación/Requerimientos/Historias_usuario.md)
+* [Product Backlog](Documentación/Requerimientos/Product_backlog.md)
+* [Sprint Backlog](Documentación/Requerimientos/sprint_backlog.md)
+* [Arquitectura Base](Documentación/Arquitectura/Arquitectura_general.md)
+* [Stack Tecnológico](Documentación/Arquitectura/Stack_Tecnologico.md)
 
 ---
 ## Planificación Scrum

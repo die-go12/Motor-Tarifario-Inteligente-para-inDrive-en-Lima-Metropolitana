@@ -108,7 +108,7 @@
 | **Backend** | Node.js, NestJS |
 | **Bases de Datos** | PostgreSQL, MongoDB, Redis |
 | **Infraestructura Local** | Docker, Docker Compose |
-| **Infraestructura Cloud** | Kubernetes|
+| **Infraestructura Cloud** | Kubernetes, ArgoCD|
 | **Integraciones** | Google Maps API, OSINERGMIN API, Tráfico API, GPS |
 | **DevOps** | GitHub, GitHub Actions, Vercel, Postman |
 

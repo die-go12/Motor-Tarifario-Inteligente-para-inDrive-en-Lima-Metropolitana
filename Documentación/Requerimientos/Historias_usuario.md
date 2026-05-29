@@ -1,4 +1,4 @@
-# 📋 Historias de Usuario
+# Historias de Usuario
 
 ## Motor Tarifario Inteligente — inDrive
 

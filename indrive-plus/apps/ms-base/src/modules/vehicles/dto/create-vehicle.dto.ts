@@ -1,8 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Length,
+  Max,
+  Min,
+} from 'class-validator';
 
 const FIRST_VALID_YEAR = 2000;
 const NEXT_YEAR = new Date().getFullYear() + 1;
+const FUEL_TYPES = ['gasoline', 'diesel', 'gas', 'electric', 'hybrid'];
 
 export class CreateVehicleDto {
   @ApiProperty({ example: 'Toyota' })
@@ -32,4 +41,15 @@ export class CreateVehicleDto {
   @Min(FIRST_VALID_YEAR)
   @Max(NEXT_YEAR)
   year?: number;
+
+  @ApiPropertyOptional({ example: 4, minimum: 1 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  capacity?: number;
+
+  @ApiPropertyOptional({ example: 'gasoline', enum: FUEL_TYPES })
+  @IsOptional()
+  @IsIn(FUEL_TYPES)
+  fuelType?: string;
 }

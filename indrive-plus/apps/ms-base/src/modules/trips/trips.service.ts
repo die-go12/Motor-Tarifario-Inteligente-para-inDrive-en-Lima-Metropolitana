@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Repository } from 'typeorm';
 import {
   AuthenticatedUser,
@@ -23,6 +24,7 @@ import { IntegrationClient } from '../../clients/integration.client';
 import { VehiclesService } from '../vehicles/vehicles.service';
 
 const DEFAULT_VEHICLE_CAPACITY = 4;
+export const TRIP_CREATED_EVENT = 'trip.created';
 
 @Injectable()
 export class TripsService {
@@ -32,6 +34,7 @@ export class TripsService {
     private readonly pricingClient: PricingClient,
     private readonly integrationClient: IntegrationClient,
     private readonly vehiclesService: VehiclesService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async estimate(origin: string, destination: string): Promise<TripEstimate> {
@@ -61,7 +64,9 @@ export class TripsService {
       maximumPrice: quote.maximumPrice,
       status: TripStatus.SEARCHING,
     });
-    return this.tripsRepository.save(trip);
+    const saved = await this.tripsRepository.save(trip);
+    this.eventEmitter.emit(TRIP_CREATED_EVENT, saved);
+    return saved;
   }
 
   private async resolveQuote(

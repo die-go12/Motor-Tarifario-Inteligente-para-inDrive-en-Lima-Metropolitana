@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OnEvent } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -16,9 +17,14 @@ import {
   JwtPayload,
   PassengerClientEvent,
   ServerEvent,
+  UserRole,
 } from '@app/shared';
-import { TripsService } from '../trips/trips.service';
+import { TripsService, TRIP_CREATED_EVENT } from '../trips/trips.service';
 import { NegotiationService } from '../trips/negotiation.service';
+import { Trip } from '../trips/entities/trip.entity';
+import { presentTrip } from '../trips/trip.presenter';
+
+const DRIVERS_ROOM = 'drivers';
 
 interface OfferPayload {
   tripId: number;
@@ -63,9 +69,19 @@ export class RealtimeGateway implements OnGatewayConnection {
       const user = await this.authenticate(client);
       (client.data as SocketData).user = user;
       await client.join(this.userRoom(user.id));
+      if (user.role === UserRole.DRIVER) {
+        await client.join(DRIVERS_ROOM);
+      }
     } catch {
       client.disconnect(true);
     }
+  }
+
+  @OnEvent(TRIP_CREATED_EVENT)
+  onTripCreated(trip: Trip): void {
+    this.server
+      .to(DRIVERS_ROOM)
+      .emit(ServerEvent.TRIP_CREATED, presentTrip(trip, UserRole.DRIVER));
   }
 
   @SubscribeMessage(DriverClientEvent.SEND_OFFER)

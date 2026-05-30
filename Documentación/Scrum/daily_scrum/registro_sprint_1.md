@@ -35,7 +35,7 @@ Realizar seguimiento al avance del Sprint 1, identificar impedimentos técnicos 
 
 <div align="center">
 
-![Daily Scrum 01](imgs/reuniondaily.jpeg)
+![Daily Scrum 01](../imgs/reuniondaily.jpeg)
 
 *Figura 1. Reunión Daily Scrum del Sprint 1.*
 

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Length } from 'class-validator';
 
-export class CreateTripDto {
+export class TripContextDto {
   @ApiProperty({ example: 'Miraflores' })
   @IsString()
   @Length(1, 255)

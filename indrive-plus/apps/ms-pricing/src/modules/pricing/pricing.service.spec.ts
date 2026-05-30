@@ -4,11 +4,28 @@ import { EventsPublisher } from '../audit/events.publisher';
 import { PricingConfigService } from '../config/pricing-config.service';
 
 const DEFAULT_CONFIG = {
-  baseFare: 3.5,
-  pricePerKm: 1.2,
-  minimumMargin: 0.85,
-  maximumMargin: 1.3,
+  costPerKmBase: 1.5,
+  fuelConsumptionPerKm: 0.1,
+  fuelFactor: 0.25,
+  capacityExtraCost: 0.5,
+  historicWeight: 0.15,
+  trafficWeight: 0.5,
+  hourWeight: 0.3,
+  timeWeight: 0.2,
   trafficMultiplierCap: 2.0,
+  minAbsoluteFare: 3.0,
+  maxAbsoluteFare: 150.0,
+  maxRangeRatio: 3.5,
+};
+
+const baseRequest = {
+  distanceKm: 10,
+  fuelPricePerGallon: 16.5,
+  vehicleCapacity: 4,
+  trafficMultiplier: 1.4,
+  hourMultiplier: 1.2,
+  timeMultiplier: 1.1,
+  historicAveragePrice: 15,
 };
 
 describe('PricingService', () => {
@@ -31,13 +48,39 @@ describe('PricingService', () => {
   });
 
   describe('quote', () => {
-    it('calcula el rango a partir de la configuración', async () => {
-      const quote = await service.quote(10);
+    it('calcula el rango con la fórmula de 7 variables', async () => {
+      const quote = await service.quote(baseRequest);
       expect(quote).toEqual({
-        basePrice: 15.5,
-        minimumPrice: 13.18,
-        maximumPrice: 20.15,
+        basePrice: 22.88,
+        minimumPrice: 22.88,
+        maximumPrice: 29.28,
       });
+    });
+
+    it('aplica el piso absoluto cuando el costo es muy bajo', async () => {
+      const quote = await service.quote({
+        ...baseRequest,
+        distanceKm: 0.5,
+        historicAveragePrice: 0,
+        vehicleCapacity: 1,
+        fuelPricePerGallon: 0,
+      });
+      expect(quote.minimumPrice).toBe(DEFAULT_CONFIG.minAbsoluteFare);
+    });
+
+    it('limita el máximo al tope del multiplicador de tráfico (x2.0)', async () => {
+      const quote = await service.quote({
+        ...baseRequest,
+        trafficMultiplier: 5,
+        hourMultiplier: 5,
+        timeMultiplier: 5,
+      });
+      expect(quote.maximumPrice).toBe(45.75);
+    });
+
+    it('nunca devuelve un máximo menor que el mínimo en viajes largos', async () => {
+      const quote = await service.quote({ ...baseRequest, distanceKm: 120 });
+      expect(quote.maximumPrice).toBeGreaterThanOrEqual(quote.minimumPrice);
     });
   });
 

@@ -5,11 +5,18 @@ import { PricingConfig } from './schemas/pricing-config.schema';
 import { UpdatePricingConfigDto } from './dto/update-pricing-config.dto';
 
 const DEFAULT_CONFIG: PricingConfig = {
-  baseFare: 3.5,
-  pricePerKm: 1.2,
-  minimumMargin: 0.85,
-  maximumMargin: 1.3,
+  costPerKmBase: 1.5,
+  fuelConsumptionPerKm: 0.1,
+  fuelFactor: 0.25,
+  capacityExtraCost: 0.5,
+  historicWeight: 0.15,
+  trafficWeight: 0.5,
+  hourWeight: 0.3,
+  timeWeight: 0.2,
   trafficMultiplierCap: 2.0,
+  minAbsoluteFare: 3.0,
+  maxAbsoluteFare: 150.0,
+  maxRangeRatio: 3.5,
 };
 
 @Injectable()

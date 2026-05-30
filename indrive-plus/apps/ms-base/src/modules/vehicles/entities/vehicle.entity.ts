@@ -32,6 +32,12 @@ export class Vehicle {
   @Column({ type: 'int', nullable: true })
   year: number | null;
 
+  @Column({ type: 'int', nullable: true })
+  capacity: number | null;
+
+  @Column({ name: 'fuel_type', type: 'varchar', length: 20, nullable: true })
+  fuelType: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

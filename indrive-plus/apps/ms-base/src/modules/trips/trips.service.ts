@@ -6,12 +6,23 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuthenticatedUser, TripStatus, UserRole } from '@app/shared';
+import {
+  AuthenticatedUser,
+  PriceQuote,
+  QuoteRequest,
+  TripContext,
+  TripStatus,
+  UserRole,
+} from '@app/shared';
 import { Trip } from './entities/trip.entity';
 import { CreateTripDto } from './dto/create-trip.dto';
+import { TripEstimate } from './trip.presenter';
 import { assertTransition } from './trip-state-machine';
 import { PricingClient } from '../../clients/pricing.client';
+import { IntegrationClient } from '../../clients/integration.client';
 import { VehiclesService } from '../vehicles/vehicles.service';
+
+const DEFAULT_VEHICLE_CAPACITY = 4;
 
 @Injectable()
 export class TripsService {
@@ -19,24 +30,64 @@ export class TripsService {
     @InjectRepository(Trip)
     private readonly tripsRepository: Repository<Trip>,
     private readonly pricingClient: PricingClient,
+    private readonly integrationClient: IntegrationClient,
     private readonly vehiclesService: VehiclesService,
   ) {}
 
+  async estimate(origin: string, destination: string): Promise<TripEstimate> {
+    const { context, quote } = await this.resolveQuote(origin, destination);
+    return {
+      distanceKm: context.distanceKm,
+      durationMin: context.durationMin,
+      polyline: context.polyline,
+      basePrice: quote.basePrice,
+      minimumPrice: quote.minimumPrice,
+      maximumPrice: quote.maximumPrice,
+    };
+  }
+
   async request(passengerId: number, dto: CreateTripDto): Promise<Trip> {
-    const quote = await this.pricingClient.quote({
-      distanceKm: dto.distanceKm,
-    });
+    const { context, quote } = await this.resolveQuote(
+      dto.origin,
+      dto.destination,
+    );
     const trip = this.tripsRepository.create({
       passengerId,
       origin: dto.origin,
       destination: dto.destination,
-      distanceKm: dto.distanceKm,
+      distanceKm: context.distanceKm,
       basePrice: quote.basePrice,
       minimumPrice: quote.minimumPrice,
       maximumPrice: quote.maximumPrice,
       status: TripStatus.SEARCHING,
     });
     return this.tripsRepository.save(trip);
+  }
+
+  private async resolveQuote(
+    origin: string,
+    destination: string,
+  ): Promise<{ context: TripContext; quote: PriceQuote }> {
+    const context = await this.integrationClient.getTripContext(
+      origin,
+      destination,
+    );
+    const quote = await this.pricingClient.quote(
+      this.buildQuoteRequest(context),
+    );
+    return { context, quote };
+  }
+
+  private buildQuoteRequest(context: TripContext): QuoteRequest {
+    return {
+      distanceKm: context.distanceKm,
+      fuelPricePerGallon: context.fuelPricePerGallon,
+      vehicleCapacity: DEFAULT_VEHICLE_CAPACITY,
+      trafficMultiplier: context.trafficMultiplier,
+      hourMultiplier: context.hourMultiplier,
+      timeMultiplier: context.timeMultiplier,
+      historicAveragePrice: context.historicAveragePrice,
+    };
   }
 
   async assign(tripId: number, driverId: number): Promise<Trip> {

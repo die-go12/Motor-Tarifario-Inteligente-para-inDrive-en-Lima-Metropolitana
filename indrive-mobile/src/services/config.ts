@@ -20,7 +20,7 @@ export const WS_BASE_URL = `http://${HOST_IP}:3001`;
 // Google Maps API Key
 // Configurar también en app.json bajo expo.android.config.googleMaps.apiKey
 // y expo.ios.config.googleMaps.apiKey
-export const GOOGLE_MAPS_API_KEY = 'TU_API_KEY_DE_GOOGLE_MAPS';
+export const GOOGLE_MAPS_API_KEY = 'AIzaSyD8P5S5XkSVt3epOPC8_dTGmPvFvRm6nx4';
 
 // Coordenadas del centro de Lima Metropolitana para filtrar búsquedas
 export const LIMA_CENTRO = {

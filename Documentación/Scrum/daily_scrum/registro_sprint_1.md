@@ -6,8 +6,8 @@
 
 **Sprint:** Sprint 1 
 **Fecha:** 25/05/2026
-**Duración:** 15 minutos  
-**Modalidad:** Reunión virtual/presencial  
+**Duración:** 40 minutos  
+**Modalidad:** Reunión virtual  
 
 ---
 

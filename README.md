@@ -150,14 +150,14 @@ motor-tarifario-inteligente/
 │   │
 │   ├── Negocio/
 │   │   ├── flujo_calculo_tarifa.md
-│   │   ├── reglas_tarifarias.md
-│   │   └── variables_tarifa.md
+│   │   └── reglas_tarifarias.md
+│   │    
 │   │
 │   ├── Requerimientos/
-│   │   ├── Criterios_aceptacion.md
 │   │   ├── Historias_usuario.md
 │   │   ├── Product_backlog.md
 │   │   └── sprint_backlog.md
+│   │   
 │   │
 │   └── Scrum/
 │       ├── daily_scrum/

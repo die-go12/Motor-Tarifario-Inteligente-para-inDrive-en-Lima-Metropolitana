@@ -138,9 +138,10 @@ class TripsService {
    */
   async acceptTripOffer(tripId, offerId) {
     try {
-      return await apiService.post(API_ENDPOINTS.TRIPS.OFFERS_ACCEPT(tripId), {
-        offerId
-      });
+      return await apiService.post(
+        API_ENDPOINTS.TRIPS.OFFERS_ACCEPT(tripId, offerId),
+        {}
+      );
     } catch (error) {
       console.error('Accept trip offer error:', error);
       throw error;

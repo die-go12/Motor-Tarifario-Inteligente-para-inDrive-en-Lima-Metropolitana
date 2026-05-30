@@ -3,7 +3,7 @@
  * Toast, modales, loading, etc.
  */
 
-import { UI_CONSTANTS } from '../config.js';
+import { UI_CONSTANTS } from './config.js';
 
 /**
  * Mostrar toast notification

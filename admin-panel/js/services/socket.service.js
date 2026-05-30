@@ -1,4 +1,3 @@
-import { io } from 'https://cdn.socket.io/4.7.1/socket.io.esm.min.js';
 import { API_CONFIG } from '../config.js';
 
 class SocketService {
@@ -9,6 +8,12 @@ class SocketService {
   connect(token) {
     if (!token) {
       console.warn('SocketService: no token available for connection');
+      return;
+    }
+
+    const io = window.io;
+    if (typeof io !== 'function') {
+      console.warn('socket.io no disponible (CDN no cargado); realtime desactivado');
       return;
     }
 

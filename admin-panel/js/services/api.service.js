@@ -14,7 +14,7 @@ class ApiService {
   resolveBase(path) {
     const normalized = path.startsWith('/') ? path : `/${path}`;
     if (normalized.startsWith('/pricing')) {
-      return API_CONFIG.MS_PRICING;
+      return API_CONFIG.GATEWAY;
     }
     if (
       normalized.startsWith('/auth') ||

@@ -43,7 +43,7 @@ export const API_ENDPOINTS = {
     COMPLETE: (id) => `/trips/${id}/complete`,
     CANCEL: (id) => `/trips/${id}/cancel`,
     OFFERS: (id) => `/trips/${id}/offers`,
-    OFFERS_ACCEPT: (id) => `/trips/${id}/offers/accept`
+    OFFERS_ACCEPT: (tripId, offerId) => `/trips/${tripId}/offers/${offerId}/accept`
   },
   USERS: {
     GET_PROFILE: '/users/me',

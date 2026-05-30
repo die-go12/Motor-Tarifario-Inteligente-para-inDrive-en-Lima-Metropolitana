@@ -1,157 +1,134 @@
 # Sprint Retrospective – Sprint 1: Fase Pre-Viaje
 
-## Información General
+##  Información General
 
 | Campo | Valor |
-|---------|---------|
+|------|------|
 | Proyecto | Motor Tarifario Inteligente para inDrive en Lima Metropolitana |
 | Sprint | Sprint 1 |
 | Duración | 2 semanas |
-| Metodología | Scrum Híbrido (Scrum + MoSCoW + DDD + ADR) |
+| Metodología | Scrum |
 | Fecha | Mayo 2026 |
 
 ---
 
-# Objetivo del Sprint
+##  Objetivo del Sprint
 
-Implementar la fase Pre-Viaje del sistema, permitiendo que el pasajero solicite un viaje, obtenga un rango tarifario calculado por el Motor Tarifario Inteligente, negocie con el conductor dentro de límites permitidos y formalice el inicio del viaje mediante aceptación bilateral.
-
----
-
-# Resumen del Sprint
-
-Durante el Sprint 1 se trabajó en la construcción de la base funcional del sistema enfocada en el flujo previo al inicio del viaje. Se avanzó en la definición de la arquitectura del backend, la configuración inicial del entorno Docker, el desarrollo de componentes de interfaz para la visualización asimétrica y la integración preliminar con servicios externos necesarios para el cálculo tarifario.
-
-El equipo logró establecer las bases técnicas que permitirán desarrollar la lógica principal del Motor Tarifario Inteligente durante los siguientes sprints.
+Implementar la fase Pre-Viaje del sistema, permitiendo que el pasajero solicite un viaje, el sistema calcule un rango tarifario inteligente, se muestre de forma asimétrica según rol, se permita la negociación dentro de límites controlados y se habilite la aceptación bilateral para iniciar el viaje.
 
 ---
 
-# ¿Qué salió bien?
+##  Resumen del Sprint
 
-### Backend
+Durante el Sprint 1 se construyó la base funcional del sistema enfocada en el flujo pre-viaje. Se avanzó en la arquitectura del backend, la implementación inicial de endpoints, el diseño de interfaces móviles y la estructura base de la lógica del motor tarifario.
 
-- Definición de la arquitectura basada en NestJS.
-- Diseño inicial de endpoints para solicitudes de viaje.
-- Avance en la estructura de microservicios.
-- Definición de la lógica preliminar para cálculo tarifario.
+También se configuró el entorno de desarrollo con Docker y se estableció la integración inicial con servicios externos simulados o parciales para el cálculo tarifario.
+
+El equipo logró establecer una base técnica estable para continuar con la lógica completa del sistema en los siguientes sprints.
+
+---
+
+##  ¿Qué salió bien?
+
+###  Backend
+- Definición de arquitectura con NestJS.
+- Diseño de endpoints principales del flujo de viaje.
+- Separación inicial por módulos y dominios.
+- Avance en lógica base del cálculo tarifario.
+
+###  Frontend
+- Implementación inicial de pantallas en React Native + Expo.
+- Desarrollo de la visualización asimétrica por rol.
+- Estructura de navegación base funcional.
+
+###  DevOps
+- Configuración de Docker Compose.
+- Integración de PostgreSQL, MongoDB y Redis.
+- Definición de variables de entorno.
+- Entorno local reproducible para el equipo.
+
+###  Gestión del proyecto
+- Refinamiento del Product Backlog.
+- Priorización de historias con MoSCoW.
+- Organización inicial de tareas por equipo.
+
+---
+
+##  ¿Qué podría mejorar?
+
+###  Backend
+- Integración real completa con APIs externas (Google Maps, tráfico, combustible).
+- Mejorar validaciones de entrada y reglas de negocio.
+- Documentación formal de API (Swagger/OpenAPI).
 
 ### Frontend
+- Mejorar manejo de estados globales.
+- Refinar experiencia de usuario en negociación.
+- Reducir inconsistencias visuales detectadas en pruebas.
 
-- Construcción inicial de pantallas móviles en React Native + Expo.
-- Diseño de componentes para visualización asimétrica.
-- Avances en navegación y estructura visual de la aplicación.
-
-### DevOps
-
-- Configuración inicial del repositorio GitHub.
-- Creación de rama de trabajo para Docker.
-- Implementación de Docker Compose.
-- Integración de:
-
-  - PostgreSQL
-  - MongoDB
-  - Redis
-
-- Configuración de variables de entorno.
-- Creación de red interna Docker para comunicación entre servicios.
-
-### Gestión del Proyecto
-
-- Product Backlog refinado.
-- Sprint Backlog actualizado.
-- Definición de historias de usuario.
-- Priorización mediante metodología MoSCoW.
-- Organización de tareas por responsables.
-
----
-
-# ¿Qué podría mejorar?
-
-### Backend
-
-- Completar integración real con APIs externas.
-- Implementar validaciones más robustas.
-- Definir contratos API mediante Swagger.
-
-### Frontend
-
-- Corregir errores visuales detectados durante pruebas.
-- Mejorar experiencia de usuario durante negociación.
-- Implementar manejo de estados globales.
-
-### DevOps
-
-- Incorporar Health Checks en Docker Compose.
-- Configurar GitHub Actions para CI/CD.
-- Crear scripts automáticos para inicialización del entorno.
-- Documentar procedimientos de despliegue.
+###  DevOps
+- Implementar Health Checks en servicios Docker.
+- Automatizar CI/CD con GitHub Actions.
+- Mejorar scripts de inicialización del entorno.
 
 ### Equipo
-
 - Mejor coordinación entre frontend y backend.
-- Mayor frecuencia de revisión de Pull Requests.
-- Definir estándares de nomenclatura desde etapas tempranas.
+- Mayor revisión de Pull Requests antes de merge.
+- Estándares de código más estrictos desde el inicio.
 
 ---
 
-# Problemas Encontrados
+## Problemas Encontrados
 
-| Problema | Impacto | Solución Aplicada |
-|-----------|-----------|------------------|
-| Conflictos de ramas Git | Medio | Uso de Pull antes de Push |
-| Configuración inicial Docker | Bajo | Documentación y pruebas locales |
-| Dependencias de APIs externas | Medio | Uso temporal de datos simulados |
-| Bugs visuales en la aplicación móvil | Alto | Corrección planificada para Sprint 2 |
+| Problema | Impacto | Solución |
+|----------|--------|----------|
+| Dependencias de APIs externas no disponibles | Medio | Uso de mocks y datos simulados |
+| Conflictos de ramas en Git | Medio | Mejora de flujo de Pull Requests |
+| Bugs visuales en app móvil | Alto | Corrección planificada en Sprint 2 |
+| Configuración inicial de Docker | Bajo | Documentación interna y pruebas locales |
 
 ---
 
-# Lecciones Aprendidas
+## Lecciones Aprendidas
 
 ### Técnicas
-
-- Docker simplifica significativamente la preparación del entorno local.
-- El uso combinado de PostgreSQL, MongoDB y Redis requiere una clara definición de responsabilidades.
-- La documentación temprana reduce problemas de integración.
+- Docker facilita la replicación del entorno de desarrollo.
+- La separación por dominios mejora el desarrollo paralelo.
+- El uso de múltiples bases de datos requiere responsabilidades bien definidas.
 
 ### Organizacionales
-
-- La división por dominios facilita el trabajo paralelo.
-- Los Pull Requests permiten mantener la calidad del código.
-- Las reuniones periódicas ayudan a detectar bloqueos rápidamente.
+- Las revisiones constantes evitan errores acumulados.
+- La comunicación entre frontend y backend es crítica en flujos en tiempo real.
+- La planificación detallada reduce bloqueos en integración.
 
 ---
 
-# Acciones para el Sprint 2
+##  Acciones para el Sprint 2
 
-## Backend
-
-- Completar lógica de recálculo post-viaje.
+###  Backend
+- Completar recálculo post-viaje.
 - Implementar regla de pago invariante.
 - Desarrollar filtro de anomalías.
 
-## Frontend
-
-- Finalizar pantallas pendientes.
-- Corregir errores detectados en pruebas.
+###  Frontend
+- Completar pantallas pendientes.
+- Corregir errores visuales.
 - Implementar panel administrativo.
 
-## DevOps
-
+###  DevOps
 - Implementar Health Checks.
-- Configurar GitHub Actions.
-- Automatizar validaciones básicas.
-- Mejorar documentación de despliegue.
+- Configurar CI/CD con GitHub Actions.
+- Automatizar despliegues locales.
 
-## QA
-
+###  QA
 - Incrementar cobertura de pruebas.
-- Diseñar casos de prueba para la fase post-viaje.
-- Validar escenarios límite.
+- Definir casos de prueba de post-viaje.
+- Validar escenarios límite del sistema.
 
 ---
 
-# Conclusión
+## 🏁 Conclusión
 
-El Sprint 1 permitió construir las bases tecnológicas del proyecto y validar la arquitectura general propuesta. Aunque varias funcionalidades aún se encuentran en desarrollo, el equipo logró establecer un entorno local funcional, una estructura de microservicios sólida y avances importantes en la aplicación móvil.
+El Sprint 1 permitió establecer la base técnica del sistema y validar la arquitectura general del Motor Tarifario Inteligente. Aunque varias funcionalidades aún están en desarrollo, se logró un entorno estable, una estructura modular y avances importantes en frontend y backend.
 
-Los resultados obtenidos permiten iniciar el Sprint 2 con una infraestructura estable y una visión clara de las siguientes funcionalidades a implementar.
+Esto permite iniciar el Sprint 2 con una base sólida para implementar la lógica avanzada del sistema (post-viaje, reglas de pago, anomalías y reportes).

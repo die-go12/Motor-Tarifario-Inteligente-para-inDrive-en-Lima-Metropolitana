@@ -73,11 +73,12 @@ export class PricingService {
       (request.timeMultiplier - 1) * config.timeWeight;
     const cappedFactor = Math.min(dynamicFactor, config.trafficMultiplierCap);
     const dynamicMaximum = minimumPrice * cappedFactor;
-    return Math.min(
+    const cappedMaximum = Math.min(
       dynamicMaximum,
       config.maxAbsoluteFare,
       minimumPrice * config.maxRangeRatio,
     );
+    return Math.max(minimumPrice, cappedMaximum);
   }
 
   settle(request: SettleRequest): PriceSettlement {

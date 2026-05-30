@@ -397,7 +397,7 @@ Estado: 🟡 En desarrollo
 
 ## Flujo de Solicitud de Viaje
 
-![Solicitud de Viaje](imgsappinicio.jpeg)
+![Solicitud de Viaje](imgs/appinicio.jpeg)
 
 **Descripción**
 

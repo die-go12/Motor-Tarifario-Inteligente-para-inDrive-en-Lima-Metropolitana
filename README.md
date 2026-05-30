@@ -80,10 +80,10 @@ Esto construye y levanta todo el stack. El esquema de PostgreSQL se carga autom�
 | ms-integration             | http://localhost:3003 |
 | Panel administrativo       | http://localhost:8080 |
 
-### Datos de demostración
+### Inyección de datos de demostración
 
 <p align="justify">
-Desde la raíz del repositorio, el script registra mediante la API un usuario administrador, uno pasajero y uno conductor (contraseña Secret123), un vehículo y tres viajes de ejemplo.
+Con el stack ya levantado, este script inyecta datos de prueba a través de la API: registra un usuario administrador, uno pasajero y uno conductor (contraseña Secret123), un vehículo y tres viajes de ejemplo (uno completado y dos en búsqueda). La base de datos arranca vacía, por lo que ejecutarlo es necesario la primera vez para poder iniciar sesión. El script es idempotente (si los usuarios ya existen no falla) y los datos persisten en los volúmenes de Docker entre reinicios del stack.
 </p>
 
 ```bash

@@ -354,7 +354,7 @@ Estado:
 
 ## Infraestructura Docker
 
-![Docker Compose](../images/docker-compose-running.png)
+![Docker Compose](../imgs/docker.png)
 
 **Descripción**
 
@@ -379,7 +379,7 @@ Estado: ✅ Operativo
 
 ## Aplicación Móvil (Versión en Desarrollo)
 
-![Pantalla Principal](../images/app-home.png)
+![Pantalla Principal](../imgs/appsecion.jpeg)
 
 **Descripción**
 
@@ -397,7 +397,7 @@ Estado: 🟡 En desarrollo
 
 ## Flujo de Solicitud de Viaje
 
-![Solicitud de Viaje](../images/app-request-trip.png)
+![Solicitud de Viaje](../imgsappinicio.jpeg)
 
 **Descripción**
 

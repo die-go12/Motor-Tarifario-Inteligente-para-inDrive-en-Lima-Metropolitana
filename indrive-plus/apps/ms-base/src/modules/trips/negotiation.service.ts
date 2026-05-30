@@ -89,6 +89,16 @@ export class NegotiationService {
       tripId,
       status: NegotiationStatus.OPEN,
     });
-    return this.negotiationsRepository.save(negotiation);
+    try {
+      return await this.negotiationsRepository.save(negotiation);
+    } catch (error) {
+      const concurrent = await this.negotiationsRepository.findOne({
+        where: { tripId },
+      });
+      if (concurrent) {
+        return concurrent;
+      }
+      throw error;
+    }
   }
 }

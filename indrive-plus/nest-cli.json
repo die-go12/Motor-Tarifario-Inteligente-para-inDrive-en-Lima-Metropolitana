@@ -28,6 +28,15 @@
         "tsConfigPath": "apps/ms-base/tsconfig.app.json"
       }
     },
+    "ms-integration": {
+      "type": "application",
+      "root": "apps/ms-integration",
+      "entryFile": "main",
+      "sourceRoot": "apps/ms-integration/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ms-integration/tsconfig.app.json"
+      }
+    },
     "ms-pricing": {
       "type": "application",
       "root": "apps/ms-pricing",

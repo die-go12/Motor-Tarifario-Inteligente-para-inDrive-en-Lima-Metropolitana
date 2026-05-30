@@ -38,7 +38,114 @@ Durante este sprint se busca:
 * Preparar el sistema para la fase Post-Viaje.
 
 ---
+# Aplicación de la Metodología Híbrida
 
+## Scrum
+
+Se define la estructura de trabajo iterativa mediante Sprint 1 y Sprint 2.
+
+### Roles
+
+| Rol              | Responsable                    |
+| ---------------- | ------------------------------ |
+| Product Owner    | Equipo de Proyecto             |
+| Scrum Master     | Coordinador del Equipo         |
+| Development Team | Frontend, Backend, DevOps y QA |
+
+---
+
+## MoSCoW
+
+### Must Have
+
+* Configuración del repositorio GitHub.
+* Configuración de Docker Compose.
+* Configuración de PostgreSQL.
+* Configuración de MongoDB.
+* Configuración de Redis.
+* Definición de arquitectura del sistema.
+* Definición del Product Backlog.
+* Definición de Historias de Usuario.
+
+### Should Have
+
+* Configuración de GitHub Actions.
+* Configuración de Postman.
+
+### Could Have
+
+* Despliegue preliminar en AWS.
+* Monitoreo básico.
+
+### Won't Have
+
+* Modelo de Machine Learning productivo.
+* Integración con sistemas de pago reales.
+
+---
+
+## Domain Driven Design (DDD)
+
+Se identifican los dominios principales del negocio.
+
+### Pricing Domain
+
+Responsable del cálculo tarifario inteligente.
+
+Funciones:
+
+* Cálculo de rango mínimo y máximo.
+* Negociación asistida.
+* Regla de pago.
+
+### Trip Domain
+
+Responsable de la gestión del viaje.
+
+Funciones:
+
+* Solicitud de viaje.
+* Asignación de conductor.
+* Seguimiento GPS.
+* Finalización del trayecto.
+
+### Administration Domain
+
+Responsable de la parametrización del sistema.
+
+Funciones:
+
+* Gestión de reglas.
+* Configuración de pesos.
+* Gestión de multiplicadores.
+
+### Analytics Domain
+
+Responsable de la explotación de datos.
+
+Funciones:
+
+* Reportes.
+* Métricas.
+* Detección de anomalías.
+
+---
+
+## ADR (Architectural Decision Records)
+
+Durante el Sprint 0 se aprueban las siguientes decisiones arquitectónicas:
+
+| ADR     | Decisión                                     |
+| ------- | -------------------------------------------- |
+| ADR-001 | Uso de NestJS para Backend                   |
+| ADR-002 | Uso de React Native para App Móvil           |
+| ADR-003 | Uso de PostgreSQL para datos transaccionales |
+| ADR-004 | Uso de MongoDB para auditoría y trazabilidad |
+| ADR-005 | Uso de Redis para caché y sesiones           |
+| ADR-006 | Uso de Docker Compose para desarrollo local  |
+| ADR-007 | Uso de GitHub Actions para CI/CD             |
+
+---
 # Componentes Desarrollados
 
 ## Frontend Móvil

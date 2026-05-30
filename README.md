@@ -34,6 +34,7 @@ Este repositorio corresponde al desarrollo del proyecto académico del curso de 
 
 ## Tabla de contenidos
 
+* [Puesta en marcha](#puesta-en-marcha)
 * [Objetivo del producto](#objetivo-del-producto)
 * [Funcionalidades principales](#funcionalidades-principales)
 * [Alcance MVP](#alcance-mvp)
@@ -43,6 +44,87 @@ Este repositorio corresponde al desarrollo del proyecto académico del curso de 
 * [Documentación Scrum](#documentación-scrum)
 * [Planificación Scrum](#planificación-scrum)
 * [Equipo](#equipo)
+
+---
+
+## Puesta en marcha
+
+<p align="justify">
+El sistema se levanta con Docker. Un solo comando arranca las bases de datos (PostgreSQL, MongoDB y Redis), los cuatro microservicios y el panel administrativo. La aplicación móvil se ejecuta aparte porque corre sobre el dispositivo.
+</p>
+
+### Requisitos previos
+
+* Git
+* Docker y Docker Compose
+* Node.js 18 o superior (solo para los datos de demostración y la aplicación móvil)
+* Para la aplicación móvil: Expo (Expo Go o Dev Client) y una Google Maps API Key
+
+### Levantar el sistema
+
+```bash
+cd indrive-plus/docker
+cp .env.example .env
+docker compose up -d --build
+```
+
+<p align="justify">
+Esto construye y levanta todo el stack. El esquema de PostgreSQL se carga automáticamente la primera vez. Servicios expuestos:
+</p>
+
+| Servicio                   | URL                   |
+| -------------------------- | --------------------- |
+| api-gateway                | http://localhost:3000 |
+| ms-base (REST y WebSocket) | http://localhost:3001 |
+| ms-pricing                 | http://localhost:3002 |
+| ms-integration             | http://localhost:3003 |
+| Panel administrativo       | http://localhost:8080 |
+
+### Inyección de datos de demostración
+
+<p align="justify">
+Con el stack ya levantado, este script inyecta datos de prueba a través de la API: registra un usuario administrador, uno pasajero y uno conductor (contraseña Secret123), un vehículo y tres viajes de ejemplo (uno completado y dos en búsqueda). La base de datos arranca vacía, por lo que ejecutarlo es necesario la primera vez para poder iniciar sesión. El script es idempotente (si los usuarios ya existen no falla) y los datos persisten en los volúmenes de Docker entre reinicios del stack.
+</p>
+
+```bash
+node admin-panel/seed.js
+```
+
+| Rol           | Credenciales de demostración          |
+| ------------- | ------------------------------------- |
+| Administrador | admin.demo@indrive.pe / Secret123     |
+| Pasajero      | pasajero.demo@indrive.pe / Secret123  |
+| Conductor     | conductor.demo@indrive.pe / Secret123 |
+
+<p align="justify">
+El panel administrativo (http://localhost:8080) es de acceso exclusivo para el rol administrador.
+</p>
+
+### Aplicación móvil
+
+```bash
+cd indrive-mobile
+npm install
+```
+
+<p align="justify">
+Antes de iniciar, editar el archivo src/services/config.ts: asignar a HOST_IP la IP local de la computadora en la red Wi-Fi (no usar localhost en dispositivos físicos) y a GOOGLE_MAPS_API_KEY una clave válida de Google Maps.
+</p>
+
+```bash
+npx expo start
+```
+
+<p align="justify">
+La aplicación se conecta directamente a ms-base en el puerto 3001 para la API REST y el WebSocket. El mapa real solo se visualiza en Dev Client; en Expo Go se muestra un marcador de posición.
+</p>
+
+### Detener el sistema
+
+```bash
+cd indrive-plus/docker
+docker compose down
+```
 
 ---
 

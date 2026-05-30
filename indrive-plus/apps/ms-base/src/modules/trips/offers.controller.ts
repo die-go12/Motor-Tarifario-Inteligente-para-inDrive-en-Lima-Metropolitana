@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -31,6 +33,17 @@ export class OffersController {
     @Body() dto: CreateOfferDto,
   ) {
     return this.negotiationService.createOffer(tripId, user, dto.amount);
+  }
+
+  @Roles(UserRole.PASSENGER)
+  @HttpCode(HttpStatus.OK)
+  @Post(':offerId/accept')
+  accept(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('tripId', ParseIntPipe) tripId: number,
+    @Param('offerId', ParseIntPipe) offerId: number,
+  ) {
+    return this.negotiationService.acceptOffer(tripId, offerId, user);
   }
 
   @Get()

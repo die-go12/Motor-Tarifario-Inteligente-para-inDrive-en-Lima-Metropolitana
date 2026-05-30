@@ -7,7 +7,7 @@
 // IMPORTANTE: No uses 'localhost' ni '127.0.0.1' en dispositivos físicos.
 // El celular intentará conectarse a sí mismo y fallará.
 
-export const HOST_IP = '192.168.18.29'; // <-- CAMBIAR A TU IP LOCAL
+export const HOST_IP = '192.168.18.10'; // <-- CAMBIAR A TU IP LOCAL
 
 // La app habla directo al microservicio base (ms-base), que expone tanto la API
 // REST (auth, users, vehicles, trips) como el WebSocket en tiempo real.

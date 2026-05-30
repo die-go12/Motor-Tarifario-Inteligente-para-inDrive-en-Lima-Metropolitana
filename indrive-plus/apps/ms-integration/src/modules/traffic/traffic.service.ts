@@ -5,6 +5,9 @@ const PEAK_HOURS = [7, 8, 9, 18, 19, 20];
 const BUSY_HOURS = [10, 11, 12, 13, 14, 15, 16, 17];
 const EVENING_HOURS = [21, 22, 23];
 
+const LIMA_UTC_OFFSET_HOURS = 5;
+const HOURS_IN_DAY = 24;
+
 const PEAK: TrafficConditions = {
   trafficMultiplier: 1.9,
   hourMultiplier: 1.5,
@@ -29,7 +32,7 @@ const QUIET: TrafficConditions = {
 @Injectable()
 export class TrafficService {
   conditions(): TrafficConditions {
-    const hour = new Date().getHours();
+    const hour = this.limaHour();
     if (PEAK_HOURS.includes(hour)) {
       return PEAK;
     }
@@ -40,5 +43,10 @@ export class TrafficService {
       return LIGHT;
     }
     return QUIET;
+  }
+
+  private limaHour(): number {
+    const utcHour = new Date().getUTCHours();
+    return (utcHour + HOURS_IN_DAY - LIMA_UTC_OFFSET_HOURS) % HOURS_IN_DAY;
   }
 }

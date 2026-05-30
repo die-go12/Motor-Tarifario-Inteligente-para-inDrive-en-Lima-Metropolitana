@@ -24,5 +24,6 @@ import { VehiclesModule } from '../vehicles/vehicles.module';
     PricingClient,
     IntegrationClient,
   ],
+  exports: [TripsService, NegotiationService],
 })
 export class TripsModule {}

@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,6 +17,7 @@ import {
 } from '@app/shared';
 import { Negotiation } from './entities/negotiation.entity';
 import { Offer } from './entities/offer.entity';
+import { Trip } from './entities/trip.entity';
 import { TripsService } from './trips.service';
 import { assertOfferWithinRange } from './offer-rules';
 
@@ -59,6 +61,60 @@ export class NegotiationService {
       `Oferta registrada: viaje=${tripId} emisor=${saved.sender} monto=${amount}`,
     );
     return saved;
+  }
+
+  async acceptOffer(
+    tripId: number,
+    offerId: number,
+    user: AuthenticatedUser,
+  ): Promise<Trip> {
+    const trip = await this.tripsService.findById(tripId);
+    if (trip.passengerId !== user.id) {
+      throw new ForbiddenException('No eres el pasajero de este viaje');
+    }
+    const offer = await this.offersRepository.findOne({
+      where: { id: offerId },
+    });
+    if (!offer) {
+      throw new NotFoundException(`Oferta ${offerId} no encontrada`);
+    }
+    await this.assertOfferBelongsToTrip(offer, tripId);
+    if (offer.sender !== OfferSender.DRIVER || offer.driverId === null) {
+      throw new BadRequestException(
+        'Solo se pueden aceptar ofertas de conductores',
+      );
+    }
+    if (offer.status !== OfferStatus.PENDING) {
+      throw new BadRequestException('La oferta ya no está disponible');
+    }
+
+    const assignedTrip = await this.tripsService.assign(tripId, offer.driverId);
+    offer.status = OfferStatus.ACCEPTED;
+    await this.offersRepository.save(offer);
+    await this.closeNegotiation(tripId);
+    this.logger.log(
+      `Aceptacion bilateral: viaje=${tripId} oferta=${offerId} conductor=${offer.driverId}`,
+    );
+    return assignedTrip;
+  }
+
+  private async assertOfferBelongsToTrip(
+    offer: Offer,
+    tripId: number,
+  ): Promise<void> {
+    const negotiation = await this.negotiationsRepository.findOne({
+      where: { tripId },
+    });
+    if (!negotiation || offer.negotiationId !== negotiation.id) {
+      throw new BadRequestException('La oferta no pertenece a este viaje');
+    }
+  }
+
+  private async closeNegotiation(tripId: number): Promise<void> {
+    await this.negotiationsRepository.update(
+      { tripId },
+      { status: NegotiationStatus.ACCEPTED },
+    );
   }
 
   async listOffers(tripId: number, user: AuthenticatedUser): Promise<Offer[]> {

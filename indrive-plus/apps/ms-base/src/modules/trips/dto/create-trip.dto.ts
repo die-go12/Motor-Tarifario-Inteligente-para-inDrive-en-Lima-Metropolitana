@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsPositive, IsString, Length } from 'class-validator';
+import { IsString, Length } from 'class-validator';
 
 export class CreateTripDto {
   @ApiProperty({ example: 'Miraflores' })
@@ -11,9 +11,4 @@ export class CreateTripDto {
   @IsString()
   @Length(1, 255)
   destination: string;
-
-  @ApiProperty({ example: 8.5 })
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @IsPositive()
-  distanceKm: number;
 }

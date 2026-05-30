@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -13,7 +15,7 @@ import { AuthenticatedUser, UserRole } from '@app/shared';
 import { TripsService } from './trips.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { CompleteTripDto } from './dto/complete-trip.dto';
-import { presentTrip } from './trip.presenter';
+import { presentQuote, presentTrip } from './trip.presenter';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -25,6 +27,19 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 @Controller('trips')
 export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
+
+  @HttpCode(HttpStatus.OK)
+  @Post('quote')
+  async quote(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateTripDto,
+  ) {
+    const estimate = await this.tripsService.estimate(
+      dto.origin,
+      dto.destination,
+    );
+    return presentQuote(estimate, user.role);
+  }
 
   @Roles(UserRole.PASSENGER)
   @Post()

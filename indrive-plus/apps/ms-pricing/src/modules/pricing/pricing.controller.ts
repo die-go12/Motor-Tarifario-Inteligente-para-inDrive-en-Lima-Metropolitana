@@ -13,7 +13,7 @@ export class PricingController {
   @HttpCode(HttpStatus.OK)
   @Post('quote')
   quote(@Body() dto: QuoteDto): Promise<PriceQuote> {
-    return this.pricingService.quote(dto.distanceKm);
+    return this.pricingService.quote(dto);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -10,7 +10,8 @@ import {
   tripsService, 
   pricingService,
   API_ENDPOINTS,
-  TRIP_STATUS
+  TRIP_STATUS,
+  USER_ROLES
 } from './services/index.js';
 import { 
   showToast, 
@@ -58,12 +59,16 @@ async function initApp() {
     console.warn('Usando pesos de pricing por defecto:', error.message);
   }
 
-  // Verificar autenticación
-  if (authService.isAuthenticated()) {
+  // Verificar autenticación (solo admin)
+  const currentUser = authService.getCurrentUser();
+  if (authService.isAuthenticated() && currentUser?.role === USER_ROLES.ADMIN) {
     showMainUI();
     connectRealtime();
     await loadDashboard();
   } else {
+    if (authService.isAuthenticated()) {
+      await authService.logout();
+    }
     showLoginUI();
   }
 
@@ -162,7 +167,11 @@ async function doLogin() {
   if (errorDisplay) errorDisplay.style.display = 'none';
 
   try {
-    await authService.login(email, password);
+    const { user } = await authService.login(email, password);
+    if (!user || user.role !== USER_ROLES.ADMIN) {
+      await authService.logout();
+      throw new Error('Acceso exclusivo para administradores');
+    }
     connectRealtime();
     showMainUI();
     await loadDashboard();
@@ -192,8 +201,21 @@ function fillDemo() {
   const emailInput = $('login-email');
   const passInput = $('login-pass');
 
-  if (emailInput) emailInput.value = 'admin@indrive.pe';
-  if (passInput) passInput.value = 'Admin1234';
+  if (emailInput) emailInput.value = 'admin.demo@indrive.pe';
+  if (passInput) passInput.value = 'Secret123';
+}
+
+/**
+ * Mostrar/ocultar contraseña
+ */
+function togglePassword() {
+  const passInput = $('login-pass');
+  const toggle = $('toggle-pass');
+  if (!passInput) return;
+
+  const show = passInput.type === 'password';
+  passInput.type = show ? 'text' : 'password';
+  if (toggle) toggle.textContent = show ? '🙈' : '👁';
 }
 
 /**
@@ -285,6 +307,56 @@ async function loadTrips() {
   } catch (error) {
     console.error('Error loading all trips:', error);
     container.innerHTML = '<div class="empty">Error cargando viajes</div>';
+  }
+}
+
+/**
+ * Navegar a una sección y cargar sus datos
+ */
+function goTo(viewName, navBtn) {
+  navigateTo(viewName, navBtn);
+  if (viewName === 'fleet') loadFleet();
+}
+
+/**
+ * Cargar conductores registrados (GET /users)
+ */
+async function loadFleet() {
+  const container = $('fleet-grid');
+  if (!container) return;
+
+  container.innerHTML = 'Cargando conductores...';
+  try {
+    const users = await authService.listAllUsers();
+    const drivers = (users || []).filter((u) => u.role === USER_ROLES.DRIVER);
+
+    if (!drivers.length) {
+      container.innerHTML = '<div class="empty">Sin conductores registrados</div>';
+      return;
+    }
+
+    container.innerHTML = drivers
+      .map(
+        (u, i) => `
+        <div class="driver-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div class="driver-av" style="background:${getColorByIndex(i)};color:var(--bg)">${getInitials(u.name)}</div>
+            <div>
+              <div class="driver-name">${u.name}</div>
+              <div class="driver-meta">${u.email}</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="dstat"><div class="dstat-label">ID</div><div class="dstat-val">#${u.id}</div></div>
+            <div class="dstat"><div class="dstat-label">Estado</div><div class="dstat-val">${u.isActive === false ? 'Inactivo' : 'Activo'}</div></div>
+          </div>
+        </div>
+      `,
+      )
+      .join('');
+  } catch (error) {
+    console.error('Error loading fleet:', error);
+    container.innerHTML = '<div class="empty">Error cargando conductores</div>';
   }
 }
 
@@ -632,23 +704,32 @@ function simulate() {
 }
 
 /**
- * Crear viaje de prueba
+ * Registrar un nuevo usuario (cualquier rol)
  */
-async function createTestTrip() {
-  simulate();
+async function registerUser() {
+  const name = $('reg-name')?.value.trim();
+  const email = $('reg-email')?.value.trim();
+  const password = $('reg-pass')?.value;
+  const role = $('reg-role')?.value;
 
-  const origin = $('sim-origin').value || 'Miraflores';
-  const destination = $('sim-dest').value || 'San Isidro';
-  const distKm = parseFloat($('sim-dist').value) || 8.5;
+  if (!name || !email || !password) {
+    showToast('Completa nombre, email y contraseña', false);
+    return;
+  }
+  if (password.length < 8) {
+    showToast('La contraseña debe tener al menos 8 caracteres', false);
+    return;
+  }
 
   try {
-    const result = await tripsService.createTrip({
-      origin,
-      destination
-    });
-    showToast(result.message);
+    await authService.register({ name, email, password, role });
+    showToast(`Usuario ${email} registrado (${role})`);
+    $('reg-name').value = '';
+    $('reg-email').value = '';
+    $('reg-pass').value = '';
+    if (role === USER_ROLES.DRIVER) loadFleet();
   } catch (error) {
-    showToast(`Error: ${error.message}`, false);
+    showToast(error.message || 'No se pudo registrar el usuario', false);
   }
 }
 
@@ -692,11 +773,38 @@ async function testConnection() {
   }
 }
 
+// ==================== EXTRAS UI ====================
+
+/**
+ * Actualizar etiquetas de pesos del motor (sliders)
+ */
+function updateWeights() {
+  const sliders = document.querySelectorAll('input[type="range"][id^="w-"]');
+  sliders.forEach((slider) => {
+    const label = $(`${slider.id}-v`);
+    if (label) label.textContent = `${slider.value}%`;
+  });
+}
+
+/**
+ * Protocolo de emergencia (placeholder Sprint 1)
+ */
+function triggerEmergency() {
+  showToast('Protocolo de emergencia activado (simulado)', false);
+}
+
 // ==================== EXPORTAR FUNCIONES GLOBALES ====================
 
 // Para llamadas desde HTML
 window.doLogin = doLogin;
 window.fillDemo = fillDemo;
+window.togglePassword = togglePassword;
+window.navigateTo = goTo;
+window.closeModal = closeModal;
+window.loadDashboard = loadDashboard;
+window.loadFleet = loadFleet;
+window.updateWeights = updateWeights;
+window.triggerEmergency = triggerEmergency;
 window.handleLogout = handleLogout;
 window.openTripDetail = openTripDetail;
 window.cancelTrip = cancelTrip;
@@ -704,7 +812,7 @@ window.assignTrip = assignTrip;
 window.completeTrip = completeTrip;
 window.setChart = setChart;
 window.simulate = simulate;
-window.createTestTrip = createTestTrip;
+window.registerUser = registerUser;
 window.loadTrips = loadTrips;
 window.saveSettings = saveSettings;
 window.testConnection = testConnection;

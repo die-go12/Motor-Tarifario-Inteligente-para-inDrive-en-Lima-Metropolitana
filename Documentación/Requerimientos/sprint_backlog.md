@@ -60,7 +60,7 @@ Implementar la fase pre-viaje completa, incluyendo cálculo de rango con 7 varia
 | S1-T06 | Pruebas unitarias e integración de US-001 | US-001 | QA | 🔴 Alta | 🟡 En progreso |
 | S1-T07 | Componente de visualización para pasajero (techo) | US-002 | Frontend | 🔴 Alta | 🟡 En progreso |
 | S1-T08 | Componente de visualización para conductor (piso) | US-002 | Frontend | 🔴 Alta | 🟡 En progreso |
-| S1-T09 | Vista admin solo lectura del rango completo | US-002 | Frontend | 🟠 Media | ⚪ Pendiente |
+| S1-T09 | Vista admin solo lectura del rango completo | US-002 | Frontend | 🟠 Media | 🟡 En progreso |
 | S1-T10 | Pruebas de acceso por rol | US-002 | QA | 🟠 Media | 🟡 En progreso |
 | S1-T11 | Lógica de validación de ofertas (dentro del rango) | US-003 | Backend | 🔴 Alta | ⚪ Pendiente |
 | S1-T12 | Endpoint para recibir ofertas/contraofertas | US-003 | Backend | 🔴 Alta | ⚪ Pendiente |

@@ -116,11 +116,3 @@ Implementar post-viaje (GPS, recálculo, regla de pago) y módulo administrativo
 | En progreso | 7 |
 | Pendientes | 11 |
 
----
-
-##  Leyenda
-
-- ✅ Completado  
-- 🟡 En progreso  
-- ⚪ Pendiente  
-- 🔴 Bloqueado  

@@ -4,9 +4,11 @@ import {
   PriceQuote,
   PriceSettlement,
   PricingChannel,
+  QuoteRequest,
   SettleRequest,
 } from '@app/shared';
 import { EventsPublisher } from '../audit/events.publisher';
+import { PricingConfig } from '../config/schemas/pricing-config.schema';
 import { PricingConfigService } from '../config/pricing-config.service';
 
 const ANOMALY_HIGH_DEVIATION = 0.5;
@@ -21,22 +23,61 @@ export class PricingService {
     private readonly pricingConfigService: PricingConfigService,
   ) {}
 
-  async quote(distanceKm: number): Promise<PriceQuote> {
+  async quote(request: QuoteRequest): Promise<PriceQuote> {
     const config = await this.pricingConfigService.getActive();
-    const basePrice = this.round(
-      config.baseFare + config.pricePerKm * distanceKm,
+    const basePrice = this.calculateBasePrice(request, config);
+    const minimumPrice = Math.max(basePrice, config.minAbsoluteFare);
+    const maximumPrice = this.calculateMaximumPrice(
+      minimumPrice,
+      request,
+      config,
     );
     const quote: PriceQuote = {
-      basePrice,
-      minimumPrice: this.round(basePrice * config.minimumMargin),
-      maximumPrice: this.round(basePrice * config.maximumMargin),
+      basePrice: this.round(basePrice),
+      minimumPrice: this.round(minimumPrice),
+      maximumPrice: this.round(maximumPrice),
     };
     this.emit(PricingChannel.CALCULATED, {
-      distanceKm,
+      distanceKm: request.distanceKm,
       ...quote,
       generatedAt: new Date().toISOString(),
     });
     return quote;
+  }
+
+  private calculateBasePrice(
+    request: QuoteRequest,
+    config: PricingConfig,
+  ): number {
+    const distanceCost = request.distanceKm * config.costPerKmBase;
+    const fuelCost =
+      request.fuelPricePerGallon *
+      config.fuelConsumptionPerKm *
+      request.distanceKm *
+      config.fuelFactor;
+    const capacityCost =
+      Math.max(0, request.vehicleCapacity - 1) * config.capacityExtraCost;
+    const historicCost = request.historicAveragePrice * config.historicWeight;
+    return distanceCost + fuelCost + capacityCost + historicCost;
+  }
+
+  private calculateMaximumPrice(
+    minimumPrice: number,
+    request: QuoteRequest,
+    config: PricingConfig,
+  ): number {
+    const dynamicFactor =
+      1 +
+      (request.trafficMultiplier - 1) * config.trafficWeight +
+      (request.hourMultiplier - 1) * config.hourWeight +
+      (request.timeMultiplier - 1) * config.timeWeight;
+    const cappedFactor = Math.min(dynamicFactor, config.trafficMultiplierCap);
+    const dynamicMaximum = minimumPrice * cappedFactor;
+    return Math.min(
+      dynamicMaximum,
+      config.maxAbsoluteFare,
+      minimumPrice * config.maxRangeRatio,
+    );
   }
 
   settle(request: SettleRequest): PriceSettlement {

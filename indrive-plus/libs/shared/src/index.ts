@@ -7,5 +7,6 @@ export * from './enums/payment-condition.enum';
 export * from './interfaces/jwt-payload.interface';
 export * from './interfaces/pricing.interface';
 export * from './interfaces/negotiation.interface';
+export * from './interfaces/integration.interface';
 export * from './events/pricing-events';
 export * from './events/ws-events';

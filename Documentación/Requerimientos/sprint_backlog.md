@@ -50,28 +50,28 @@
 **Objetivo del Sprint:**  
 Implementar la fase pre-viaje completa, incluyendo cálculo de rango con 7 variables, visualización asimétrica, negociación acotada y aceptación bilateral.
 
-| ID | Tarea | Product Backlog relacionado | Responsable | Prioridad | Estado |
+| ID | Tarea | US | Responsable | Prioridad | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| S1-T01 | Implementar endpoint de solicitud de viaje | US-001 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S1-T02 | Integrar Google Maps Distance API | US-001 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S1-T03 | Integrar OSINERGMIN API con caché de 24h | US-001 | Backend | 🔴 Alta |🟡 En Progreso |
-| S1-T04 | Implementar lógica de ponderación de 7 variables | US-001 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S1-T05 | Implementar timeout y circuit breaker para APIs externas | US-001 | DevOps | 🔴 Alta | 🟡 En Progreso |
-| S1-T06 | Pruebas unitarias e integración de US-001 | US-001 | QA | 🔴 Alta | 🟡 En Progreso |
-| S1-T08 | Diseñar componente de visualización para pasajero (techo) | US-002 | Frontend | 🔴 Alta | 🟡 En Progreso |
-| S1-T09 | Diseñar componente de visualización para conductor (piso) | US-002 | Frontend | 🔴 Alta | 🟡 En Progreso |
-| S1-T10 | Implementar panel admin para visualizar rango completo | US-002 | Frontend | 🔴 Alta | 🟡 En Progreso |
-| S1-T11 | Pruebas de acceso por rol | US-002 | QA | 🟠 Media |🟡 En Progreso |
-| S1-T12 | Implementar lógica de validación de ofertas | US-003 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S1-T13 | Crear endpoint para recibir ofertas | US-003 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S1-T14 | Implementar registro de ofertas en logs (CAR-007) | US-003 | Backend | 🟠 Media | 🟡 En Progreso |
-| S1-T15 | Diseñar interfaz de chat/negociación | US-003 | Frontend | 🔴 Alta | 🟡 En Progreso |
-| S1-T16 | Pruebas de límites del rango | US-003 | QA | 🔴 Alta | ⚪ Pendiente |
-| S1-T17 | Implementar endpoint de aceptación bilateral | US-004 | Backend | 🔴 Alta | 🟡 En Progreso|
-| S1-T18 | Implementar máquina de estados del viaje | US-004 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S1-T19 | Implementar notificaciones push | US-004 | Frontend | 🟠 Media | ⚪ Pendiente|
-| S1-T20 | Activar servicio de captura GPS | US-004 | Backend | 🔴 Alta | ⚪ Pendiente|
-| S1-T21 | Pruebas de flujo completo | US-004 | QA | 🔴 Alta | ⚪ Pendiente |
+| S1-T01 | Implementar endpoint de solicitud de viaje | US-001 | Backend | 🔴 Alta | ✅ Completado |
+| S1-T02 | Integrar Google Maps Distance API (stub inyectable) | US-001 | Backend | 🔴 Alta | ⚪ Pendiente |
+| S1-T03 | Integrar OSINERGMIN API con caché 24h (stub inyectable) | US-001 | Backend | 🔴 Alta | ⚪ Pendiente |
+| S1-T04 | Implementar ponderación de las 7 variables | US-001 | Backend | 🔴 Alta | 🟡 En progreso |
+| S1-T05 | Timeout y circuit breaker para APIs externas | US-001 | Backend | 🔴 Alta | 🟡 En progreso |
+| S1-T06 | Pruebas unitarias e integración de US-001 | US-001 | QA | 🔴 Alta | 🟡 En progreso |
+| S1-T07 | Componente de visualización para pasajero (techo) | US-002 | Frontend | 🔴 Alta | 🟡 En progreso |
+| S1-T08 | Componente de visualización para conductor (piso) | US-002 | Frontend | 🔴 Alta | 🟡 En progreso |
+| S1-T09 | Vista admin solo lectura del rango completo | US-002 | Frontend | 🟠 Media | ⚪ Pendiente |
+| S1-T10 | Pruebas de acceso por rol | US-002 | QA | 🟠 Media | 🟡 En progreso |
+| S1-T11 | Lógica de validación de ofertas (dentro del rango) | US-003 | Backend | 🔴 Alta | ⚪ Pendiente |
+| S1-T12 | Endpoint para recibir ofertas/contraofertas | US-003 | Backend | 🔴 Alta | ⚪ Pendiente |
+| S1-T13 | Registro de ofertas en logs (CAR-007) | US-003 | Backend | 🟠 Media | ⚪ Pendiente |
+| S1-T14 | Interfaz de chat/negociación | US-003 | Frontend | 🔴 Alta | 🟡 En progreso |
+| S1-T15 | Pruebas de límites del rango | US-003 | QA | 🔴 Alta | ⚪ Pendiente |
+| S1-T16 | Endpoint de aceptación bilateral | US-004 | Backend | 🔴 Alta | ⚪ Pendiente |
+| S1-T17 | Máquina de estados del viaje | US-004 | Backend | 🔴 Alta | ✅ Hecho |
+| S1-T18 | Notificaciones push | US-004 | Frontend | 🟠 Media | ⚪ Pendiente |
+| S1-T19 | Activar captura GPS al iniciar el viaje | US-004 | Backend | 🔴 Alta | ⚪ Pendiente |
+| S1-T20 | Pruebas de flujo completo | US-004 | QA | 🔴 Alta | ⚪ Pendiente |
 
 ---
 
@@ -80,30 +80,30 @@ Implementar la fase pre-viaje completa, incluyendo cálculo de rango con 7 varia
 **Objetivo del Sprint:**  
 Implementar la fase post-viaje (recálculo GPS, regla de pago invariante, filtro de anomalías) y el panel de administración (configuración de parámetros y reportes).
 
-| ID | Tarea | Product Backlog relacionado | Responsable | Prioridad | Estado |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| S2-T01 | Implementar servicio de captura GPS continua | US-005 | Backend | 🔴 Alta |  ⚪ Pendiente |
-| S2-T02 | Implementar cálculo de distancia real desde coordenadas | US-005 | Backend | 🔴 Alta |  ⚪ Pendiente |
-| S2-T03 | Implementar cálculo de tiempo real | US-005 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S2-T04 | Implementar detección de paradas/desvíos | US-005 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T05 | Implementar recálculo de `precio_real` | US-005 | Backend | 🔴 Alta | ⚪ Pendiente  |
-| S2-T06 | Pruebas con datos reales | US-005 | QA | 🔴 Alta | ⚪ Pendiente |
-| S2-T07 | Implementar función de regla de pago | US-006 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S2-T08 | Implementar los 3 escenarios de la regla | US-006 | Backend | 🔴 Alta | 🟡 En Progreso |
-| S2-T09 | Registrar condición aplicada en logs | US-006 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T10 | Integrar con servicio de pagos | US-006 | Backend | 🔴 Alta | ⚪ Pendiente |
-| S2-T11 | Pruebas de los 3 escenarios | US-006 | QA | 🔴 Alta | ⚪ Pendiente |
-| S2-T12 | Implementar CRUD de parámetros en backend | US-007 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T13 | Diseñar interfaz de panel admin | US-007 | Frontend | 🟠 Media | 🟡 En Progreso |
-| S2-T14 | Implementar formularios de configuración | US-007 | Frontend | 🟠 Media | ⚪ Pendiente |
-| S2-T15 | Implementar registro de cambios en logs | US-007 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T16 | Pruebas de configuración | US-007 | QA | 🟠 Media | ⚪ Pendiente |
-| S2-T17 | Implementar consultas de demanda por zona | US-008 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T18 | Implementar cálculos de precios promedio | US-008 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T19 | Implementar reportes de anomalías | US-008 | Backend | 🟠 Media | ⚪ Pendiente |
-| S2-T20 | Diseñar dashboard de reportes | US-008 | Frontend | 🟠 Media | ⚪ Pendiente |
-| S2-T21 | Implementar filtros por fecha y zona | US-008 | Frontend | 🟠 Media | ⚪ Pendiente |
-| S2-T22 | Pruebas de reportes | US-008 | QA | 🟠 Media | ⚪ Pendiente |
+|ID	|Tarea|	US	|Responsable|	Prioridad|	Estado|
+|----|----|------|----------|-----------|-------|
+|S2-T01|	Servicio de captura GPS continua durante el trayecto|	US-005	|Backend|	🔴 Alta	|⚪ Pendiente|
+|S2-T02|	Cálculo de distancia real desde coordenadas|	US-005|	Backend|	🔴 Alta	|⚪ Pendiente|
+|S2-T03|	Cálculo de tiempo real|	US-005	|Backend|	🔴 Alta	|⚪ Pendiente|
+|S2-T04|	Detección de paradas/desvíos	|US-005	|Backend|	🟠 Media	|⚪ Pendiente|
+|S2-T05|	Recálculo de precio_real	|US-005|	Backend	|🔴 Alta	|⚪ Pendiente|
+|S2-T06|	Pruebas con datos reales|	US-005	|QA|	🔴 Alta	|⚪ Pendiente|
+|S2-T07|	Función de regla de pago	|US-006	|Backend	|🔴 Alta	|✅ Hecho (adelantada)|
+|S2-T08|	Los 3 escenarios de la regla	|US-006	|Backend|	🔴 Alta|	✅ Hecho (adelantada)|
+|S2-T09	|Registrar condición aplicada en logs	|US-006|	Backend	|🟠 Media	|🟡 En progreso|
+|S2-T10|	Integrar con servicio de pagos|	US-006	|Backend|	🔴 Alta	|⚪ Pendiente|
+|S2-T11|	Pruebas de los 3 escenarios|	US-006	|QA	|🔴 Alta	|✅ Hecho|
+|S2-T12|	CRUD de parámetros en backend|	US-007|	Backend	|🟠 Media|	✅ Hecho|
+|S2-T13|	Interfaz de panel admin de configuración	|US-007	|Frontend	|🟠 Media|	🟡 En progreso|
+|S2-T14|	Formularios de configuración	|US-007|	Frontend|	🟠 Media	|⚪ Pendiente|
+|S2-T15|	Registro de cambios de parámetros en logs	|US-007|	Backend|	🟠 Media	|⚪ Pendiente|
+|S2-T16|	Pruebas de configuración	|US-007	|QA|	🟠 Media	|⚪ Pendiente|
+|S2-T17|	Consultas de demanda por zona|	US-008	|Backend|🟠 Media	|⚪ Pendiente|
+|S2-T18|	Cálculos de precios promedio|	US-008|	Backend	|🟠 Media	|⚪ Pendiente|
+|S2-T19|	Reportes de anomalías	|US-008	|Backend|	🟠 Media	|⚪ Pendiente|
+|S2-T20|	Dashboard de reportes	|US-008|	Frontend	|🟠 Media	|⚪ Pendiente|
+|S2-T21|	Filtros por fecha y zona|	US-008|	Frontend	|🟠 Media	|⚪ Pendiente|
+|S2-T22|Pruebas de reportes|US-008|	QA	|🟠 Media|	⚪ Pendiente|
 
 ---
 
@@ -114,10 +114,10 @@ Implementar la fase post-viaje (recálculo GPS, regla de pago invariante, filtro
 | Métrica | Valor |
 | :--- | :--- |
 | **Historias** | US-001, US-002, US-003, US-004 |
-| **Total de tareas** | 21 |
-| **Tareas completadas** | 0 |
-| **Tareas en progreso** | 17 |
-| **Tareas pendientes** | 4 |
+| **Total de tareas** | 20 |
+| **Tareas completadas** | 2 |
+| **Tareas en progreso** | 7 |
+| **Tareas pendientes** | 11 |
 | **Porcentaje de avance** | -- |
 | **Estado** | 🟡 En Progreso |
 
@@ -127,9 +127,9 @@ Implementar la fase post-viaje (recálculo GPS, regla de pago invariante, filtro
 | :--- | :--- |
 | **Historias** | US-005, US-006, US-007, US-008 |
 | **Total de tareas** | 22 |
-| **Tareas completadas** | 0 |
-| **Tareas en progreso** | 4 |
-| **Tareas pendientes** | 18 |
+| **Tareas completadas** | 4 |
+| **Tareas en progreso** | 2 |
+| **Tareas pendientes** | 16 |
 | **Porcentaje de avance** | -- |
 | **Estado** | ⚪ Pendiente |
 

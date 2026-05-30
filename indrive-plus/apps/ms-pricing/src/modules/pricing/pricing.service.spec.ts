@@ -77,6 +77,11 @@ describe('PricingService', () => {
       });
       expect(quote.maximumPrice).toBe(45.75);
     });
+
+    it('nunca devuelve un máximo menor que el mínimo en viajes largos', async () => {
+      const quote = await service.quote({ ...baseRequest, distanceKm: 120 });
+      expect(quote.maximumPrice).toBeGreaterThanOrEqual(quote.minimumPrice);
+    });
   });
 
   describe('settle', () => {

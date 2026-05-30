@@ -13,6 +13,7 @@ export interface TarifaRango {
 }
 
 export interface Oferta {
+  offerId: number;
   conductorId: string;
   conductorNombre: string;
   conductorFoto?: string;

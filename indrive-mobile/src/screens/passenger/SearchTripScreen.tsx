@@ -37,8 +37,12 @@ interface PlaceSuggestion {
 interface TripPreview {
   distanciaKm: number;
   duracionMin: number;
-  tarifaMin: number;
   tarifaMax: number;
+}
+
+interface Coords {
+  latitude: number;
+  longitude: number;
 }
 
 export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
@@ -46,11 +50,15 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
   const [sugerencias, setSugerencias] = useState<PlaceSuggestion[]>([]);
   const [lugarSeleccionado, setLugarSeleccionado] = useState<PlaceSuggestion | null>(null);
   const [preview, setPreview] = useState<TripPreview | null>(null);
+  const [destinoCoords, setDestinoCoords] = useState<Coords | null>(null);
   const [buscando, setBuscando] = useState(false);
   const [solicitando, setSolicitando] = useState(false);
   const [ofertaInicial, setOfertaInicial] = useState('');
 
   const { setViajeActivo, setRutaCoords } = useTripStore();
+
+  // El backend usa nombres de lugar (no coordenadas) para el contexto del viaje.
+  const ORIGEN_DIRECCION = 'Ubicación actual';
 
   const buscarLugares = async (texto: string) => {
     setDestino(texto);
@@ -61,8 +69,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
     setBuscando(true);
     try {
       const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(texto)}&location=${LIMA_CENTRO.latitude},${LIMA_CENTRO.longitude}&radius=${LIMA_RADIO_BUSQUEDA}&components=country:pe&key=${GOOGLE_MAPS_API_KEY}`;
-      const { data } = await api.get(url.replace(api.defaults.baseURL || '', ''));
-      // Llamada directa a Google (sin pasar por el baseURL del backend)
+      // Llamada directa a Google (sin pasar por el backend)
       const resp = await fetch(url);
       const json = await resp.json();
       if (json.predictions) {
@@ -91,26 +98,27 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
       const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${lugar.placeId}&fields=geometry&key=${GOOGLE_MAPS_API_KEY}`;
       const detailsResp = await fetch(detailsUrl);
       const detailsJson = await detailsResp.json();
-      const destinoCoords = detailsJson.result.geometry.location;
+      const coords = detailsJson.result.geometry.location;
+      setDestinoCoords({ latitude: coords.lat, longitude: coords.lng });
 
-      // Obtener ruta desde el API Gateway (ms-pricing calculará la tarifa)
+      // Cotización pre-viaje: el backend (Integración + Motor) devuelve
+      // distancia, duración, polyline y el TECHO (visualización asimétrica).
       const { data: tripData } = await api.post('/trips/quote', {
-        destino: { lat: destinoCoords.lat, lng: destinoCoords.lng },
-        destinoDireccion: lugar.descripcion,
+        origin: ORIGEN_DIRECCION,
+        destination: lugar.descripcion,
       });
 
       setPreview({
-        distanciaKm: tripData.distanciaKm,
-        duracionMin: tripData.duracionMin,
-        tarifaMin: tripData.tarifa.minimo,
-        tarifaMax: tripData.tarifa.maximo,
+        distanciaKm: tripData.distanceKm,
+        duracionMin: tripData.durationMin,
+        tarifaMax: tripData.maximumPrice,
       });
 
       if (tripData.polyline) {
         setRutaCoords(decodePolyline(tripData.polyline));
       }
 
-      setOfertaInicial(String(tripData.tarifa.maximo));
+      setOfertaInicial(String(tripData.maximumPrice));
     } catch (e) {
       console.error('Error calculando ruta:', e);
     }
@@ -121,11 +129,25 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
     setSolicitando(true);
     try {
       const { data } = await api.post('/trips', {
-        destinoDireccion: lugarSeleccionado.descripcion,
-        ofertaInicial: parseFloat(ofertaInicial),
+        origin: ORIGEN_DIRECCION,
+        destination: lugarSeleccionado.descripcion,
       });
-      setViajeActivo(data);
-      navigation.navigate('Negotiation', { tripId: data.id });
+      const origen: Coords = {
+        latitude: LIMA_CENTRO.latitude,
+        longitude: LIMA_CENTRO.longitude,
+      };
+      setViajeActivo({
+        id: String(data.id),
+        status: data.status,
+        origen,
+        destino: destinoCoords ?? origen,
+        origenDireccion: ORIGEN_DIRECCION,
+        destinoDireccion: lugarSeleccionado.descripcion,
+        distanciaKm: preview.distanciaKm,
+        duracionMin: preview.duracionMin,
+        tarifa: { minimo: 0, maximo: preview.tarifaMax },
+      });
+      navigation.navigate('Negotiation', { tripId: String(data.id) });
     } catch (e) {
       console.error('Error solicitando viaje:', e);
     } finally {

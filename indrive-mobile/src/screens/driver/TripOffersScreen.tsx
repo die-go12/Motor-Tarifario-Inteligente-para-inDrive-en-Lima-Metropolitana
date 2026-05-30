@@ -16,10 +16,42 @@ import { api } from '../../services/api';
 import { useTripStore, ViajeActivo } from '../../store/useTripStore';
 import { DriverStackParamList } from '../../navigation/DriverNavigator';
 import { getSocket, DRIVER_EVENTS, SERVER_EVENTS } from '../../services/socket';
+import { LIMA_CENTRO } from '../../services/config';
 import { formatSoles, formatDistancia, formatDuracion } from '../../utils/format';
 
 type Props = {
   navigation: NativeStackNavigationProp<DriverStackParamList, 'TripOffers'>;
+};
+
+// Forma del viaje tal como lo devuelve el backend en la vista del conductor.
+interface BackendTrip {
+  id: number;
+  status: ViajeActivo['status'];
+  origin: string;
+  destination: string;
+  distanceKm: number;
+  minimumPrice: number;
+}
+
+const PROMEDIO_KMH = 20;
+
+// El backend no guarda coordenadas ni duración del viaje; se completan acá.
+const mapBackendTrip = (t: BackendTrip): ViajeActivo => {
+  const origen = {
+    latitude: LIMA_CENTRO.latitude,
+    longitude: LIMA_CENTRO.longitude,
+  };
+  return {
+    id: String(t.id),
+    status: t.status,
+    origen,
+    destino: origen,
+    origenDireccion: t.origin,
+    destinoDireccion: t.destination,
+    distanciaKm: t.distanceKm,
+    duracionMin: Math.round((t.distanceKm / PROMEDIO_KMH) * 60),
+    tarifa: { minimo: t.minimumPrice, maximo: 0 },
+  };
 };
 
 export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
@@ -35,17 +67,15 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
     const socket = getSocket();
     if (socket) {
       // Nuevas solicitudes en tiempo real
-      socket.on(SERVER_EVENTS.TRIP_CREATED, (viaje: ViajeActivo) => {
-        setSolicitudes((prev) => [viaje, ...prev]);
+      socket.on(SERVER_EVENTS.TRIP_CREATED, (t: BackendTrip) => {
+        setSolicitudes((prev) => [mapBackendTrip(t), ...prev]);
       });
 
       // Si el pasajero acepta nuestra oferta
-      socket.on(SERVER_EVENTS.TRIP_ASSIGNED, (data: { tripId: string }) => {
-        const viaje = solicitudes.find((s) => s.id === data.tripId);
-        if (viaje) {
-          setViajeActivo(viaje);
-          navigation.navigate('ActiveTrip', { tripId: data.tripId });
-        }
+      socket.on(SERVER_EVENTS.TRIP_ASSIGNED, (t: BackendTrip) => {
+        const viaje = mapBackendTrip(t);
+        setViajeActivo(viaje);
+        navigation.navigate('ActiveTrip', { tripId: viaje.id });
       });
     }
 
@@ -58,8 +88,8 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
   const cargarSolicitudes = async () => {
     setCargando(true);
     try {
-      const { data } = await api.get('/trips?status=SEARCHING');
-      setSolicitudes(data);
+      const { data } = await api.get<BackendTrip[]>('/trips/available');
+      setSolicitudes(data.map(mapBackendTrip));
     } catch (e) {
       console.error('Error cargando solicitudes:', e);
     } finally {
@@ -72,7 +102,10 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
     const monto = parseFloat(ofertas[tripId] || '0');
     if (!socket || !monto) return;
 
-    socket.emit(DRIVER_EVENTS.SEND_OFFER, { tripId, montoPropuesto: monto });
+    socket.emit(DRIVER_EVENTS.SEND_OFFER, {
+      tripId: Number(tripId),
+      amount: monto,
+    });
   };
 
   return (

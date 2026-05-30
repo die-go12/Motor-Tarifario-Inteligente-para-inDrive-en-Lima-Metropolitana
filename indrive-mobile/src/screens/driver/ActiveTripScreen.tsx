@@ -56,20 +56,20 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
       (location) => {
         const coords = { latitude: location.coords.latitude, longitude: location.coords.longitude };
         const socket = getSocket();
-        socket?.emit(DRIVER_EVENTS.UPDATE_LOCATION, { tripId, ...coords });
+        socket?.emit(DRIVER_EVENTS.UPDATE_LOCATION, { tripId: Number(tripId), ...coords });
       }
     );
   };
 
   const iniciarViaje = () => {
     const socket = getSocket();
-    socket?.emit(DRIVER_EVENTS.START_TRIP, { tripId });
+    socket?.emit(DRIVER_EVENTS.START_TRIP, { tripId: Number(tripId) });
     actualizarEstado('IN_PROGRESS');
   };
 
   const finalizarViaje = () => {
     const socket = getSocket();
-    socket?.emit(DRIVER_EVENTS.COMPLETE_TRIP, { tripId });
+    socket?.emit(DRIVER_EVENTS.COMPLETE_TRIP, { tripId: Number(tripId) });
   };
 
   // Pantalla de cobro final

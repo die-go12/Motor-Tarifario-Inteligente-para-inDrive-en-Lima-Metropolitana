@@ -23,6 +23,13 @@ type Props = {
   route: RouteProp<PassengerStackParamList, 'Negotiation'>;
 };
 
+// Forma de la oferta tal como la emite el backend.
+interface BackendOffer {
+  id: number;
+  driverId: number | null;
+  amount: number;
+}
+
 export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
   const { viajeActivo, ofertas, agregarOferta, actualizarEstado, setTarifaFinal, reset } =
     useTripStore();
@@ -31,8 +38,16 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
     const socket = getSocket();
     if (!socket) return;
 
-    // Escuchar ofertas de conductores
-    socket.on(SERVER_EVENTS.OFFER_RECEIVED, (oferta: Oferta) => {
+    // Escuchar ofertas de conductores (mapea la oferta del backend al modelo de la app)
+    socket.on(SERVER_EVENTS.OFFER_RECEIVED, (offer: BackendOffer) => {
+      const oferta: Oferta = {
+        offerId: offer.id,
+        conductorId: String(offer.driverId ?? ''),
+        conductorNombre: `Conductor ${offer.driverId ?? ''}`,
+        vehiculoPlaca: '—',
+        vehiculoModelo: '—',
+        montoPropuesto: offer.amount,
+      };
       agregarOferta(oferta);
     });
 
@@ -57,9 +72,8 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
     const socket = getSocket();
     if (!socket || !viajeActivo) return;
     socket.emit(PASSENGER_EVENTS.ACCEPT_OFFER, {
-      tripId: viajeActivo.id,
-      conductorId: oferta.conductorId,
-      monto: oferta.montoPropuesto,
+      tripId: Number(viajeActivo.id),
+      offerId: oferta.offerId,
     });
     actualizarEstado('ASSIGNED');
     navigation.navigate('PassengerMap');
@@ -68,7 +82,7 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
   const cancelarViaje = () => {
     const socket = getSocket();
     if (!socket || !viajeActivo) return;
-    socket.emit(PASSENGER_EVENTS.CANCEL_TRIP, { tripId: viajeActivo.id });
+    socket.emit(PASSENGER_EVENTS.CANCEL_TRIP, { tripId: Number(viajeActivo.id) });
     reset();
     navigation.navigate('PassengerMap');
   };
@@ -114,7 +128,7 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
         ) : (
           <FlatList
             data={ofertas}
-            keyExtractor={(item) => item.conductorId}
+            keyExtractor={(item) => String(item.offerId)}
             renderItem={({ item }) => (
               <TarjetaBase estilo={estilos.tarjetaOferta}>
                 <View style={estilos.filaOferta}>

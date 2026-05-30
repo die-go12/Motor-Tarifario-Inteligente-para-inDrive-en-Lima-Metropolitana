@@ -16,7 +16,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { DriverStackParamList } from '../../navigation/DriverNavigator';
 import { LIMA_CENTRO } from '../../services/config';
 import { DARK_MAP_STYLE } from '../../theme/mapStyle';
-import { getSocket, SERVER_EVENTS, DRIVER_EVENTS } from '../../services/socket';
+import { getSocket, SERVER_EVENTS } from '../../services/socket';
 
 type Props = {
   navigation: NativeStackNavigationProp<DriverStackParamList, 'DriverMap'>;
@@ -27,7 +27,7 @@ export const DriverMapScreen: React.FC<Props> = ({ navigation }) => {
   const [disponible, setDisponible] = useState(true);
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
 
-  const { user, switchRole } = useAuthStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     iniciarRastreoGPS();
@@ -64,12 +64,8 @@ export const DriverMapScreen: React.FC<Props> = ({ navigation }) => {
           longitude: location.coords.longitude,
         };
         setUbicacion(coords);
-
-        // Enviar ubicación al backend via socket si está disponible
-        const socket = getSocket();
-        if (socket && disponible) {
-          socket.emit(DRIVER_EVENTS.UPDATE_LOCATION, coords);
-        }
+        // La ubicación se transmite al backend solo durante un viaje activo
+        // (ver ActiveTripScreen, que envía driver_location con el tripId).
       }
     );
   };
@@ -93,9 +89,6 @@ export const DriverMapScreen: React.FC<Props> = ({ navigation }) => {
         <TarjetaBase estilo={estilos.barraEncabezado}>
           <View style={estilos.filaEncabezado}>
             <Text style={estilos.saludo}>Conductor: {user?.name?.split(' ')[0]}</Text>
-            <TouchableOpacity style={estilos.botonRol} onPress={switchRole}>
-              <Text style={estilos.textoRol}>Cambiar rol</Text>
-            </TouchableOpacity>
           </View>
         </TarjetaBase>
       </View>

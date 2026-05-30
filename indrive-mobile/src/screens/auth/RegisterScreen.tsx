@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../../theme/theme';
@@ -25,6 +26,7 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmar, setConfirmar] = useState('');
+  const [rol, setRol] = useState<'passenger' | 'driver'>('passenger');
   const [cargando, setCargando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
@@ -49,7 +51,7 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         name: nombre,
         email,
         password,
-        role: 'passenger', // Rol por defecto requerido por el backend
+        role: rol,
       });
       await setSession(data.accessToken, data.refreshToken, data.user);
     } catch (error: unknown) {
@@ -109,6 +111,28 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             error={errores.confirmar}
           />
 
+          <View>
+            <Text style={estilos.etiquetaRol}>Quiero usar inDrive+ como</Text>
+            <View style={estilos.selectorRol}>
+              <TouchableOpacity
+                style={[estilos.opcionRol, rol === 'passenger' && estilos.opcionRolActiva]}
+                onPress={() => setRol('passenger')}
+              >
+                <Text style={[estilos.opcionRolTexto, rol === 'passenger' && estilos.opcionRolTextoActivo]}>
+                  🧑 Pasajero
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[estilos.opcionRol, rol === 'driver' && estilos.opcionRolActiva]}
+                onPress={() => setRol('driver')}
+              >
+                <Text style={[estilos.opcionRolTexto, rol === 'driver' && estilos.opcionRolTextoActivo]}>
+                  🚗 Conductor
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <BotonNeon
             titulo="Crear cuenta"
             onPress={handleRegistro}
@@ -160,6 +184,36 @@ const estilos = StyleSheet.create({
   },
   boton: {
     marginTop: theme.spacing.sm,
+  },
+  etiquetaRol: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm,
+  },
+  selectorRol: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  opcionRol: {
+    flex: 1,
+    height: 48,
+    borderRadius: theme.rounded.md,
+    borderWidth: 1,
+    borderColor: theme.colors.borderSubtle,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  opcionRolActiva: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.surfaceTertiary,
+  },
+  opcionRolTexto: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textSecondary,
+  },
+  opcionRolTextoActivo: {
+    color: theme.colors.primary,
+    fontFamily: 'Inter-Bold',
   },
   pieFormulario: {
     flexDirection: 'row',

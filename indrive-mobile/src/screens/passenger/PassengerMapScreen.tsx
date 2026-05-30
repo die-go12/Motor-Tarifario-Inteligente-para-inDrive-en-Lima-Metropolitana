@@ -30,7 +30,7 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
   } | null>(null);
   const [permisoConcedido, setPermisoConcedido] = useState(false);
 
-  const { user, switchRole } = useAuthStore();
+  const { user } = useAuthStore();
   const { viajeActivo, rutaCoords } = useTripStore();
 
   useEffect(() => {
@@ -77,11 +77,9 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
         <TarjetaBase estilo={estilos.barraEncabezado}>
           <View style={estilos.filaEncabezado}>
             <Text style={estilos.saludo}>Hola, {user?.name?.split(' ')[0]} 👋</Text>
-            <TouchableOpacity style={estilos.botonRol} onPress={switchRole}>
-              <Text style={estilos.textoRol}>
-                {user?.activeRole === 'PASSENGER' ? '🧑 Pasajero' : '🚗 Conductor'}
-              </Text>
-            </TouchableOpacity>
+            <View style={estilos.botonRol}>
+              <Text style={estilos.textoRol}>🧑 Pasajero</Text>
+            </View>
           </View>
         </TarjetaBase>
       </View>

@@ -7,6 +7,7 @@ import { Payment } from './entities/payment.entity';
 import { TripsService } from './trips.service';
 import { TripsController } from './trips.controller';
 import { PricingClient } from '../../clients/pricing.client';
+import { IntegrationClient } from '../../clients/integration.client';
 import { VehiclesModule } from '../vehicles/vehicles.module';
 
 @Module({
@@ -15,6 +16,6 @@ import { VehiclesModule } from '../vehicles/vehicles.module';
     VehiclesModule,
   ],
   controllers: [TripsController],
-  providers: [TripsService, PricingClient],
+  providers: [TripsService, PricingClient, IntegrationClient],
 })
 export class TripsModule {}

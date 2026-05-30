@@ -4,7 +4,9 @@
  */
 
 import { 
+  apiService,
   authService, 
+  socketService,
   tripsService, 
   pricingService,
   API_ENDPOINTS,
@@ -59,6 +61,7 @@ async function initApp() {
   // Verificar autenticación
   if (authService.isAuthenticated()) {
     showMainUI();
+    connectRealtime();
     await loadDashboard();
   } else {
     showLoginUI();
@@ -160,6 +163,7 @@ async function doLogin() {
 
   try {
     await authService.login(email, password);
+    connectRealtime();
     showMainUI();
     await loadDashboard();
     showToast('Sesión iniciada');
@@ -198,6 +202,7 @@ function fillDemo() {
 async function handleLogout() {
   if (!confirm('¿Estás seguro de que deseas cerrar sesión?')) return;
 
+  socketService.disconnect();
   await authService.logout();
   showLoginUI();
   showToast('Sesión cerrada');
@@ -212,9 +217,75 @@ async function loadDashboard() {
   console.log('Cargando dashboard...');
   await Promise.all([
     loadKPIs(),
-    loadLiveTrips()
+    loadLiveTrips(),
+    loadTrips()
   ]);
   setChart('7d');
+}
+
+/**
+ * Conectar el socket de actualizaciones en tiempo real
+ */
+function connectRealtime() {
+  const token = apiService.getToken();
+  if (!token || token === 'DEMO') {
+    return;
+  }
+
+  socketService.disconnect();
+  socketService.connect(token);
+
+  socketService.on('trip_created', () => {
+    showToast('Nuevo viaje recibido');
+    loadLiveTrips();
+    loadTrips();
+  });
+
+  socketService.on('offer_received', () => {
+    showToast('Nueva oferta recibida');
+    loadLiveTrips();
+    loadTrips();
+  });
+
+  socketService.on('trip_assigned', () => {
+    showToast('Viaje asignado');
+    loadLiveTrips();
+    loadTrips();
+  });
+
+  socketService.on('driver_location_update', () => {
+    loadLiveTrips();
+    loadTrips();
+  });
+
+  socketService.on('trip_started', () => {
+    showToast('Viaje iniciado');
+    loadLiveTrips();
+    loadTrips();
+  });
+
+  socketService.on('trip_cancelled', () => {
+    showToast('Viaje cancelado');
+    loadLiveTrips();
+    loadTrips();
+  });
+}
+
+/**
+ * Cargar lista completa de viajes
+ */
+async function loadTrips() {
+  const container = $('trips-full-table');
+  if (!container) return;
+
+  const filter = $('trip-status-filter')?.value || '';
+  try {
+    const trips = await tripsService.getMyTrips(filter || null);
+    renderTripsTable(container, trips, false);
+  } catch (error) {
+    console.error('Error loading all trips:', error);
+    container.innerHTML = '<div class="empty">Error cargando viajes</div>';
+  }
 }
 
 /**
@@ -573,8 +644,7 @@ async function createTestTrip() {
   try {
     const result = await tripsService.createTrip({
       origin,
-      destination,
-      distanceKm: distKm
+      destination
     });
     showToast(result.message);
   } catch (error) {
@@ -635,6 +705,7 @@ window.completeTrip = completeTrip;
 window.setChart = setChart;
 window.simulate = simulate;
 window.createTestTrip = createTestTrip;
+window.loadTrips = loadTrips;
 window.saveSettings = saveSettings;
 window.testConnection = testConnection;
 

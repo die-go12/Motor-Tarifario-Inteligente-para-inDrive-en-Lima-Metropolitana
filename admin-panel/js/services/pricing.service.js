@@ -47,21 +47,21 @@ class PricingService {
       this.config = config;
       this.weights = {
         base: {
-          distance: config.distanceWeight || 40,
-          fuel: config.fuelWeight || 25,
-          capacity: config.capacityWeight || 20,
-          historic: config.historicWeight || 15
+          distance: config.costPerKmBase ?? 40,
+          fuel: config.fuelConsumptionPerKm ?? 25,
+          capacity: config.capacityExtraCost ?? 20,
+          historic: config.historicWeight ?? 15
         },
         dynamic: {
-          traffic: config.trafficWeight || 50,
-          hour: config.hourWeight || 30,
-          time: config.timeWeight || 20
+          traffic: config.trafficWeight ?? 50,
+          hour: config.hourWeight ?? 30,
+          time: config.timeWeight ?? 20
         },
         limits: {
-          minimum: config.minimumPrice || 3.00,
-          maximum: config.maximumPrice || 150.00,
-          maxRatio: config.maxRatio || 3.5,
-          maxTrafficMultiplier: config.maxTrafficMultiplier || 2.0
+          minimum: config.minAbsoluteFare ?? 3.00,
+          maximum: config.maxAbsoluteFare ?? 150.00,
+          maxRatio: config.maxRangeRatio ?? 3.5,
+          maxTrafficMultiplier: config.trafficMultiplierCap ?? 2.0
         }
       };
       return this.config;
@@ -78,9 +78,24 @@ class PricingService {
    */
   async updateConfig(configData) {
     try {
+      const payload = {
+        costPerKmBase: configData.costPerKmBase ?? configData.distanceWeight,
+        fuelConsumptionPerKm: configData.fuelConsumptionPerKm ?? configData.fuelWeight,
+        fuelFactor: configData.fuelFactor ?? 1,
+        capacityExtraCost: configData.capacityExtraCost ?? configData.capacityWeight,
+        historicWeight: configData.historicWeight,
+        trafficWeight: configData.trafficWeight,
+        hourWeight: configData.hourWeight,
+        timeWeight: configData.timeWeight,
+        trafficMultiplierCap: configData.trafficMultiplierCap ?? configData.maxTrafficMultiplier,
+        minAbsoluteFare: configData.minAbsoluteFare ?? configData.minimumPrice,
+        maxAbsoluteFare: configData.maxAbsoluteFare ?? configData.maximumPrice,
+        maxRangeRatio: configData.maxRangeRatio ?? configData.maxRatio
+      };
+
       const updated = await apiService.put(
         API_ENDPOINTS.PRICING.UPDATE_CONFIG,
-        configData
+        payload
       );
       this.config = updated;
       return {
@@ -96,45 +111,29 @@ class PricingService {
 
   /**
    * Obtener una cotización de precio
-   * @param {number} distanceKm - Distancia en kilómetros
+   * @param {Object|number} quoteParams
    * @returns {Promise<Object>} - {minimumPrice, maximumPrice}
    */
-  async getQuote(distanceKm) {
+  async getQuote(quoteParams) {
     try {
-      const quote = await apiService.post(API_ENDPOINTS.PRICING.QUOTE, {
-        distanceKm
-      });
+      const payload = typeof quoteParams === 'number'
+        ? { distanceKm: quoteParams }
+        : quoteParams || {};
+
+      const endpoint = payload.origin && payload.destination
+        ? API_ENDPOINTS.TRIPS.QUOTE
+        : API_ENDPOINTS.PRICING.QUOTE;
+
+      const quote = await apiService.post(endpoint, payload);
       return {
         success: true,
         minimumPrice: quote.minimumPrice,
         maximumPrice: quote.maximumPrice,
-        distanceKm
+        distanceKm: payload.distanceKm
       };
     } catch (error) {
       console.error('Get quote error:', error);
-      // Fallback a simulación local
-      return this.simulatePrice({ distanceKm });
-    }
-  }
-
-  /**
-   * Liquidar un viaje (settle)
-   * @param {Object} settlementData - {tripId, finalPrice, ...}
-   * @returns {Promise<Object>}
-   */
-  async settleTrip(settlementData) {
-    try {
-      const settlement = await apiService.post(
-        API_ENDPOINTS.PRICING.SETTLE,
-        settlementData
-      );
-      return {
-        success: true,
-        settlement
-      };
-    } catch (error) {
-      console.error('Settle trip error:', error);
-      throw error;
+      return this.simulatePrice({ distanceKm: quoteParams.distanceKm || quoteParams });
     }
   }
 

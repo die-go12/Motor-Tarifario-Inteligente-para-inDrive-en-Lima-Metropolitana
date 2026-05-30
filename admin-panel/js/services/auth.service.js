@@ -62,9 +62,14 @@ class AuthService {
         password
       });
 
-      // Guardar token y usuario
+      // Guardar token, refresh token y usuario
       this.token = response.accessToken;
       apiService.setToken(response.accessToken);
+      if (response.refreshToken) {
+        localStorage.setItem(AUTH_CONFIG.REFRESH_TOKEN_KEY, response.refreshToken);
+      } else {
+        localStorage.removeItem(AUTH_CONFIG.REFRESH_TOKEN_KEY);
+      }
       this.saveUser(response.user);
 
       return {
@@ -87,7 +92,7 @@ class AuthService {
       id: 999,
       name: 'Admin Demo',
       email: 'admin@demo.local',
-      role: 'ADMIN'
+      role: 'admin'
     };
     apiService.setToken('DEMO');
     this.saveUser(this.currentUser);
@@ -107,7 +112,18 @@ class AuthService {
    */
   async register(userData) {
     try {
-      const response = await apiService.post(API_ENDPOINTS.AUTH.REGISTER, userData);
+      const payload = {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        role: String(userData.role || '').toLowerCase()
+      };
+
+      if (userData.phone) {
+        payload.phone = userData.phone;
+      }
+
+      const response = await apiService.post(API_ENDPOINTS.AUTH.REGISTER, payload);
       return {
         success: true,
         user: response

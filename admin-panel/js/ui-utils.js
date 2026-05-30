@@ -158,6 +158,7 @@ export function getInitials(name) {
 export function getStatusConfig(status) {
   const map = {
     COMPLETED: { class: 'settled', label: 'Completado' },
+    IN_PROGRESS: { class: 'active', label: 'Activo' },
     ACTIVE: { class: 'active', label: 'Activo' },
     SEARCHING: { class: 'info', label: 'Buscando' },
     ASSIGNED: { class: 'moderate', label: 'Asignado' },

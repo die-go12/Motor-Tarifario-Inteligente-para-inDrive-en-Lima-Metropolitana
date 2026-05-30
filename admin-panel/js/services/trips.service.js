@@ -14,11 +14,25 @@ class TripsService {
    */
   async createTrip(tripData) {
     try {
-      const trip = await apiService.post(API_ENDPOINTS.TRIPS.CREATE, tripData);
+      const payload = {
+        origin: tripData.origin,
+        destination: tripData.destination
+      };
+
+      const trip = await apiService.post(API_ENDPOINTS.TRIPS.CREATE, payload);
+      const priceParts = [];
+      if (typeof trip.minimumPrice === 'number') {
+        priceParts.push(`mín S/${trip.minimumPrice.toFixed(2)}`);
+      }
+      if (typeof trip.maximumPrice === 'number') {
+        priceParts.push(`máx S/${trip.maximumPrice.toFixed(2)}`);
+      }
+
+      const priceLabel = priceParts.length ? `: ${priceParts.join(' — ')}` : '';
       return {
         success: true,
         trip,
-        message: `Viaje #${trip.id} creado: Rango S/${trip.minimumPrice.toFixed(2)} — S/${trip.maximumPrice.toFixed(2)}`
+        message: `Viaje #${trip.id} creado${priceLabel}`
       };
     } catch (error) {
       console.error('Create trip error:', error);
@@ -83,6 +97,52 @@ class TripsService {
       return await apiService.get(API_ENDPOINTS.TRIPS.GET_AVAILABLE);
     } catch (error) {
       console.error('Get available trips error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener ofertas de un viaje
+   * @param {number} tripId
+   * @returns {Promise<Array>}
+   */
+  async getTripOffers(tripId) {
+    try {
+      return await apiService.get(API_ENDPOINTS.TRIPS.OFFERS(tripId));
+    } catch (error) {
+      console.error('Get trip offers error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Crear una oferta para un viaje
+   * @param {number} tripId
+   * @param {Object} offerData
+   * @returns {Promise<Object>}
+   */
+  async createTripOffer(tripId, offerData) {
+    try {
+      return await apiService.post(API_ENDPOINTS.TRIPS.OFFERS(tripId), offerData);
+    } catch (error) {
+      console.error('Create trip offer error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Aceptar una oferta de viaje
+   * @param {number} tripId
+   * @param {number|string} offerId
+   * @returns {Promise<Object>}
+   */
+  async acceptTripOffer(tripId, offerId) {
+    try {
+      return await apiService.post(API_ENDPOINTS.TRIPS.OFFERS_ACCEPT(tripId), {
+        offerId
+      });
+    } catch (error) {
+      console.error('Accept trip offer error:', error);
       throw error;
     }
   }
@@ -225,7 +285,7 @@ class TripsService {
 
     const completed = trips.filter(t => t.status === 'COMPLETED');
     const cancelled = trips.filter(t => t.status === 'CANCELLED');
-    const active = trips.filter(t => ['SEARCHING', 'ASSIGNED', 'ACTIVE'].includes(t.status));
+    const active = trips.filter(t => ['SEARCHING', 'ASSIGNED', 'IN_PROGRESS'].includes(t.status));
 
     const totalEarnings = completed.reduce((sum, t) => sum + (t.finalPrice || 0), 0);
     const avgPrice = completed.length ? totalEarnings / completed.length : 0;

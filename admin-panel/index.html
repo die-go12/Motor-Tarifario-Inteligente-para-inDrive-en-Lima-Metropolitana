@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lima Ops · inDrive+ Fleet Control</title>
+  <title>inDrive+ · inDrive+ Fleet Control</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -506,7 +506,7 @@
               <option value="">Todos los estados</option>
               <option value="SEARCHING">Buscando</option>
               <option value="ASSIGNED">Asignado</option>
-              <option value="ACTIVE">En curso</option>
+              <option value="IN_PROGRESS">En curso</option>
               <option value="COMPLETED">Completado</option>
               <option value="CANCELLED">Cancelado</option>
             </select>
@@ -623,8 +623,10 @@
             </div>
             <div class="config-row">
               <select id="reg-role" class="config-input" style="margin-bottom:0">
-                <option value="PASSENGER">Pasajero</option>
-                <option value="DRIVER">Conductor</option>
+                <option value="passenger">Pasajero</option>
+                <option value="driver">Conductor</option>
+                <option value="admin">Administrador</option>
+                <option value="auditor">Auditor</option>
               </select>
             </div>
             <button class="btn-primary" style="width:100%;margin-top:12px">Registrar usuario</button>

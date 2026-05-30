@@ -11,6 +11,22 @@ class ApiService {
     this.timeout = UI_CONSTANTS.DEFAULT_TIMEOUT;
   }
 
+  resolveBase(path) {
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    if (normalized.startsWith('/pricing')) {
+      return API_CONFIG.MS_PRICING;
+    }
+    if (
+      normalized.startsWith('/auth') ||
+      normalized.startsWith('/users') ||
+      normalized.startsWith('/trips') ||
+      normalized.startsWith('/vehicles')
+    ) {
+      return API_CONFIG.MS_BASE;
+    }
+    return API_CONFIG.BASE_URL;
+  }
+
   /**
    * Obtener token JWT del localStorage
    */
@@ -58,7 +74,8 @@ class ApiService {
    * @returns {Promise<Object>} - Respuesta JSON
    */
   async request(path, options = {}) {
-    const url = this.baseUrl + path;
+    const baseUrl = this.resolveBase(path);
+    const url = baseUrl + path;
     const config = {
       method: options.method || 'GET',
       headers: this.getHeaders(options.headers),

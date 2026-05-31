@@ -87,16 +87,17 @@ Permitir negociación dentro de límites controlados del rango tarifario.
 # US-004 – Aceptación bilateral e inicio de viaje (3 SP)
 
 ### Objetivo
-Formalizar el inicio del viaje mediante aceptación de ambas partes.
+Formalizar el inicio del viaje mediante aceptación de ambas partes y transición controlada del estado del viaje.
+
+---
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Endpoint aceptación bilateral | Backend | Pendiente |
-| Máquina de estados del viaje | Backend | Completado |
+| Endpoint de aceptación bilateral | Backend | Pendiente |
+| Máquina de estados del viaje (CREATED → NEGOTIATION → ACCEPTED → IN_PROGRESS) | Backend | En progreso |
 | Registro de aceptación con timestamp | Backend | Pendiente |
 | Sistema de notificaciones | Frontend | Pendiente |
-| Activación de GPS | Backend | Pendiente |
-| Cambio de estado a “En curso” | Backend | Pendiente |
+| Activación de GPS al inicio del viaje | Backend | Pendiente |
 | Pruebas de flujo completo end-to-end | QA | Pendiente |
 
 ---

@@ -21,7 +21,7 @@
 
 ---
 
-## Visión General de Sprint (Sprint 1)
+## Visión General del Sprint 1
 
 | Sprint | Nombre | Historias | Story Points | Duración |
 |--------|--------|-----------|--------------|----------|
@@ -32,58 +32,72 @@
 ## Sprint 1 – Fase Pre-viaje
 
 ### Objetivo
-Implementar el flujo completo de pre-viaje: solicitud, cálculo de rango tarifario, visualización asimétrica, negociación y aceptación bilateral.
+Implementar el flujo completo de pre-viaje: solicitud de viaje, cálculo de rango tarifario, visualización asimétrica, negociación controlada y aceptación bilateral.
 
 ---
 
-## US-001 – Solicitud de viaje con cálculo de rango
+# US-001 – Solicitud de viaje con cálculo de rango (5 SP)
+
+### Objetivo
+Generar un rango tarifario inteligente en menos de 5 segundos.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
 | Endpoint solicitud de viaje | Backend | Completado |
-| Integración Google Maps | Backend | Pendiente |
-| Integración OSINERGMIN | Backend | Pendiente |
-| API de tráfico | Backend | Pendiente |
-| Algoritmo de cálculo de rango | Backend | En progreso |
-| Manejo de fallos externos | Backend | En progreso |
+| Integración Google Maps (distancia y tiempo) | Backend | Pendiente |
+| Integración OSINERGMIN (combustible) | Backend | Pendiente |
+| API de tráfico en tiempo real | Backend | Pendiente |
+| Algoritmo de cálculo de rango (7 variables) | Backend | En progreso |
+| Manejo de fallos externos (degradación elegante) | Backend | En progreso |
 | Pruebas unitarias e integración | QA | En progreso |
 
 ---
 
-## US-002 – Visualización asimétrica del precio
+# US-002 – Visualización asimétrica del precio (4 SP)
+
+### Objetivo
+Mostrar información distinta según el rol del usuario.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Vista pasajero (máximo) | Frontend | En progreso |
-| Vista conductor (mínimo) | Frontend | En progreso |
+| Vista pasajero (solo máximo) | Frontend | En progreso |
+| Vista conductor (solo mínimo) | Frontend | En progreso |
 | Vista administrador (rango completo) | Frontend | En progreso |
 | Control de acceso por roles | Frontend | En progreso |
-| Pruebas de seguridad | QA | En progreso |
+| Pruebas de seguridad y autorización | QA | En progreso |
 
 ---
 
-## US-003 – Negociación acotada dentro del rango
+# US-003 – Negociación acotada dentro del rango (4 SP)
+
+### Objetivo
+Permitir negociación dentro de límites controlados del rango tarifario.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Endpoint de ofertas | Backend | Pendiente |
-| Validación de rango | Backend | Pendiente |
-| Interfaz de negociación | Frontend | En progreso |
-| Registro de ofertas | Backend | Pendiente |
-| Contraofertas | Backend | Pendiente |
-| Pruebas de límites | QA | Pendiente |
+| Endpoint de ofertas y contraofertas | Backend | Pendiente |
+| Validación de rango permitido | Backend | Pendiente |
+| Interfaz de negociación en tiempo real | Frontend | En progreso |
+| Registro de ofertas (trazabilidad) | Backend | Pendiente |
+| Gestión de contraofertas | Backend | Pendiente |
+| Pruebas de límites y validaciones | QA | Pendiente |
 
 ---
 
-## US-004 – Aceptación bilateral e inicio de viaje
+# US-004 – Aceptación bilateral e inicio de viaje (3 SP)
+
+### Objetivo
+Formalizar el inicio del viaje mediante aceptación de ambas partes.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
 | Endpoint aceptación bilateral | Backend | Pendiente |
 | Máquina de estados del viaje | Backend | Completado |
-| Notificaciones | Frontend | Pendiente |
-| Activación GPS | Backend | Pendiente |
-| Pruebas de flujo completo | QA | Pendiente |
+| Registro de aceptación con timestamp | Backend | Pendiente |
+| Sistema de notificaciones | Frontend | Pendiente |
+| Activación de GPS | Backend | Pendiente |
+| Cambio de estado a “En curso” | Backend | Pendiente |
+| Pruebas de flujo completo end-to-end | QA | Pendiente |
 
 ---
 
@@ -92,7 +106,23 @@ Implementar el flujo completo de pre-viaje: solicitud, cálculo de rango tarifar
 | Métrica | Valor |
 |--------|------|
 | Historias | 4 |
-| Tareas totales | 20 |
+| Story Points | 16 SP |
+| Tareas totales | 24 |
 | Completadas | 2 |
 | En progreso | 7 |
-| Pendientes | 11 |
+| Pendientes | 15 |
+
+---
+
+## Trazabilidad (CAR → US)
+
+| CAR | Relación |
+|-----|----------|
+| CAR-001 | US-001 |
+| CAR-002 | US-002 |
+| CAR-003 | US-003 |
+| CAR-007 | US-003 / US-004 |
+| CAR-009 | US-001 |
+| CAR-002 (parcial UX) | US-002 |
+
+---

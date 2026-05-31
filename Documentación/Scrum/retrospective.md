@@ -1,6 +1,6 @@
 # Sprint Retrospective – Sprint 1: Fase Pre-Viaje
 
-##  Información General
+## Información General
 
 | Campo | Valor |
 |------|------|
@@ -12,61 +12,65 @@
 
 ---
 
-##  Objetivo del Sprint
+## Objetivo del Sprint
 
 Implementar la fase Pre-Viaje del sistema, permitiendo que el pasajero solicite un viaje, el sistema calcule un rango tarifario inteligente, se muestre de forma asimétrica según rol, se permita la negociación dentro de límites controlados y se habilite la aceptación bilateral para iniciar el viaje.
 
 ---
 
-##  Resumen del Sprint
+## Resumen del Sprint
 
-Durante el Sprint 1 se construyó la base funcional del sistema enfocada en el flujo pre-viaje. Se avanzó en la arquitectura del backend, la implementación inicial de endpoints, el diseño de interfaces móviles y la estructura base de la lógica del motor tarifario.
+Durante el Sprint 1 se construyó la base funcional del sistema enfocada en el flujo pre-viaje, alineado a las historias US-001, US-002, US-003 y US-004.
 
-También se configuró el entorno de desarrollo con Docker y se estableció la integración inicial con servicios externos simulados o parciales para el cálculo tarifario.
+Se avanzó en la arquitectura del backend, la implementación inicial de endpoints principales, el diseño de interfaces móviles y la lógica base del motor tarifario para cálculo de rangos.
 
-El equipo logró establecer una base técnica estable para continuar con la lógica completa del sistema en los siguientes sprints.
+Asimismo, se configuró el entorno de desarrollo con Docker Compose y se estableció una integración inicial mediante datos simulados para servicios externos como mapas, tráfico y combustible.
+
+El resultado del sprint fue una base funcional coherente que permite continuar con la implementación del sistema completo en los siguientes sprints.
 
 ---
 
-##  ¿Qué salió bien?
+## ¿Qué salió bien?
 
-###  Backend
-- Definición de arquitectura con NestJS.
-- Diseño de endpoints principales del flujo de viaje.
-- Separación inicial por módulos y dominios.
-- Avance en lógica base del cálculo tarifario.
+### Backend
+- Definición de arquitectura modular con NestJS.
+- Implementación de endpoints principales del flujo de viaje (US-001 a US-004).
+- Avance en la lógica base del cálculo de rango tarifario.
+- Implementación inicial de la máquina de estados del viaje.
 
-###  Frontend
+### Frontend
 - Implementación inicial de pantallas en React Native + Expo.
-- Desarrollo de la visualización asimétrica por rol.
-- Estructura de navegación base funcional.
+- Desarrollo de la visualización asimétrica por rol (pasajero/conductor/admin).
+- Interfaz básica de negociación entre usuarios.
+- Estructura de navegación funcional.
 
-###  DevOps
+### DevOps
 - Configuración de Docker Compose.
 - Integración de PostgreSQL, MongoDB y Redis.
 - Definición de variables de entorno.
 - Entorno local reproducible para el equipo.
 
-###  Gestión del proyecto
+### Gestión del Proyecto
 - Refinamiento del Product Backlog.
 - Priorización de historias con MoSCoW.
-- Organización inicial de tareas por equipo.
+- Definición clara de alcance del Sprint 1.
+- Organización del trabajo por equipos (Backend, Frontend, QA).
 
 ---
 
-##  ¿Qué podría mejorar?
+## ¿Qué podría mejorar?
 
-###  Backend
-- Integración real completa con APIs externas (Google Maps, tráfico, combustible).
-- Mejorar validaciones de entrada y reglas de negocio.
-- Documentación formal de API (Swagger/OpenAPI).
+### Backend
+- Integración real de APIs externas (Google Maps, tráfico, combustible).
+- Mejora en validaciones de reglas de negocio del cálculo tarifario.
+- Documentación formal de APIs (Swagger/OpenAPI).
 
 ### Frontend
-- Mejorar manejo de estados globales.
-- Refinar experiencia de usuario en negociación.
-- Reducir inconsistencias visuales detectadas en pruebas.
+- Mejor manejo de estados globales en la app.
+- Refinar experiencia de usuario en el flujo de negociación.
+- Mejorar consistencia visual entre roles.
 
-###  DevOps
+### DevOps
 - Implementar Health Checks en servicios Docker.
 - Automatizar CI/CD con GitHub Actions.
 - Mejorar scripts de inicialización del entorno.
@@ -74,17 +78,17 @@ El equipo logró establecer una base técnica estable para continuar con la lóg
 ### Equipo
 - Mejor coordinación entre frontend y backend.
 - Mayor revisión de Pull Requests antes de merge.
-- Estándares de código más estrictos desde el inicio.
+- Definición de estándares de código más estrictos.
 
 ---
 
 ## Problemas Encontrados
 
 | Problema | Impacto | Solución |
-|----------|--------|----------|
-| Dependencias de APIs externas no disponibles | Medio | Uso de mocks y datos simulados |
-| Conflictos de ramas en Git | Medio | Mejora de flujo de Pull Requests |
-| Bugs visuales en app móvil | Alto | Corrección planificada en Sprint 2 |
+|----------|----------|----------|
+| Dependencia de APIs externas no disponibles | Medio | Uso de mocks y datos simulados |
+| Conflictos de ramas en Git | Medio | Mejora del flujo de Pull Requests |
+| Bugs visuales en la app móvil | Alto | Corrección planificada para Sprint 2 |
 | Configuración inicial de Docker | Bajo | Documentación interna y pruebas locales |
 
 ---
@@ -92,43 +96,43 @@ El equipo logró establecer una base técnica estable para continuar con la lóg
 ## Lecciones Aprendidas
 
 ### Técnicas
-- Docker facilita la replicación del entorno de desarrollo.
+- Docker facilita la consistencia del entorno de desarrollo.
 - La separación por dominios mejora el desarrollo paralelo.
-- El uso de múltiples bases de datos requiere responsabilidades bien definidas.
+- El uso de datos simulados acelera la integración inicial.
 
 ### Organizacionales
-- Las revisiones constantes evitan errores acumulados.
 - La comunicación entre frontend y backend es crítica en flujos en tiempo real.
-- La planificación detallada reduce bloqueos en integración.
+- La revisión de código reduce errores acumulados.
+- Una planificación clara mejora la estabilidad del sprint.
 
 ---
 
-##  Acciones para el Sprint 2
+## Acciones para el Sprint 2
 
-###  Backend
-- Completar recálculo post-viaje.
-- Implementar regla de pago invariante.
-- Desarrollar filtro de anomalías.
+### Backend
+- Completar integración de APIs externas reales.
+- Mejorar lógica de validación del cálculo tarifario.
+- Fortalecer la máquina de estados del viaje.
 
-###  Frontend
-- Completar pantallas pendientes.
-- Corregir errores visuales.
-- Implementar panel administrativo.
+### Frontend
+- Completar flujos de pantalla pendientes.
+- Mejorar experiencia de usuario en negociación.
+- Reducir inconsistencias visuales.
 
-###  DevOps
+### DevOps
 - Implementar Health Checks.
 - Configurar CI/CD con GitHub Actions.
-- Automatizar despliegues locales.
+- Automatizar despliegue del entorno.
 
-###  QA
+### QA
 - Incrementar cobertura de pruebas.
-- Definir casos de prueba de post-viaje.
+- Definir casos de prueba para flujo completo pre-viaje.
 - Validar escenarios límite del sistema.
 
 ---
 
-## 🏁 Conclusión
+## Conclusión
 
-El Sprint 1 permitió establecer la base técnica del sistema y validar la arquitectura general del Motor Tarifario Inteligente. Aunque varias funcionalidades aún están en desarrollo, se logró un entorno estable, una estructura modular y avances importantes en frontend y backend.
+El Sprint 1 permitió establecer una base técnica sólida del Motor Tarifario Inteligente, validando el flujo completo de pre-viaje: solicitud, cálculo de rango, visualización asimétrica, negociación y aceptación bilateral.
 
-Esto permite iniciar el Sprint 2 con una base sólida para implementar la lógica avanzada del sistema (post-viaje, reglas de pago, anomalías y reportes).
+El sistema queda listo para evolucionar hacia fases más avanzadas en los siguientes sprints, manteniendo una arquitectura modular y escalable.

@@ -121,7 +121,7 @@ Formalizar el inicio del viaje mediante aceptación de ambas partes.
 | CAR-001 | US-001 |
 | CAR-002 | US-002 |
 | CAR-003 | US-003 |
-| CAR-007 | US-003 / US-004 |
+| CAR-007 | US-001 / US-003 / US-004 |
 | CAR-009 | US-001 |
 | CAR-002 (parcial UX) | US-002 |
 

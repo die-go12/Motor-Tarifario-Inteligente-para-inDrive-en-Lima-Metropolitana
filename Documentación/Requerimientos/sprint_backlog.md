@@ -1,10 +1,10 @@
 # Sprint Backlog – Motor Tarifario Inteligente — inDrive
 
-##  MVP Lima Metropolitana | Duración: 8 meses | Presupuesto: USD $182,000
+## MVP Lima Metropolitana | Duración: 8 meses | Presupuesto: USD $182,000
 
 ---
 
-##  Características del Producto (CAR)
+## Características del Producto (CAR)
 
 | ID | Característica | Descripción |
 |----|----------------|-------------|
@@ -21,23 +21,22 @@
 
 ---
 
-##  Visión General de Sprints
+## Visión General de Sprint (Sprint 1)
 
 | Sprint | Nombre | Historias | Story Points | Duración |
 |--------|--------|-----------|--------------|----------|
 | Sprint 1 | Fase Pre-viaje | US-001, US-002, US-003, US-004 | 16 SP | 2 semanas |
-| Sprint 2 | Fase Post-viaje + Administración | US-005, US-006, US-007, US-008 | 18 SP | 2 semanas |
 
 ---
 
-##  Sprint 1 – Fase Pre-viaje
+## Sprint 1 – Fase Pre-viaje
 
-###  Objetivo
-Implementar la fase pre-viaje: cálculo de rango tarifario, visualización asimétrica, negociación y aceptación bilateral.
+### Objetivo
+Implementar el flujo completo de pre-viaje: solicitud, cálculo de rango tarifario, visualización asimétrica, negociación y aceptación bilateral.
 
 ---
 
-###  US-001 – Solicitud de viaje con cálculo de rango
+## US-001 – Solicitud de viaje con cálculo de rango
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
@@ -51,19 +50,19 @@ Implementar la fase pre-viaje: cálculo de rango tarifario, visualización asim�
 
 ---
 
-###  US-002 – Visualización asimétrica del precio
+## US-002 – Visualización asimétrica del precio
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
 | Vista pasajero (máximo) | Frontend | En progreso |
 | Vista conductor (mínimo) | Frontend | En progreso |
-| Vista admin (rango completo) | Frontend | En progreso |
+| Vista administrador (rango completo) | Frontend | En progreso |
 | Control de acceso por roles | Frontend | En progreso |
 | Pruebas de seguridad | QA | En progreso |
 
 ---
 
-###  US-003 – Negociación acotada
+## US-003 – Negociación acotada dentro del rango
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
@@ -76,43 +75,24 @@ Implementar la fase pre-viaje: cálculo de rango tarifario, visualización asim�
 
 ---
 
-###  US-004 – Aceptación bilateral e inicio de viaje
+## US-004 – Aceptación bilateral e inicio de viaje
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
 | Endpoint aceptación bilateral | Backend | Pendiente |
-| Máquina de estados | Backend | Completado |
+| Máquina de estados del viaje | Backend | Completado |
 | Notificaciones | Frontend | Pendiente |
 | Activación GPS | Backend | Pendiente |
 | Pruebas de flujo completo | QA | Pendiente |
 
 ---
 
-##  Sprint 2 – Post-viaje + Administración
+## Resumen del Sprint 1
 
-###  Objetivo
-Implementar post-viaje (GPS, recálculo, regla de pago) y módulo administrativo (configuración y reportes).
-
----
-
-###  US-005 a US-008 (resumen)
-
-| US | Estado general |
-|----|--------------|
-| US-005 Recálculo post-viaje | Pendiente |
-| US-006 Regla de pago | Avanzado |
-| US-007 Parametrización | En progreso |
-| US-008 Reportes | Pendiente |
-
----
-
-##  Resumen del Sprint
-
-| Métrica | Sprint 1 |
-|--------|----------|
+| Métrica | Valor |
+|--------|------|
 | Historias | 4 |
 | Tareas totales | 20 |
 | Completadas | 2 |
 | En progreso | 7 |
 | Pendientes | 11 |
-

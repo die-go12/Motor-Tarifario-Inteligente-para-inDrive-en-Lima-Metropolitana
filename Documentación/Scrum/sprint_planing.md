@@ -17,14 +17,14 @@ Implementar la fase Pre-Viaje del sistema permitiendo que el pasajero solicite u
 
 ---
 
-##  Historias de Usuario del Sprint
+## Historias de Usuario del Sprint
 
-| ID | Historia | Prioridad |
-|----|----------|-----------|
-| US-001 | Solicitud de viaje con cálculo de rango | Alta |
-| US-002 | Visualización asimétrica del precio | Alta |
-| US-003 | Negociación acotada dentro del rango | Alta |
-| US-004 | Aceptación bilateral e inicio de viaje | Alta |
+| ID | Historia | Prioridad | Story Points |
+|----|----------|-----------|--------------|
+| US-001 | Solicitud de viaje con cálculo de rango | Alta | 5 SP |
+| US-002 | Visualización asimétrica del precio | Alta | 4 SP |
+| US-003 | Negociación acotada dentro del rango | Alta | 4 SP |
+| US-004 | Aceptación bilateral e inicio de viaje | Alta | 3 SP |
 
 ---
 

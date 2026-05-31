@@ -17,7 +17,7 @@ Implementar la fase Pre-Viaje del sistema permitiendo que el pasajero solicite u
 
 ---
 
-## 📋 Historias de Usuario del Sprint
+##  Historias de Usuario del Sprint
 
 | ID | Historia | Prioridad |
 |----|----------|-----------|

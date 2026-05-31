@@ -44,9 +44,9 @@ Generar un rango tarifario inteligente en menos de 5 segundos.
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
 | Endpoint solicitud de viaje | Backend | Completado |
-| Integración Google Maps (distancia y tiempo) | Backend | Pendiente |
-| Integración OSINERGMIN (combustible) | Backend | Pendiente |
-| API de tráfico en tiempo real | Backend | Pendiente |
+| Integración Google Maps (modo mock / datos simulados) | Backend | Pendiente |
+| Integración OSINERGMIN (modo mock / datos simulados)| Backend | Pendiente |
+| API de tráfico en tiempo real (simulado)| Backend | Pendiente |
 | Algoritmo de cálculo de rango (7 variables) | Backend | En progreso |
 | Manejo de fallos externos (degradación elegante) | Backend | En progreso |
 | Pruebas unitarias e integración | QA | En progreso |

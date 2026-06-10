@@ -2,7 +2,7 @@
 
 Guía rápida para usar los servicios del frontend.
 
-## 🔗 Importar Servicios
+## Importar Servicios
 
 ```javascript
 import { 
@@ -15,7 +15,7 @@ import {
 } from './services/index.js';
 ```
 
-## 🔐 Auth
+## Auth
 
 ```javascript
 // Login
@@ -34,7 +34,7 @@ authService.getCurrentUser();
 if (authService.isAuthenticated()) { ... }
 ```
 
-## 🚗 Trips
+## Trips
 
 ```javascript
 // Get all trips
@@ -76,7 +76,7 @@ const stats = tripsService.calculateStats(trips);
 const outliers = tripsService.findOutliers(trips);
 ```
 
-## 💰 Pricing
+## Pricing
 
 ```javascript
 // Load config (ADMIN)
@@ -114,7 +114,7 @@ await pricingService.updateConfig({
 });
 ```
 
-## 🛠️ API Service
+## API Service
 
 ```javascript
 // Get
@@ -142,7 +142,7 @@ const token = apiService.getToken();
 apiService.clearToken();
 ```
 
-## 🎨 UI Utils
+## UI Utils
 
 ```javascript
 import { showToast, showLoading, closeModal, openModal, $ } from './ui-utils.js';
@@ -180,7 +180,7 @@ await copyToClipboard('text');
 downloadJSON(data, 'file.json');
 ```
 
-## 📋 Estados de Viaje
+## Estados de Viaje
 
 ```javascript
 TRIP_STATUS.SEARCHING   // 'SEARCHING'
@@ -190,7 +190,7 @@ TRIP_STATUS.COMPLETED   // 'COMPLETED'
 TRIP_STATUS.CANCELLED   // 'CANCELLED'
 ```
 
-## 👥 Roles de Usuario
+## Roles de Usuario
 
 ```javascript
 USER_ROLES.ADMIN       // 'ADMIN'
@@ -198,7 +198,7 @@ USER_ROLES.DRIVER      // 'DRIVER'
 USER_ROLES.PASSENGER   // 'PASSENGER'
 ```
 
-## 🔌 Endpoints
+## Endpoints
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
@@ -215,14 +215,14 @@ USER_ROLES.PASSENGER   // 'PASSENGER'
 | GET | /pricing/config | Obtener config (ADMIN) |
 | PUT | /pricing/config | Actualizar config (ADMIN) |
 
-## ⚙️ Configuración
+## Configuración
 
 ```javascript
 // Cambiar URL del backend
 localStorage.setItem('api_gateway_url', 'http://new-url:3000');
 ```
 
-## 🐛 Debugging
+## Debugging
 
 ```javascript
 // Enable debug mode
@@ -238,7 +238,7 @@ window.AppState.trips;
 pricingService.config;
 ```
 
-## 📱 Mobile Responsiveness
+## Mobile Responsiveness
 
 Breakpoint media queries en CSS:
 

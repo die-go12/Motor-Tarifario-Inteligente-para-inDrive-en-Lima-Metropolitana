@@ -2,7 +2,7 @@
 
 Panel administrativo moderno para gestión de viajes, conductores y tarifas en inDrive+ Lima Metropolitana.
 
-## 📦 Estructura
+## Estructura
 
 ```
 admin-panel/
@@ -22,7 +22,7 @@ admin-panel/
         └── pricing.service.js    # Motor de tarifas
 ```
 
-## 🚀 Comenzar
+## Comenzar
 
 ### 1. Iniciar Backend
 
@@ -63,7 +63,7 @@ python -m http.server 8000
 
 O usa **Modo Demo** si el backend no está disponible.
 
-## 🎯 Funcionalidades
+## Funcionalidades
 
 ### Dashboard
 - KPIs en tiempo real: Total de viajes, gap de negociación, conductores activos, anomalías
@@ -99,7 +99,7 @@ O usa **Modo Demo** si el backend no está disponible.
 - Prueba de conexión
 - Registro de nuevos usuarios
 
-## 📡 API Gateway
+## API Gateway
 
 El frontend se conecta al **API Gateway** (puerto 3000), que actúa como punto central:
 
@@ -120,7 +120,7 @@ Frontend
 - ✅ Autenticación en un solo lugar
 - ✅ Fácil de escalar
 
-## 🔑 Autenticación
+## Autenticación
 
 Token JWT almacenado automáticamente en `localStorage`:
 
@@ -135,7 +135,7 @@ Si el token expira (401):
 2. Redirige a login
 3. Usuario puede ingresar nuevamente
 
-## 🔧 Configuración
+## Configuración
 
 ### Cambiar URL del Backend
 
@@ -161,7 +161,7 @@ API_CONFIG.MS_BASE = 'http://localhost:3001'    // ms-base
 API_CONFIG.MS_PRICING = 'http://localhost:3002' // ms-pricing
 ```
 
-## 🎨 Diseño
+## Diseño
 
 Basado en [DESIGN.md](../DESIGN.md):
 
@@ -170,7 +170,7 @@ Basado en [DESIGN.md](../DESIGN.md):
 - **Tipografía**: Inter sans-serif
 - **Responsive**: Adaptado a mobile
 
-## 📊 Estructura de Datos
+## Estructura de Datos
 
 ### Trip
 ```javascript
@@ -217,7 +217,7 @@ Basado en [DESIGN.md](../DESIGN.md):
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Con Postman/Insomnia
 
@@ -243,7 +243,7 @@ Si el backend no está disponible, el frontend entra automáticamente en **modo 
 - Funcionalidad parcial
 - Perfecto para desarrollo y UI testing
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### "No se puede conectar al backend"
 ```
@@ -272,14 +272,14 @@ El token se almacena en localStorage.
 Limpia cache si persiste el problema.
 ```
 
-## 📚 Documentación
+## Documentación
 
 - [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) - Guía completa de integración
 - [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - Referencia rápida de APIs
 - [../DESIGN.md](../DESIGN.md) - Sistema de diseño
 - [../indrive-plus/README.md](../indrive-plus/README.md) - Backend
 
-## 🔐 Seguridad
+## Seguridad
 
 - ✅ JWT authentication
 - ✅ CORS configurado
@@ -287,7 +287,7 @@ Limpia cache si persiste el problema.
 - ✅ Validación de inputs
 - ✅ Error handling seguro (sin exponer detalles internos)
 
-## 📝 Desarrollo
+## Desarrollo
 
 ### Agregar nueva función
 
@@ -326,7 +326,7 @@ Limpia cache si persiste el problema.
    }
    ```
 
-## 🎓 Aprendizaje
+## Aprendizaje
 
 Este proyecto demuestra:
 - ✅ Arquitectura modular (servicios)
@@ -337,7 +337,7 @@ Este proyecto demuestra:
 - ✅ UI responsiva
 - ✅ Integración con backend
 
-## 📞 Soporte
+## Soporte
 
 Para reportar bugs o sugerencias, crea un issue en GitHub o contacta al equipo de desarrollo.
 

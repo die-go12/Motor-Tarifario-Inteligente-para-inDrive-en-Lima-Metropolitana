@@ -1,10 +1,10 @@
-# 📋 Resumen de Refactorización Frontend
+# Resumen de Refactorización Frontend
 
-## ✅ Tareas Completadas
+## Tareas Completadas
 
 Se ha refactorizado completamente el frontend para tener una arquitectura modular y profesional que se conecte correctamente con el backend.
 
-## 📁 Archivos Creados
+## Archivos Creados
 
 ### Configuración
 - **[js/config.js](js/config.js)** - Configuración centralizada (URLs, endpoints, constantes)
@@ -28,7 +28,7 @@ Se ha refactorizado completamente el frontend para tener una arquitectura modula
 - **[INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md)** - Guía de integración frontend-backend
 - **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Referencia rápida de APIs
 
-## 🔄 Cambios Principales
+## Cambios Principales
 
 ### 1. **URL del Backend**
 ```javascript
@@ -72,7 +72,7 @@ await authService.login(email, password);
 // ✅ Soporte para modo demo
 ```
 
-## 📊 Endpoints Implementados
+## Endpoints Implementados
 
 | Servicio | Método | Endpoint | Función |
 |----------|--------|----------|---------|
@@ -92,7 +92,7 @@ await authService.login(email, password);
 | Users | GET | /users/me | Mi perfil |
 | Users | PATCH | /users/me | Actualizar perfil |
 
-## 🚀 Cómo Empezar
+## Cómo Empezar
 
 ### 1. Iniciar Backend
 ```bash
@@ -118,7 +118,7 @@ python -m http.server 8000
 ### 4. O usar Modo Demo
 Si el backend no está disponible, haz click en "Usar credenciales demo"
 
-## 🧪 Testing
+## Testing
 
 ### Test con curl
 ```bash
@@ -143,7 +143,7 @@ curl -X POST http://localhost:3000/pricing/quote \
 3. Ve a Viajes - Debería mostrar tabla de transacciones
 4. Ve a Configuración - Prueba la conexión
 
-## 🔧 Estructura de Carpetas
+## Estructura de Carpetas
 
 ```
 admin-panel/
@@ -163,7 +163,7 @@ admin-panel/
         └── pricing.service.js    ← Tarifas
 ```
 
-## 🎯 Características Implementadas
+## Características Implementadas
 
 ✅ Autenticación JWT  
 ✅ Dashboard con KPIs  
@@ -181,7 +181,7 @@ admin-panel/
 ✅ Tablas dinámicas  
 ✅ Gráficos con Chart.js  
 
-## 📖 Documentación Disponible
+## Documentación Disponible
 
 1. **README.md** - Manual de usuario y setup
 2. **INTEGRATION_GUIDE.md** - Cómo integrar frontend con backend
@@ -189,7 +189,7 @@ admin-panel/
 4. [DESIGN.md](../DESIGN.md) - Sistema de diseño
 5. [Backend README](../indrive-plus/README.md) - Documentación del backend
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "No se puede conectar al backend"
 1. Verifica que el API Gateway esté en http://localhost:3000
@@ -209,7 +209,7 @@ localStorage.clear();
 location.reload();
 ```
 
-## 💡 Próximos Pasos
+## Próximos Pasos
 
 1. **Conectar con tu base de datos real** - Modifica ms-base para usar tu BD
 2. **Implementar WebSockets** - Para actualizaciones en tiempo real
@@ -217,7 +217,7 @@ location.reload();
 4. **Integración de pago** - Para liquidación de tarifas
 5. **Mobile app** - React Native con los mismos servicios
 
-## 📝 Notas Técnicas
+## Notas Técnicas
 
 - Usa ES6 modules (`type="module"`)
 - Todos los servicios son singletons
@@ -226,7 +226,7 @@ location.reload();
 - Error handling centralizado
 - Configuración por localStorage
 
-## ✨ Características Futuras
+## Características Futuras
 
 - [ ] WebSockets para notificaciones en tiempo real
 - [ ] Gráficos más avanzados

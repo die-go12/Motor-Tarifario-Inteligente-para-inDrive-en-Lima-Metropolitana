@@ -108,7 +108,7 @@ GET /users/:id
 Headers: { Authorization: Bearer TOKEN }
 ```
 
-#### 💰 Pricing (`/pricing`)
+#### Pricing (`/pricing`)
 ```javascript
 // Cotizar precio
 POST /pricing/quote
@@ -129,7 +129,7 @@ Headers: { Authorization: Bearer TOKEN }
 Body: { distanceWeight, fuelWeight, ... }
 ```
 
-## 🚀 Uso de Servicios
+## Uso de Servicios
 
 ### 1. Autenticación
 
@@ -299,7 +299,7 @@ async function updatePricingConfig() {
 }
 ```
 
-## 📌 Cambios en el HTML
+##  Cambios en el HTML
 
 Necesitas actualizar tu `index.html` para importar los servicios:
 
@@ -352,7 +352,7 @@ async function init() {
 window.addEventListener('DOMContentLoaded', init);
 ```
 
-## 🔄 Flujo de Autenticación
+## Flujo de Autenticación
 
 ```
 1. Usuario intenta login
@@ -372,7 +372,7 @@ window.addEventListener('DOMContentLoaded', init);
 8. Si 401, apiService dispara evento 'auth:logout'
 ```
 
-## ⚠️ Manejo de Errores
+## Manejo de Errores
 
 ```javascript
 try {
@@ -387,7 +387,7 @@ try {
 }
 ```
 
-## 🧪 Testing Endpoints
+## Testing Endpoints
 
 Usa esta URL para probar en Postman/Insomnia:
 
@@ -400,7 +400,7 @@ Endpoints ejemplo:
 - GET http://localhost:3000/trips
 - POST http://localhost:3000/pricing/quote
 
-## 📝 Variables de Configuración
+## Variables de Configuración
 
 Cambiar URL del backend en tiempo de ejecución:
 
@@ -415,7 +415,7 @@ apiService.setBaseUrl(API_CONFIG.GATEWAY);
 localStorage.setItem('api_gateway_url', 'http://api.production.com:3000');
 ```
 
-## ✅ Checklist de Integración
+## Checklist de Integración
 
 - [ ] Backend corriendo en localhost:3000 (API Gateway)
 - [ ] Frontend importa servicios correctamente
@@ -428,7 +428,7 @@ localStorage.setItem('api_gateway_url', 'http://api.production.com:3000');
 - [ ] Errores capturados y mostrados al usuario
 - [ ] Tokens persistidos en localStorage
 
-## 🐛 Debugging
+## Debugging
 
 Habilitar logs en consola:
 

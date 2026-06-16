@@ -23,6 +23,7 @@ import {
 } from '../../services/config';
 import { decodePolyline } from '../../utils/polyline';
 import { formatSoles, formatDistancia, formatDuracion } from '../../utils/format';
+import * as Location from 'expo-location';
 
 type Props = {
   navigation: NativeStackNavigationProp<PassengerStackParamList, 'SearchTrip'>;
@@ -55,10 +56,47 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
   const [solicitando, setSolicitando] = useState(false);
   const [ofertaInicial, setOfertaInicial] = useState('');
 
+  const [origenCoords, setOrigenCoords] = useState<Coords>(LIMA_CENTRO);
+  const [origenDireccion, setOrigenDireccion] = useState('Obteniendo ubicación...');
+
   const { setViajeActivo, setRutaCoords } = useTripStore();
 
-  // El backend usa nombres de lugar (no coordenadas) para el contexto del viaje.
-  const ORIGEN_DIRECCION = 'Ubicación actual';
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setOrigenDireccion('Lima Centro, Perú');
+          return;
+        }
+        const location = await Location.getCurrentPositionAsync({});
+        const coords = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+        setOrigenCoords(coords);
+        
+        const address = await Location.reverseGeocodeAsync(coords);
+        if (address && address.length > 0) {
+          const item = address[0];
+          const parts = [];
+          if (item.street) {
+            parts.push(item.street + (item.streetNumber ? ` ${item.streetNumber}` : ''));
+          }
+          if (item.district) {
+            parts.push(item.district);
+          }
+          const formatted = parts.join(', ') || 'Ubicación actual';
+          setOrigenDireccion(formatted);
+        } else {
+          setOrigenDireccion('Ubicación actual');
+        }
+      } catch (e) {
+        console.error('Error obteniendo ubicación GPS:', e);
+        setOrigenDireccion('Ubicación actual');
+      }
+    })();
+  }, []);
 
   const buscarLugares = async (texto: string) => {
     setDestino(texto);
@@ -104,7 +142,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
       // Cotización pre-viaje: el backend (Integración + Motor) devuelve
       // distancia, duración, polyline y el TECHO (visualización asimétrica).
       const { data: tripData } = await api.post('/trips/quote', {
-        origin: ORIGEN_DIRECCION,
+        origin: origenDireccion,
         destination: lugar.descripcion,
       });
 
@@ -129,19 +167,16 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
     setSolicitando(true);
     try {
       const { data } = await api.post('/trips', {
-        origin: ORIGEN_DIRECCION,
+        origin: origenDireccion,
         destination: lugarSeleccionado.descripcion,
       });
-      const origen: Coords = {
-        latitude: LIMA_CENTRO.latitude,
-        longitude: LIMA_CENTRO.longitude,
-      };
+      const origen: Coords = origenCoords;
       setViajeActivo({
         id: String(data.id),
         status: data.status,
         origen,
         destino: destinoCoords ?? origen,
-        origenDireccion: ORIGEN_DIRECCION,
+        origenDireccion: origenDireccion,
         destinoDireccion: lugarSeleccionado.descripcion,
         distanciaKm: preview.distanciaKm,
         duracionMin: preview.duracionMin,

@@ -2,7 +2,7 @@
 // Las variables de conexión y API keys ahora se manejan mediante variables de entorno en un archivo `.env`.
 // Para desarrollo local se lee process.env.EXPO_PUBLIC_*.
 
-const DEFAULT_IP = '192.168.18.202';
+const DEFAULT_IP = '192.168.18.29';
 
 // La app habla directo al microservicio base (ms-base), que expone tanto la API
 // REST (auth, users, vehicles, trips) como el WebSocket en tiempo real.

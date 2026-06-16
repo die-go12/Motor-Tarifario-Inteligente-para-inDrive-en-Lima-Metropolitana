@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { MapViewCompatible, MarkerCompatible, PolylineCompatible } from '../../components/MapViewCompatible';
 import * as Location from 'expo-location';
@@ -30,7 +31,7 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
   } | null>(null);
   const [permisoConcedido, setPermisoConcedido] = useState(false);
 
-  const { user } = useAuthStore();
+  const { user, logout, switchRole } = useAuthStore();
   const { viajeActivo, rutaCoords } = useTripStore();
 
   useEffect(() => {
@@ -45,6 +46,21 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
       });
     })();
   }, []);
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Seguro que deseas salir de tu cuenta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Salir', style: 'destructive', onPress: () => logout() },
+      ],
+    );
+  };
+
+  const handleSwitchRole = () => {
+    switchRole();
+  };
 
   return (
     <View style={estilos.contenedor}>
@@ -72,15 +88,21 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
         )}
       </MapViewCompatible>
 
-      {/* Encabezado con saludo y switch de rol */}
+      {/* Encabezado con saludo, switch de rol y logout */}
       <View style={estilos.encabezado}>
         <TarjetaBase estilo={estilos.barraEncabezado}>
           <View style={estilos.filaEncabezado}>
-            <Text style={estilos.saludo}>Hola, {user?.name?.split(' ')[0]} 👋</Text>
-            <View style={estilos.botonRol}>
-              <Text style={estilos.textoRol}>🧑 Pasajero</Text>
+            <View style={estilos.filaUsuario}>
+              <Text style={estilos.saludo}>Hola, {user?.name?.split(' ')[0]} 👋</Text>
+              <TouchableOpacity onPress={handleLogout} activeOpacity={0.7}>
+                <Text style={estilos.logoutTexto}>Salir</Text>
+              </TouchableOpacity>
             </View>
           </View>
+          <TouchableOpacity style={estilos.botonRol} onPress={handleSwitchRole} activeOpacity={0.7}>
+            <Text style={estilos.textoRol}>🧑 Pasajero</Text>
+            <Text style={estilos.switchHint}>Toca para cambiar a Conductor →</Text>
+          </TouchableOpacity>
         </TarjetaBase>
       </View>
 
@@ -120,26 +142,45 @@ const estilos = StyleSheet.create({
     left: theme.spacing.lg,
     right: theme.spacing.lg,
   },
-  barraEncabezado: { padding: theme.spacing.md },
+  barraEncabezado: { padding: theme.spacing.md, gap: theme.spacing.sm },
   filaEncabezado: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  filaUsuario: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flex: 1,
+  },
   saludo: {
     ...theme.typography.bodyLg,
     color: theme.colors.textPrimary,
+  },
+  logoutTexto: {
+    ...theme.typography.caption,
+    color: theme.colors.error,
+    fontFamily: 'Inter-Bold',
   },
   botonRol: {
     backgroundColor: theme.colors.surfaceSecondary,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.rounded.full,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   textoRol: {
     ...theme.typography.caption,
     color: theme.colors.primary,
     fontFamily: 'Inter-Bold',
+  },
+  switchHint: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    fontSize: 11,
   },
   panelInferior: {
     position: 'absolute',

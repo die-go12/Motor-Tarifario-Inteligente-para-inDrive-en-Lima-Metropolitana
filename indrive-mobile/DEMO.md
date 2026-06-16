@@ -36,24 +36,52 @@ node dist/apps/ms-base/main.js          # :3001  (API REST + WebSocket)  <- la a
 
 Desde `indrive-mobile/`:
 
-1. **Pon la IP de tu PC** (no `localhost`) en `src/services/config.ts`:
-   ```ts
-   export const HOST_IP = '192.168.X.X'; // <- tu IP en la Wi-Fi (ipconfig / hostname -I)
+1. **Configurar el archivo `.env`**:
+   Copia el archivo `.env.example` como `.env`:
+   ```bash
+   cp .env.example .env
    ```
-   Tu celular y tu PC deben estar en la **misma red Wi-Fi**.
+   Abre `.env` y configura las variables:
+   * Si usas un **emulador local** o **conexión USB por cable** con redirección de puertos, puedes mantener `localhost`:
+     ```env
+     EXPO_PUBLIC_API_URL=http://localhost:3001
+     EXPO_PUBLIC_WS_URL=http://localhost:3001
+     ```
+   * Si usas un **dispositivo físico vía Wi-Fi**, reemplaza `localhost` con la IP local de tu PC (ej. `http://192.168.18.202:3001`).
+   * Configura tu API Key de Google Maps en `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY`.
 
-2. **Google Maps API Key** (necesaria para buscar el destino):
-   ```ts
-   export const GOOGLE_MAPS_API_KEY = 'TU_API_KEY';
-   ```
-   > Sin esta key, el buscador de destinos del pasajero no devuelve sugerencias.
-
-3. Instala y arranca Expo:
+2. **Instalar dependencias**:
    ```bash
    npm install
-   npx expo start
    ```
-   Escanea el QR con **Expo Go** en tu celular.
+
+3. **Compilar y Arrancar con Expo Dev Client**:
+   * **Para Emulador o Dispositivo Android (Recomendado)**:
+     Asegúrate de tener el SDK de Android configurado. Si usas un dispositivo físico por USB, activa la depuración USB y ejecuta:
+     ```bash
+     # Redirigir puertos de Metro y el backend al celular por USB
+     adb reverse tcp:8081 tcp:8081
+     adb reverse tcp:3001 tcp:3001
+     
+     # Compilar e instalar el cliente de desarrollo e iniciar Metro
+     npx expo run:android
+     ```
+     *(La primera vez compilará el APK de desarrollo y lo instalará en tu dispositivo/emulador. Para arranques diarios subsiguientes, puedes usar `npx expo start --dev-client`).*
+
+   * **Para Simulador iOS (macOS)**:
+     ```bash
+     npx expo run:ios
+     ```
+
+   * **Para compilación en la nube (EAS Build)**:
+     Si prefieres no compilar localmente, puedes usar EAS en la nube (requiere cuenta de Expo):
+     ```bash
+     npx eas build --profile development --platform android
+     ```
+     Descarga e instala el APK de desarrollo generado en tu dispositivo, y luego inicia Metro con:
+     ```bash
+     npx expo start --dev-client
+     ```
 
 ---
 

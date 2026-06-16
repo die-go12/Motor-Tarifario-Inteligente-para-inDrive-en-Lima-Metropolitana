@@ -16,6 +16,7 @@
     },
     "android": {
       "package": "pe.indrive.app",
+      "usesCleartextTraffic": true,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyD8P5S5XkSVt3epOPC8_dTGmPvFvRm6nx4"

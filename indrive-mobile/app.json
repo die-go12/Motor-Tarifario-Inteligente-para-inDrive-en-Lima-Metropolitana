@@ -9,10 +9,18 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "pe.indrive.app",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyD8P5S5XkSVt3epOPC8_dTGmPvFvRm6nx4"
+      }
     },
     "android": {
       "package": "pe.indrive.app",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD8P5S5XkSVt3epOPC8_dTGmPvFvRm6nx4"
+        }
+      },
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

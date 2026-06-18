@@ -6,6 +6,8 @@
 
 **Sprint:** Sprint 1
 
+**Período:** 26–30 de mayo de 2026 (presentación: sábado 30 de mayo)
+
 **Objetivo General**
 
 Implementar la fase Pre-Viaje del sistema, permitiendo que un pasajero solicite un viaje, el motor tarifario calcule un rango de precios, ambas partes negocien dentro de dicho rango y finalmente acepten la propuesta para iniciar el trayecto.
@@ -223,17 +225,19 @@ Estados:
 
 Cálculo del rango pre-viaje utilizando:
 
-1. Distancia estimada
-2. Tiempo estimado
-3. Tráfico
-4. Precio combustible
-5. Oferta de conductores
-6. Demanda de pasajeros
-7. Historial de viajes
+1. Distancia del trayecto
+2. Precio del combustible
+3. Capacidad del vehículo
+4. Condición del tráfico
+5. Hora del día / demanda zonal
+6. Tiempo estimado del viaje
+7. Histórico de viajes
 
 Resultado:
 
 [minimo, maximo]
+
+> **Nota:** la "demanda" está representada por la variable 5 (hora/demanda zonal). El simulador del panel admin incorpora controles de "oferta" y "demanda" que ajustan ese factor dinámico para visualizar su efecto en el rango. El surge real en tiempo real (oferta/demanda en vivo) queda como trabajo futuro.
 
 ---
 
@@ -280,7 +284,7 @@ Uso:
 
 Estado:
 
-🟡 En desarrollo
+✅ Mock/stub funcional
 
 ---
 
@@ -292,7 +296,7 @@ Uso:
 
 Estado:
 
-🟡 En desarrollo
+✅ Mock/stub funcional (dataset local)
 
 ---
 
@@ -305,7 +309,7 @@ Uso:
 
 Estado:
 
-🟡 En desarrollo
+✅ Mock/stub funcional (simulado)
 
 ---
 
@@ -383,8 +387,9 @@ Estado:
 Flujo de trabajo:
 
 * main
-* backend
-* frontend
+* feature/backend
+* feature/mobile-integration
+* Panel_Admin
 * docker-setup
 
 Pull Requests:
@@ -403,12 +408,12 @@ Estado:
 
 | ID     | Tarea                   | Estado |
 | ------ | ----------------------- | ------ |
-| S1-T01 | Endpoint de solicitud   | 🟡     |
-| S1-T02 | Integración Google Maps | 🟡     |
-| S1-T03 | Integración OSINERGMIN  | 🟡     |
-| S1-T04 | Cálculo de variables    | 🟡     |
-| S1-T05 | Circuit Breaker APIs    | 🟡     |
-| S1-T06 | Pruebas                 | 🟡     |
+| S1-T01 | Endpoint de solicitud          | ✅     |
+| S1-T02 | Integración Google Maps (mock) | ✅     |
+| S1-T03 | Integración OSINERGMIN (mock)  | ✅     |
+| S1-T04 | Cálculo de variables           | ✅     |
+| S1-T05 | Circuit Breaker APIs           | ✅     |
+| S1-T06 | Pruebas                        | 🟡     |
 
 ---
 
@@ -416,10 +421,10 @@ Estado:
 
 | ID     | Tarea               | Estado |
 | ------ | ------------------- | ------ |
-| S1-T08 | Vista pasajero      | 🟡     |
-| S1-T09 | Vista conductor     | 🟡     |
-| S1-T10 | Vista administrador | 🟡     |
-| S1-T11 | Pruebas por rol     | 🟡     |
+| S1-T08 | Vista pasajero (techo)      | ✅     |
+| S1-T09 | Vista conductor (piso)      | ✅     |
+| S1-T10 | Vista administrador (rango) | ✅     |
+| S1-T11 | Pruebas por rol             | 🟡     |
 
 ---
 
@@ -427,11 +432,11 @@ Estado:
 
 | ID     | Tarea                 | Estado |
 | ------ | --------------------- | ------ |
-| S1-T12 | Validación de ofertas | 🟡     |
-| S1-T13 | Endpoint de ofertas   | 🟡     |
-| S1-T14 | Registro de ofertas   | 🟡     |
+| S1-T12 | Validación de ofertas | ✅     |
+| S1-T13 | Endpoint de ofertas   | ✅     |
+| S1-T14 | Registro de ofertas   | ✅     |
 | S1-T15 | Interfaz negociación  | 🟡     |
-| S1-T16 | Pruebas de límites    | ⚪      |
+| S1-T16 | Pruebas de límites    | ✅     |
 
 ---
 
@@ -439,11 +444,11 @@ Estado:
 
 | ID     | Tarea               | Estado |
 | ------ | ------------------- | ------ |
-| S1-T17 | Endpoint aceptación | 🟡     |
-| S1-T18 | Máquina de estados  | 🟡     |
-| S1-T19 | Notificaciones      | ⚪      |
-| S1-T20 | Captura GPS         | ⚪      |
-| S1-T21 | Flujo completo      | ⚪      |
+| S1-T17 | Endpoint aceptación        | ✅     |
+| S1-T18 | Máquina de estados         | ✅     |
+| S1-T19 | Notificaciones (WebSocket) | ✅     |
+| S1-T20 | Captura GPS                | 🟡     |
+| S1-T21 | Flujo completo             | ✅     |
 
 ---
 
@@ -536,5 +541,5 @@ Próximo objetivo:
 
 Completar las funcionalidades pendientes contempladas para avanzar a la siguiente fase con el Sprint 2.
 
-Estado General: 🟡 En Progreso
+Estado General: ✅ Completado (US-001 a US-004)
 

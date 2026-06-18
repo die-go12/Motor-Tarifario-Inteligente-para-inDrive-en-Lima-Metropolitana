@@ -32,5 +32,9 @@ export interface AnomalyDetectedEvent {
   tripId?: number;
   anomalyType: string;
   severity: AnomalySeverity;
+  realPrice: number;
+  minimumPrice: number;
+  maximumPrice: number;
+  deviation: number;
   detectedAt: string;
 }

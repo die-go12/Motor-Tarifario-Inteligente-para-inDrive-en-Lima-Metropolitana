@@ -113,6 +113,10 @@ export class PricingService {
       tripId,
       anomalyType: 'PRICE_OUTLIER',
       severity: this.severityFor(deviation),
+      realPrice,
+      minimumPrice,
+      maximumPrice,
+      deviation: this.round(deviation),
       detectedAt: new Date().toISOString(),
     });
   }

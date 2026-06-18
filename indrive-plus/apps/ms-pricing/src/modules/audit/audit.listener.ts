@@ -88,6 +88,10 @@ export class AuditListener implements OnModuleInit, OnModuleDestroy {
       tripId: event.tripId,
       anomalyType: event.anomalyType,
       severity: event.severity,
+      realPrice: event.realPrice,
+      minimumPrice: event.minimumPrice,
+      maximumPrice: event.maximumPrice,
+      deviation: event.deviation,
       detectedAt: new Date(event.detectedAt),
     });
   }

@@ -8,6 +8,9 @@ import {
 } from './schemas/pricing-history.schema';
 import { EventsPublisher } from './events.publisher';
 import { AuditListener } from './audit.listener';
+import { AnomaliesService } from './anomalies.service';
+import { AnomaliesController } from './anomalies.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -16,8 +19,10 @@ import { AuditListener } from './audit.listener';
       { name: AnomalyLog.name, schema: AnomalyLogSchema },
       { name: PricingHistory.name, schema: PricingHistorySchema },
     ]),
+    AuthModule,
   ],
-  providers: [EventsPublisher, AuditListener],
+  controllers: [AnomaliesController],
+  providers: [EventsPublisher, AuditListener, AnomaliesService],
   exports: [EventsPublisher],
 })
 export class AuditModule {}

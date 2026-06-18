@@ -237,6 +237,30 @@ class AuthService {
   }
 
   /**
+   * Actualizar un usuario (solo ADMIN) - patch parcial
+   */
+  async adminUpdateUser(userId, data) {
+    try {
+      return await apiService.patch(API_ENDPOINTS.USERS.GET_ONE(userId), data);
+    } catch (error) {
+      console.error('Admin update user error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Eliminar un usuario (solo ADMIN)
+   */
+  async deleteUser(userId) {
+    try {
+      return await apiService.delete(API_ENDPOINTS.USERS.GET_ONE(userId));
+    } catch (error) {
+      console.error('Delete user error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Listar todos los usuarios (solo ADMIN)
    */
   async listAllUsers() {

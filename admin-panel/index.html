@@ -158,6 +158,13 @@
     .dstat{background:var(--surface2);border-radius:var(--r-sm);padding:10px}
     .dstat-label{font-size:11px;color:var(--t3);margin-bottom:3px}
     .dstat-val{font-size:15px;font-weight:700;color:var(--t1)}
+    .role-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+    .role-driver{background:rgba(97,184,255,.12);color:#61B8FF}
+    .role-passenger{background:rgba(168,85,247,.12);color:#C084FC}
+    .role-admin{background:rgba(198,247,10,.12);color:var(--lime)}
+    .role-auditor{background:rgba(251,146,60,.12);color:#fb923c}
+    .users-tab-btn{padding:8px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--t2);cursor:pointer;transition:all .15s;font-size:13px;}
+    .users-tab-btn.active{background:var(--lime);color:var(--bg);border-color:var(--lime);}
 
     /* ── MODAL ── */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center}
@@ -250,12 +257,14 @@
     <div class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-label">Main</div>
-        <button class="nav-item active" onclick="window.navigateTo('dashboard', this)">Dashboard</button>
-        <button class="nav-item" onclick="window.navigateTo('fleet', this)">Fleet</button>
-        <button class="nav-item" onclick="window.navigateTo('pricing', this)">Pricing</button>
-        <button class="nav-item" onclick="window.navigateTo('trips', this)">Viajes</button>
-        <button class="nav-item" onclick="window.navigateTo('safety', this)">Seguridad</button>
-        <button class="nav-item" onclick="window.navigateTo('settings', this)">Configuración</button>
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="fleet">Fleet</button>
+        <button class="nav-item" data-view="users">Usuarios</button>
+        <button class="nav-item" data-view="audit">Auditoría</button>
+        <button class="nav-item" data-view="pricing">Pricing</button>
+        <button class="nav-item" data-view="trips">Viajes</button>
+        <button class="nav-item" data-view="safety">Seguridad</button>
+        <button class="nav-item" data-view="settings">Configuración</button>
       </div>
     </div>
 
@@ -369,9 +378,40 @@
             <div class="panel-title">Fleet Management</div>
             <div class="panel-sub">Conductores registrados en la plataforma</div>
           </div>
-          <button class="btn-primary">+ Nuevo conductor</button>
+          <button class="btn-primary" id="new-driver-btn">+ Nuevo conductor</button>
         </div>
         <div id="fleet-grid" class="fleet-grid">Cargando conductores...</div>
+      </div>
+
+      <!-- USERS VIEW -->
+      <div id="view-users" class="view">
+        <div class="panel-header" style="margin-bottom:20px">
+          <div>
+            <div class="panel-title">Usuarios</div>
+            <div class="panel-sub">Lista completa de usuarios registrados</div>
+          </div>
+          <button class="btn-primary" id="new-driver-btn-users">+ Nuevo Registro</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+          <button class="users-tab-btn active" data-role="all" onclick="window.loadUsers('all')">Todos</button>
+          <button class="users-tab-btn" data-role="driver" onclick="window.loadUsers('driver')">Conductores</button>
+          <button class="users-tab-btn" data-role="passenger" onclick="window.loadUsers('passenger')">Pasajeros</button>
+          <button class="users-tab-btn" data-role="admin" onclick="window.loadUsers('admin')">Admins</button>
+          <button class="users-tab-btn" data-role="auditor" onclick="window.loadUsers('auditor')">Auditores</button>
+        </div>
+        <div id="users-table-wrap" class="table-wrap">Cargando usuarios...</div>
+      </div>
+
+      <!-- AUDIT VIEW -->
+      <div id="view-audit" class="view">
+        <div class="panel-header" style="margin-bottom:20px">
+          <div>
+            <div class="panel-title">Auditoría</div>
+            <div class="panel-sub">Historial de eventos de pricing y anomalías</div>
+          </div>
+          <button class="filter-btn" onclick="window.loadAuditLogs()">↻ Actualizar</button>
+        </div>
+        <div id="audit-table-wrap" class="table-wrap">Cargando auditoría...</div>
       </div>
 
       <!-- PRICING VIEW -->

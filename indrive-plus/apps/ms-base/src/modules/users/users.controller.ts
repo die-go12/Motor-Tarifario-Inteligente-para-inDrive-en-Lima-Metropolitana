@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -46,5 +47,20 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Patch(':id')
+  updateOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.usersService.updateProfile(id, dto);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Delete(':id')
+  removeOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.remove(id);
   }
 }

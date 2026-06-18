@@ -10,14 +10,14 @@ export const AUTH_CONFIG = {
 
 export const API_CONFIG = {
   // Se usan URL directas de cada servicio cuando la gateway no proxea pricing/WS
-  GATEWAY: localStorage.getItem('api_gateway_url') || 'http://localhost:3000',
+  GATEWAY: localStorage.getItem('api_gateway_url') || 'http://localhost:3001',
 
   get MS_BASE() {
-    return localStorage.getItem('ms_base_url') || 'http://localhost:3001';
+    return localStorage.getItem('ms_base_url') || 'http://localhost:3002';
   },
 
   get MS_PRICING() {
-    return localStorage.getItem('ms_pricing_url') || 'http://localhost:3002';
+    return localStorage.getItem('ms_pricing_url') || 'http://localhost:3003';
   },
 
   get BASE_URL() {

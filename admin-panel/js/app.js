@@ -26,6 +26,7 @@ import {
   getInitials,
   getColorByIndex
 } from './ui-utils.js';
+import { debounce } from './ui-utils.js';
 
 // Estado global
 const AppState = {
@@ -106,6 +107,43 @@ function setupEventListeners() {
   const testConnectionBtn = document.querySelector('[data-action="test-connection"]');
   if (testConnectionBtn) {
     testConnectionBtn.addEventListener('click', testConnection);
+  }
+
+  // Sidebar navigation
+  document.querySelectorAll('.nav-item[data-view]').forEach((button) => {
+    try {
+      button.addEventListener('click', () => {
+        console.debug('Nav click:', button.dataset.view);
+        goTo(button.dataset.view, button);
+      });
+    } catch (err) {
+      console.error('Error attaching nav listener', err);
+    }
+  });
+
+  // User role tab navigation
+  document.querySelectorAll('.users-tab-btn').forEach((button) => {
+    try {
+      button.addEventListener('click', () => {
+        const role = button.getAttribute('data-role') || 'all';
+        console.debug('Users tab click:', role);
+        loadUsers(role);
+      });
+      // remove any inline onclick to avoid double-calls
+      if (button.getAttribute('onclick')) button.removeAttribute('onclick');
+    } catch (err) {
+      console.error('Error attaching users tab listener', err);
+    }
+  });
+
+  // Nuevo conductor buttons
+  const newDriverBtn = $('new-driver-btn');
+  if (newDriverBtn) {
+    newDriverBtn.addEventListener('click', openNewDriverModal);
+  }
+  const newDriverBtnUsers = $('new-driver-btn-users');
+  if (newDriverBtnUsers) {
+    newDriverBtnUsers.addEventListener('click', openNewUserModal);
   }
 }
 
@@ -314,8 +352,30 @@ async function loadTrips() {
  * Navegar a una sección y cargar sus datos
  */
 function goTo(viewName, navBtn) {
-  navigateTo(viewName, navBtn);
+  try {
+    console.debug('goTo ->', viewName);
+    navigateTo(viewName, navBtn);
+  } catch (err) {
+    console.error('navigateTo failed:', err);
+  }
+
+  // Fallback: si la vista no se activó, forzar toggle manualmente
+  const targetView = document.getElementById(`view-${viewName}`);
+  if (targetView && !targetView.classList.contains('active')) {
+    // Ocultar todas las vistas y activar la requerida
+    document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+    targetView.classList.add('active');
+
+    // Actualizar estado activo del nav
+    document.querySelectorAll('.nav-item').forEach((n) => n.classList.remove('active'));
+    if (navBtn) navBtn.classList.add('active');
+
+    showToast(`Navegando a: ${viewName}`);
+  }
+
   if (viewName === 'fleet') loadFleet();
+  if (viewName === 'users') loadUsers();
+  if (viewName === 'audit') loadAuditLogs();
 }
 
 /**
@@ -327,7 +387,11 @@ async function loadFleet() {
 
   container.innerHTML = 'Cargando conductores...';
   try {
-    const users = await authService.listAllUsers();
+    let users = await authService.listAllUsers();
+    if (users && typeof users === 'object') {
+      users = Array.isArray(users.data) ? users.data : Array.isArray(users.users) ? users.users : users;
+    }
+    console.debug('Fleet users response:', users);
     const drivers = (users || []).filter((u) => u.role === USER_ROLES.DRIVER);
 
     if (!drivers.length) {
@@ -348,7 +412,7 @@ async function loadFleet() {
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div class="dstat"><div class="dstat-label">ID</div><div class="dstat-val">#${u.id}</div></div>
-            <div class="dstat"><div class="dstat-label">Estado</div><div class="dstat-val">${u.isActive === false ? 'Inactivo' : 'Activo'}</div></div>
+            <div class="dstat"><div class="dstat-label">Rol</div><div class="dstat-val">${u.role}</div></div>
           </div>
         </div>
       `,
@@ -357,6 +421,384 @@ async function loadFleet() {
   } catch (error) {
     console.error('Error loading fleet:', error);
     container.innerHTML = '<div class="empty">Error cargando conductores</div>';
+  }
+}
+
+/**
+ * Activar tab de usuarios por rol
+ */
+function setActiveUserTab(role) {
+  document.querySelectorAll('.users-tab-btn').forEach((button) => {
+    const buttonRole = button.getAttribute('data-role');
+    button.classList.toggle('active', buttonRole === role);
+  });
+}
+
+/**
+ * Cargar usuarios registrados (GET /users)
+ */
+async function loadUsers(roleFilter = 'all') {
+  const container = $('users-table-wrap');
+  if (!container) return;
+
+  window._usersRoleFilter = roleFilter;
+  setActiveUserTab(roleFilter);
+  showLoading(container, 'Cargando usuarios...');
+
+  try {
+    let users = await authService.listAllUsers();
+    if (users && typeof users === 'object') {
+      users = Array.isArray(users.data) ? users.data : Array.isArray(users.users) ? users.users : users;
+    }
+    console.debug('Users list response:', users);
+    if (!Array.isArray(users)) {
+      users = [];
+    }
+
+    if (roleFilter && roleFilter !== 'all') {
+      users = users.filter((u) => String(u.role || '').toLowerCase() === String(roleFilter).toLowerCase());
+    }
+
+    if (!users.length) {
+      container.innerHTML = `<div class="empty">No se encontraron usuarios${roleFilter && roleFilter !== 'all' ? ` de rol ${roleFilter}` : ''}</div>`;
+      return;
+    }
+
+    const rows = users
+      .map(
+        (u) => {
+          const role = String(u.role || 'desconocido').toLowerCase();
+          const isActive = u.isActive === false ? false : true;
+          return `
+          <tr>
+            <td>#${u.id}</td>
+            <td>${u.name || '—'}</td>
+            <td>${u.email || '—'}</td>
+            <td><span class="role-pill role-${role}">${u.role || '—'}</span></td>
+            <td>${isActive ? '<span class="pill-active">Activo</span>' : '<span class="pill-cancelled">Inactivo</span>'}</td>
+            <td style="white-space:nowrap">
+              <button class="users-action-btn btn-secondary" data-action="toggle" data-id="${u.id}" data-active="${isActive}">${isActive ? 'Desactivar' : 'Activar'}</button>
+              <button class="users-action-btn btn-secondary" data-action="delete" data-id="${u.id}" style="margin-left:8px">Eliminar</button>
+            </td>
+          </tr>
+        `;
+        },
+      )
+      .join('');
+
+    container.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    `;
+
+    // Attach action handlers for each user row (activar/desactivar, eliminar)
+    setTimeout(() => {
+      try {
+        document.querySelectorAll('.users-action-btn').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            const active = btn.getAttribute('data-active') === 'true';
+            if (action === 'toggle') {
+              await toggleUserActive(Number(id), active);
+            } else if (action === 'delete') {
+              await removeUser(Number(id));
+            }
+          });
+        });
+      } catch (err) {
+        console.error('Error attaching user action handlers', err);
+      }
+    }, 10);
+
+  } catch (error) {
+    console.error('Error loading users:', error);
+    container.innerHTML = '<div class="empty">Error cargando usuarios</div>';
+  }
+}
+
+/**
+ * Abrir modal para crear un nuevo conductor
+ */
+function openNewDriverModal() {
+  const modalTitle = $('modal-title');
+  const modalBody = $('modal-body');
+
+  if (modalTitle) modalTitle.textContent = 'Nuevo conductor';
+  if (modalBody) {
+    modalBody.innerHTML = `
+      <div style="display:grid;gap:14px">
+        <div>
+          <label class="form-label">Nombre</label>
+          <input id="new-driver-name" class="form-input" placeholder="Nombre completo">
+        </div>
+        <div>
+          <label class="form-label">Email</label>
+          <input id="new-driver-email" type="email" class="form-input" placeholder="conductor@dominio.com">
+        </div>
+        <div>
+          <label class="form-label">Contraseña</label>
+          <input id="new-driver-pass" type="password" class="form-input" placeholder="Mínimo 8 caracteres">
+        </div>
+        <button class="btn-primary" onclick="window.createDriver()">Crear conductor</button>
+      </div>
+    `;
+  }
+  openModal();
+}
+
+/**
+ * Abrir modal para crear un nuevo usuario (selección de rol)
+ */
+function openNewUserModal(defaultRole = '') {
+  const modalTitle = $('modal-title');
+  const modalBody = $('modal-body');
+
+  if (modalTitle) modalTitle.textContent = 'Nuevo usuario';
+  if (modalBody) {
+    modalBody.innerHTML = `
+      <div style="display:grid;gap:14px">
+        <div>
+          <label class="form-label">Nombre</label>
+          <input id="new-user-name" class="form-input" placeholder="Nombre completo">
+        </div>
+        <div>
+          <label class="form-label">Email</label>
+          <input id="new-user-email" type="email" class="form-input" placeholder="usuario@dominio.com">
+          <div id="new-user-email-hint" style="font-size:12px;color:var(--t3);margin-top:6px"></div>
+        </div>
+        <div>
+          <label class="form-label">Contraseña</label>
+          <input id="new-user-pass" type="password" class="form-input" placeholder="Mínimo 8 caracteres">
+        </div>
+        <div>
+          <label class="form-label">Rol</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="new-user-role" class="form-input">
+              <option value="">-- Seleccionar rol --</option>
+              <option value="admin">Admin</option>
+              <option value="driver" data-driver-option style="display:none">Conductor</option>
+              <option value="passenger">Pasajero</option>
+              <option value="auditor">Auditor</option>
+            </select>
+            <button id="toggle-driver-option" class="btn-secondary" style="padding:6px 10px;font-size:12px">Mostrar Conductor</button>
+          </div>
+        </div>
+        <button id="create-user-btn" class="btn-primary" onclick="window.createUser()">Crear usuario</button>
+      </div>
+    `;
+    if (defaultRole) {
+      setTimeout(() => {
+        const sel = $('new-user-role');
+        if (sel) sel.value = defaultRole;
+      }, 10);
+    }
+  }
+  openModal();
+
+  // Attach email check + toggle driver option handlers
+  const emailInput = $('new-user-email');
+  const hint = $('new-user-email-hint');
+  const createBtn = $('create-user-btn');
+  const toggleDriverBtn = $('toggle-driver-option');
+  const roleSelect = $('new-user-role');
+
+  async function checkEmail(value) {
+    if (!value || value.indexOf('@') === -1) {
+      if (hint) hint.textContent = '';
+      if (createBtn) createBtn.disabled = false;
+      return;
+    }
+    try {
+      const users = await authService.listAllUsers();
+      let list = users;
+      if (list && typeof list === 'object') {
+        list = Array.isArray(list.data) ? list.data : Array.isArray(list.users) ? list.users : list;
+      }
+      const exists = (list || []).some(u => String(u.email || '').toLowerCase() === String(value).toLowerCase());
+      if (exists) {
+        if (hint) hint.textContent = 'Ya existe un usuario con ese email';
+        if (createBtn) createBtn.disabled = true;
+      } else {
+        if (hint) hint.textContent = '';
+        if (createBtn) createBtn.disabled = false;
+      }
+    } catch (err) {
+      console.error('Error checking email', err);
+      if (hint) hint.textContent = '';
+      if (createBtn) createBtn.disabled = false;
+    }
+  }
+
+  if (emailInput) {
+    const debounced = debounce((e) => checkEmail(e.target.value), 400);
+    emailInput.addEventListener('input', debounced);
+    emailInput.addEventListener('blur', (e) => checkEmail(e.target.value));
+  }
+
+  if (toggleDriverBtn && roleSelect) {
+    toggleDriverBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const opt = roleSelect.querySelector('option[data-driver-option]');
+      if (!opt) return;
+      if (opt.style.display === 'none') {
+        opt.style.display = '';
+        toggleDriverBtn.textContent = 'Ocultar Conductor';
+      } else {
+        opt.style.display = 'none';
+        if (roleSelect.value === 'driver') roleSelect.value = '';
+        toggleDriverBtn.textContent = 'Mostrar Conductor';
+      }
+    });
+  }
+}
+
+/**
+ * Crear un usuario nuevo (rol configurable)
+ */
+async function createUser() {
+  const name = $('new-user-name')?.value.trim();
+  const email = $('new-user-email')?.value.trim();
+  const password = $('new-user-pass')?.value;
+  const role = ($('new-user-role')?.value || '').toLowerCase();
+
+  if (!name || !email || !password || !role) {
+    showToast('Completa nombre, email, contraseña y rol', false);
+    return;
+  }
+  if (password.length < 8) {
+    showToast('La contraseña debe tener al menos 8 caracteres', false);
+    return;
+  }
+
+  try {
+    await authService.register({ name, email, password, role });
+    showToast(`Usuario ${email} creado`);
+    closeModal();
+    if (role === USER_ROLES.DRIVER) {
+      await loadFleet();
+    }
+    if ($('view-users')?.classList.contains('active')) {
+      await loadUsers();
+    }
+  } catch (error) {
+    showToast(error.message || 'No se pudo crear el usuario', false);
+  }
+}
+
+/**
+ * Activar / Desactivar usuario
+ */
+async function toggleUserActive(userId, currentlyActive) {
+  const action = currentlyActive ? 'desactivar' : 'activar';
+  if (!confirm(`¿Seguro que deseas ${action} al usuario #${userId}?`)) return;
+  try {
+    if (typeof authService.adminUpdateUser === 'function') {
+      await authService.adminUpdateUser(userId, { isActive: !currentlyActive });
+    } else {
+      await apiService.patch(API_ENDPOINTS.USERS.GET_ONE(userId), { isActive: !currentlyActive });
+    }
+    showToast(`Usuario #${userId} ${currentlyActive ? 'desactivado' : 'activado'}`);
+    // Refrescar vistas relevantes
+    await loadUsers(window._usersRoleFilter || 'all');
+    await loadFleet();
+  } catch (err) {
+    console.error('Error toggling user active:', err);
+    showToast(err.message || 'No se pudo actualizar el usuario', false);
+  }
+}
+
+/**
+ * Eliminar usuario
+ */
+async function removeUser(userId) {
+  if (!confirm(`¿Eliminar permanentemente al usuario #${userId}? Esta acción es irreversible.`)) return;
+  try {
+    if (typeof authService.deleteUser === 'function') {
+      await authService.deleteUser(userId);
+    } else {
+      await apiService.delete(API_ENDPOINTS.USERS.GET_ONE(userId));
+    }
+    showToast(`Usuario #${userId} eliminado`);
+    await loadUsers(window._usersRoleFilter || 'all');
+    await loadFleet();
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    showToast(err.message || 'No se pudo eliminar el usuario', false);
+  }
+}
+
+/**
+ * Crear un conductor nuevo
+ */
+async function createDriver() {
+  const name = $('new-driver-name')?.value.trim();
+  const email = $('new-driver-email')?.value.trim();
+  const password = $('new-driver-pass')?.value;
+
+  if (!name || !email || !password) {
+    showToast('Completa nombre, email y contraseña', false);
+    return;
+  }
+  if (password.length < 8) {
+    showToast('La contraseña debe tener al menos 8 caracteres', false);
+    return;
+  }
+
+  try {
+    await authService.register({ name, email, password, role: USER_ROLES.DRIVER });
+    showToast(`Conductor ${email} creado`);
+    closeModal();
+    await loadFleet();
+    if ($('view-users')?.classList.contains('active')) {
+      await loadUsers();
+    }
+  } catch (error) {
+    showToast(error.message || 'No se pudo crear el conductor', false);
+  }
+}
+
+/**
+ * Cargar registros de auditoría (placeholder de integración)
+ */
+async function loadAuditLogs() {
+  const container = $('audit-table-wrap');
+  if (!container) return;
+
+  container.innerHTML = 'Cargando auditoría...';
+  try {
+    // Actualmente el backend no expone logs de auditoría públicos.
+    // Aquí se deja la estructura preparada para cuando se implemente el endpoint.
+    container.innerHTML = `
+      <div class="panel-body" style="padding:24px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:14px;color:var(--t1);font-weight:700">Auditoría de transacciones</div>
+          <div style="color:var(--t3);line-height:1.6">
+            El endpoint de auditoría no está disponible todavía en el backend.
+            Cuando se implemente, los registros de precios, anomalías y transacciones aparecerán aquí.
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;font-size:13px;color:var(--t2)">
+            Endpoint futuro: <code>/audit/logs</code> en el servicio de pricing.
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error loading audit logs:', error);
+    container.innerHTML = '<div class="empty">Error cargando auditoría</div>';
   }
 }
 
@@ -803,6 +1245,12 @@ window.navigateTo = goTo;
 window.closeModal = closeModal;
 window.loadDashboard = loadDashboard;
 window.loadFleet = loadFleet;
+window.loadUsers = loadUsers;
+window.openNewDriverModal = openNewDriverModal;
+window.createDriver = createDriver;
+window.loadAuditLogs = loadAuditLogs;
+window.openNewUserModal = openNewUserModal;
+window.createUser = createUser;
 window.updateWeights = updateWeights;
 window.triggerEmergency = triggerEmergency;
 window.handleLogout = handleLogout;

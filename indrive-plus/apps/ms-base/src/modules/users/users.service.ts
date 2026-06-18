@@ -44,6 +44,11 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async remove(id: number): Promise<void> {
+    const user = await this.findById(id);
+    await this.usersRepository.remove(user);
+  }
+
   private async ensureEmailIsAvailable(email: string): Promise<void> {
     const existing = await this.findByEmail(email);
     if (existing) {

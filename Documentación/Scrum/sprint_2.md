@@ -1,5 +1,30 @@
 # Sprint 2 – Desarrollo del MVP
 
+## Índice del Sprint 2
+
+> Punto de entrada único: desde aquí se navega a todos los documentos del sprint. Se distingue lo que es **Scrum oficial** (Guía 2020) de las **prácticas complementarias**.
+
+### Artefactos de Scrum (Guía 2020)
+- [Product Backlog](../Requerimientos/Product_backlog.md)
+- [Sprint Backlog](../Requerimientos/sprint_backlog.md)
+- Incremento: el sistema funcionando + este documento
+
+### Eventos de Scrum
+- [Daily Scrum](daily_scrum/registro_sprint_2.md)
+- [Sprint Retrospective](retrospective.md) (resumen en la sección 12)
+
+### Documentos de Ingeniería de Software (complementarios)
+- [Historias de Usuario](../Requerimientos/Historias_usuario.md)
+- [Arquitectura general](../Aquitectura/Arquitectura_general.md)
+- [Decisiones arquitectónicas (ADR)](../Aquitectura/decisiones_arquitectonicas.md)
+- [Stack tecnológico](../Aquitectura/Stack_Tecnologico.md)
+- [Negocio / 7 variables](../Negocio/flujo_calculo_tarifa.md)
+
+### Métricas (complementarias)
+- Velocity y Burndown: sección 10 de este documento
+
+---
+
 ## 1. Información general
 
 - **Proyecto:** Motor Tarifario Inteligente para inDrive en Lima Metropolitana

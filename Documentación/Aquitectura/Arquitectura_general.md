@@ -121,7 +121,7 @@ flowchart TD
 
     subgraph "Externo"
         GoogleMaps["Google Maps API"]
-        OSINERGMIN["OSINERGMIN API"]
+        OSINERGMIN["OSINERGMIN (local)"]
         TrafficAPI["Tráfico API"]
     end
 
@@ -170,7 +170,7 @@ flowchart TD
 </tr>
 <tr>
 <td>Precio del combustible</td>
-<td>API OSINERGMIN</td>
+<td>OSINERGMIN (dataset local, sin API en vivo)</td>
 </tr>
 <tr>
 <td>Capacidad del vehículo</td>
@@ -179,7 +179,7 @@ flowchart TD
 <tr>
 <td rowspan="3"><b>Dinámica</b></td>
 <td>Condición del tráfico</td>
-<td>API de tráfico en tiempo real</td>
+<td>Tráfico (simulado: modelo por hora/zona)</td>
 </tr>
 <tr>
 <td>Hora del día / demanda zonal</td>
@@ -187,7 +187,7 @@ flowchart TD
 </tr>
 <tr>
 <td>Tiempo estimado del viaje</td>
-<td>API de tráfico</td>
+<td>Google Maps (duración estimada)</td>
 </tr>
 <tr>
 <td><b>Aprendizaje</b></td>
@@ -195,6 +195,8 @@ flowchart TD
 <td>Base datos interna inDrive</td>
 </tr>
 </table>
+
+> **Nota de implementación (fuentes reales vs. simuladas).** Google Maps se consume **en vivo** (distancia, ruta y búsqueda de destino). **OSINERGMIN no expone una API pública en tiempo real**, por lo que el precio de combustible se sirve desde un **dataset real local** (datos de OSINERGMIN / Facilito) por tipo de combustible. El **tráfico se simula** con un modelo por hora/zona. Las variables de capacidad, hora/demanda e histórico son **internas** (perfil del vehículo y base de datos). El diseño deja el contrato preparado para conmutar a una API real si llegara a existir.
 
 ```mermaid
 flowchart TD
@@ -361,7 +363,7 @@ flowchart TD
 
     subgraph "Externo"
         GoogleMaps["Google Maps API"]
-        OSINERGMIN["OSINERGMIN API"]
+        OSINERGMIN["OSINERGMIN (local)"]
         TrafficAPI["Tráfico API"]
     end
 

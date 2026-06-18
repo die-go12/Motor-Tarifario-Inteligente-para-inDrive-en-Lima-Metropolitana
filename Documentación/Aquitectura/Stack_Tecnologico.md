@@ -70,8 +70,8 @@
 | API | Propósito | Frecuencia |
 |-----|-----------|------------|
 | **Google Maps API** | Cálculo de distancias, rutas y geolocalización | Por solicitud de viaje |
-| **OSINERGMIN API** | Precio oficial de combustible en Perú | Diaria / Bajo demanda |
-| **Tráfico API** (TomTom/Waze) | Congestión vehicular en tiempo real | Tiempo real (cada 5 min) |
+| **OSINERGMIN (dataset local)** | Precio oficial de combustible en Perú (sin API pública en vivo) | Dato real servido local |
+| **Tráfico (simulado)** | Congestión vehicular (modelo por hora/zona) | Simulado |
 | **GPS Real Time** | Geolocalización de vehículos durante el viaje | Tiempo real |
 
 ---
@@ -109,7 +109,7 @@
 | **Bases de Datos** | PostgreSQL, MongoDB, Redis |
 | **Infraestructura Local** | Docker, Docker Compose |
 | **Infraestructura Cloud** | Kubernetes, ArgoCD|
-| **Integraciones** | Google Maps API, OSINERGMIN API, Tráfico API, GPS |
+| **Integraciones** | Google Maps API (en vivo), OSINERGMIN (dataset local), Tráfico (simulado), GPS |
 | **DevOps** | GitHub, GitHub Actions, Vercel, Postman |
 
 ---

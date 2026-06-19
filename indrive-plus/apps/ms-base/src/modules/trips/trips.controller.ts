@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -15,6 +16,7 @@ import { AuthenticatedUser, UserRole } from '@app/shared';
 import { TripsService } from './trips.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { CompleteTripDto } from './dto/complete-trip.dto';
+import { FindTripsDto } from './dto/find-trips.dto';
 import { presentQuote, presentTrip } from './trip.presenter';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -65,6 +67,13 @@ export class TripsController {
         ? await this.tripsService.findByDriver(user.id)
         : await this.tripsService.findByPassenger(user.id);
     return trips.map((trip) => presentTrip(trip, user.role));
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Get('all')
+  async findAll(@Query() query: FindTripsDto) {
+    const trips = await this.tripsService.findAll(query.status);
+    return trips.map((trip) => presentTrip(trip, UserRole.ADMIN));
   }
 
   @Get(':id')

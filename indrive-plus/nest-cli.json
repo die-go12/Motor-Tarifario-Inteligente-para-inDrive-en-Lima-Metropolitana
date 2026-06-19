@@ -46,6 +46,15 @@
         "tsConfigPath": "apps/ms-pricing/tsconfig.app.json"
       }
     },
+    "ms-reports": {
+      "type": "application",
+      "root": "apps/ms-reports",
+      "entryFile": "main",
+      "sourceRoot": "apps/ms-reports/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ms-reports/tsconfig.app.json"
+      }
+    },
     "shared": {
       "type": "library",
       "root": "libs/shared",

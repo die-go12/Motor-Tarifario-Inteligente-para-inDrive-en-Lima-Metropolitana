@@ -18,7 +18,7 @@ export class PricingController {
 
   @HttpCode(HttpStatus.OK)
   @Post('settle')
-  settle(@Body() dto: SettleDto): PriceSettlement {
+  settle(@Body() dto: SettleDto): Promise<PriceSettlement> {
     return this.pricingService.settle(dto);
   }
 }

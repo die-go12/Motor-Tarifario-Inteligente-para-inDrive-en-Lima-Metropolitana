@@ -19,6 +19,7 @@
 - [Decisiones arquitectónicas (ADR)](../Aquitectura/decisiones_arquitectonicas.md)
 - [Stack tecnológico](../Aquitectura/Stack_Tecnologico.md)
 - [Negocio / 7 variables](../Negocio/flujo_calculo_tarifa.md)
+- [Pruebas del sistema](pruebas_sistema.md)
 
 ### Métricas (complementarias)
 - Velocity y Burndown: sección 10 de este documento
@@ -156,6 +157,14 @@ Al cierre del Sprint 1, el panel administrativo y la aplicación móvil estaban 
 | --- | --- |
 | Persistencia de cálculos en Mongo por eventos | ✅ |
 
+### Reportes (CAR-008 — prioridad "Could")
+| Tarea | Estado |
+| --- | --- |
+| Microservicio `ms-reports` (read-model por eventos Redis Pub/Sub) | ✅ |
+| `GET /reports/summary` (admin/auditor) + `GET /trips/all` (admin) | ✅ |
+| Umbrales de anomalías configurables desde `/pricing/config` (CA-007-03) | ✅ |
+| Reportes avanzados (zona/franja horaria, tiempos, filtros) | ⚪ (roadmap §13) |
+
 ---
 
 ## 8. Fuentes de datos (real vs. simulado)
@@ -243,7 +252,8 @@ Por ser el último sprint del curso, lo no entregado se documenta como roadmap, 
 - **Recálculo con GPS real** post-viaje (hoy: simulado).
 - **Pagos reales**.
 - **Surge pricing real** (oferta/demanda en tiempo real).
-- Migración a **RabbitMQ**, **OpenSearch** para logs, **MFA** del administrador.
+- **Reportes avanzados** (CAR-008 / US-008): desglose por zona y franja horaria, tiempos de viaje y filtros por fecha/zona en `ms-reports` (hoy: resumen agregado vía `GET /reports/summary`).
+- Migración del **bus de eventos** de **Redis Pub/Sub** (actual) a **RabbitMQ**; **OpenSearch** para logs; **MFA** del administrador.
 
 ---
 

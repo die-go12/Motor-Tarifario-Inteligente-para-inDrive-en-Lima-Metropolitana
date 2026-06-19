@@ -210,6 +210,13 @@ export class TripsService {
     return this.tripsRepository.find({ where: { driverId } });
   }
 
+  findAll(status?: TripStatus): Promise<Trip[]> {
+    return this.tripsRepository.find({
+      where: status ? { status } : {},
+      order: { requestedAt: 'DESC' },
+    });
+  }
+
   private async findAssignedDriverTrip(
     tripId: number,
     driverId: number,

@@ -103,11 +103,35 @@ describe('PricingService', () => {
       );
     });
 
-    it('publica una anomalía cuando el precio real se dispara', () => {
+    it('publica una anomalía con el detalle del rango y la desviación', () => {
       service.settle({ ...range, realPrice: 40 });
       expect(publisher.publish).toHaveBeenCalledWith(
         'anomaly.detected',
-        expect.objectContaining({ anomalyType: 'PRICE_OUTLIER' }),
+        expect.objectContaining({
+          anomalyType: 'PRICE_OUTLIER',
+          realPrice: 40,
+          minimumPrice: range.minimumPrice,
+          maximumPrice: range.maximumPrice,
+          deviation: expect.any(Number),
+        }),
+      );
+    });
+
+    it('clasifica la severidad según la desviación fuera del rango', () => {
+      service.settle({ ...range, realPrice: 19 });
+      service.settle({ ...range, realPrice: 23 });
+      service.settle({ ...range, realPrice: 40 });
+      const severities = publisher.publish.mock.calls
+        .filter(([channel]) => channel === 'anomaly.detected')
+        .map(([, payload]) => (payload as { severity: string }).severity);
+      expect(severities).toEqual(['LOW', 'MEDIUM', 'HIGH']);
+    });
+
+    it('no publica anomalía cuando el precio real está dentro del rango', () => {
+      service.settle({ ...range, realPrice: 16.5 });
+      expect(publisher.publish).not.toHaveBeenCalledWith(
+        'anomaly.detected',
+        expect.anything(),
       );
     });
   });

@@ -15,6 +15,18 @@ export class AnomalyLog {
   @Prop({ type: String, required: true, enum: AnomalySeverity })
   severity: AnomalySeverity;
 
+  @Prop()
+  realPrice?: number;
+
+  @Prop()
+  minimumPrice?: number;
+
+  @Prop()
+  maximumPrice?: number;
+
+  @Prop()
+  deviation?: number;
+
   @Prop({ required: true })
   detectedAt: Date;
 }

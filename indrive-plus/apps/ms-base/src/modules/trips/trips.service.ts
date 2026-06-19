@@ -16,9 +16,11 @@ import {
   UserRole,
 } from '@app/shared';
 import { Trip } from './entities/trip.entity';
+import { Payment } from './entities/payment.entity';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { TripEstimate } from './trip.presenter';
 import { assertTransition } from './trip-state-machine';
+import { derivePaymentCondition } from './payment-condition';
 import { PricingClient } from '../../clients/pricing.client';
 import { IntegrationClient } from '../../clients/integration.client';
 import { VehiclesService } from '../vehicles/vehicles.service';
@@ -31,6 +33,8 @@ export class TripsService {
   constructor(
     @InjectRepository(Trip)
     private readonly tripsRepository: Repository<Trip>,
+    @InjectRepository(Payment)
+    private readonly paymentsRepository: Repository<Payment>,
     private readonly pricingClient: PricingClient,
     private readonly integrationClient: IntegrationClient,
     private readonly vehiclesService: VehiclesService,
@@ -138,7 +142,27 @@ export class TripsService {
     trip.finalPrice = settlement.finalPrice;
     trip.status = TripStatus.COMPLETED;
     trip.completedAt = new Date();
-    return this.tripsRepository.save(trip);
+    const completed = await this.tripsRepository.save(trip);
+    await this.persistPayment(completed, settlement.finalPrice, realPrice);
+    return completed;
+  }
+
+  private async persistPayment(
+    trip: Trip,
+    amount: number,
+    realPrice: number,
+  ): Promise<void> {
+    const payment = this.paymentsRepository.create({
+      tripId: trip.id,
+      amount,
+      realPrice,
+      condition: derivePaymentCondition(
+        realPrice,
+        trip.minimumPrice,
+        trip.maximumPrice,
+      ),
+    });
+    await this.paymentsRepository.save(payment);
   }
 
   async cancel(tripId: number, userId: number): Promise<Trip> {

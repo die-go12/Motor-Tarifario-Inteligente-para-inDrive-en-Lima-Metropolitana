@@ -19,6 +19,7 @@
 - [Decisiones arquitectónicas (ADR)](../Aquitectura/decisiones_arquitectonicas.md)
 - [Stack tecnológico](../Aquitectura/Stack_Tecnologico.md)
 - [Negocio / 7 variables](../Negocio/flujo_calculo_tarifa.md)
+- [Pruebas del sistema](pruebas_sistema.md)
 
 ### Métricas (complementarias)
 - Velocity y Burndown: sección 10 de este documento

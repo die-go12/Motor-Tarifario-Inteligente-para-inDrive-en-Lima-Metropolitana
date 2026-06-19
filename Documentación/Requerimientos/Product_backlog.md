@@ -16,7 +16,7 @@
 | CAR-006 | Parametrización | Configuración de reglas, pesos y multiplicadores |
 | CAR-007 | Registro y trazabilidad | Registro inmutable de todas las fases para auditoría |
 | CAR-008 | Reportes | Generación de métricas y análisis del sistema |
-| CAR-009 | Integración externa | Google Maps, OSINERGMIN y tráfico en tiempo real |
+| CAR-009 | Integración externa | Google Maps en vivo; OSINERGMIN y tráfico simulados (dato real local) |
 | CAR-010 | Tolerancia a fallos | Degradación elegante ante fallos externos |
 
 ---

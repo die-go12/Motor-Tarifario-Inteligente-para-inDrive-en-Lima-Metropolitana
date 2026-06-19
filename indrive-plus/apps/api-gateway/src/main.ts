@@ -4,7 +4,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { ApiGatewayModule } from './api-gateway.module';
 
 const BASE_ROUTES = ['/auth', '/users', '/vehicles', '/trips'];
-const PRICING_ROUTES = ['/pricing/config'];
+const PRICING_ROUTES = ['/pricing/config', '/pricing/anomalies'];
 
 const matches = (prefixes: string[]) => (pathname: string) =>
   prefixes.some((prefix) => pathname.startsWith(prefix));

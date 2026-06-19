@@ -54,11 +54,11 @@ El motor pondera **7 variables** para calcular el rango `[mínimo, máximo]`. Ca
 | Tipo | # | Variable | Fuente | Impacto en el negocio |
 | :--- | :--- | :--- | :--- | :--- |
 | **Base** | 1 | Distancia del trayecto | Google Maps API | A mayor distancia, mayor costo base. |
-| **Base** | 2 | Precio del combustible | OSINERGMIN API | Cuando el combustible sube, el mínimo se eleva. |
+| **Base** | 2 | Precio del combustible | OSINERGMIN (dataset local) | Cuando el combustible sube, el mínimo se eleva. |
 | **Base** | 3 | Capacidad del vehículo | Perfil del conductor | Vehículos más grandes tienen mayor costo operativo. |
-| **Dinámica** | 4 | Condición del tráfico | API de tráfico | Tráfico pesado → más tiempo → mayor precio (hasta ×2.0). |
+| **Dinámica** | 4 | Condición del tráfico | Tráfico (simulado) | Tráfico pesado → más tiempo → mayor precio (hasta ×2.0). |
 | **Dinámica** | 5 | Hora del día / demanda zonal | Reloj + histórico | Horas punta y zonas calientes elevan precios. |
-| **Dinámica** | 6 | Tiempo estimado del viaje | API de tráfico | Viajes más largos en tiempo → mayor precio. |
+| **Dinámica** | 6 | Tiempo estimado del viaje | Google Maps (duración) | Viajes más largos en tiempo → mayor precio. |
 | **Aprendizaje** | 7 | Histórico de viajes similares | Base inDrive | El sistema aprende de viajes pasados para mejorar la precisión. |
 
 ### Diagrama de flujo de las 7 variables

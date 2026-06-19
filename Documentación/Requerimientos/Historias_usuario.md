@@ -24,7 +24,7 @@ Las siguientes **10 características funcionales y no funcionales** (CAR-001 a C
 | **CAR-006** | Parametrización | Configuración de reglas de negocio, pesos y multiplicadores desde panel administrativo |
 | **CAR-007** | Registro y trazabilidad | Registro inmutable de todas las fases (pre-viaje y post-viaje) para auditoría |
 | **CAR-008** | Reportes | Generación de métricas para control y toma de decisiones |
-| **CAR-009** | Integración externa | Conexión con Google Maps, OSINERGMIN y APIs de tráfico en tiempo real |
+| **CAR-009** | Integración externa | Google Maps en vivo (distancia/ruta); combustible (OSINERGMIN) y tráfico en modo simulado con dato real local |
 | **CAR-010** | Tolerancia a fallos | Degradación elegante ante fallos de servicios externos |
 
 ---
@@ -61,7 +61,7 @@ Yo como **pasajero** quiero **solicitar un viaje ingresando mi origen y destino*
 | :--- | :--- |
 | CA-001-01 | El sistema debe calcular el rango `[mínimo, máximo]` en menos de 5 segundos |
 | CA-001-02 | El cálculo debe considerar la distancia obtenida desde Google Maps API |
-| CA-001-03 | El cálculo debe considerar el precio de combustible desde OSINERGMIN API |
+| CA-001-03 | El cálculo debe considerar el precio de combustible desde el dataset de OSINERGMIN (local) |
 | CA-001-04 | El cálculo debe considerar la condición de tráfico en tiempo real |
 | CA-001-05 | El sistema debe tolerar fallos de APIs externas con degradación elegante (CAR-010) |
 

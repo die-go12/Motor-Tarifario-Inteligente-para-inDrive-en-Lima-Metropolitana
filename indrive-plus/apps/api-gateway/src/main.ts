@@ -5,6 +5,7 @@ import { ApiGatewayModule } from './api-gateway.module';
 
 const BASE_ROUTES = ['/auth', '/users', '/vehicles', '/trips'];
 const PRICING_ROUTES = ['/pricing/config', '/pricing/anomalies'];
+const REPORTS_ROUTES = ['/reports'];
 
 const matches = (prefixes: string[]) => (pathname: string) =>
   prefixes.some((prefix) => pathname.startsWith(prefix));
@@ -27,6 +28,13 @@ async function bootstrap() {
       target: configService.getOrThrow<string>('MS_PRICING_URL'),
       changeOrigin: true,
       pathFilter: matches(PRICING_ROUTES),
+    }),
+  );
+  app.use(
+    createProxyMiddleware({
+      target: configService.getOrThrow<string>('MS_REPORTS_URL'),
+      changeOrigin: true,
+      pathFilter: matches(REPORTS_ROUTES),
     }),
   );
 

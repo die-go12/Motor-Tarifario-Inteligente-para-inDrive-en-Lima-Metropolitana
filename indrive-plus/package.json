@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build ms-base && nest build api-gateway && nest build ms-pricing && nest build ms-integration",
+    "build": "nest build ms-base && nest build api-gateway && nest build ms-pricing && nest build ms-integration && nest build ms-reports",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start ms-base",
     "start:base": "nest start ms-base --watch",

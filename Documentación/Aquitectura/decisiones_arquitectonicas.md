@@ -546,7 +546,7 @@ Se implementa una **estrategia de base de datos poliglota**:
 <table align="center">
   <tr>
     <td><b>Estado</b></td>
-    <td>✅ Aceptado</td>
+    <td>✅ Aceptado · MVP implementado con Redis Pub/Sub (RabbitMQ en roadmap)</td>
   </tr>
   <tr>
     <td><b>Fecha</b></td>
@@ -567,6 +567,8 @@ El sistema necesita desacoplar el registro de logs, la validación de anomalías
 ### Decisión
 
 Se adopta una **arquitectura orientada a eventos (EDA)** con RabbitMQ como message broker (MVP local) y proyección a AWS MSK (Kafka) en cloud.
+
+> **Actualización (Sprint 2):** en el MVP entregado el bus de eventos se implementó con **Redis Pub/Sub** (canales reales `pricing.calculated`, `pricing.settled`, `anomaly.detected`); los microservicios `ms-pricing` y `ms-reports` publican/consumen sobre Redis. La migración a **RabbitMQ** (y la proyección a Kafka) queda como **roadmap** consciente. Ver `Documentación/Scrum/sprint_2.md` §13.
 
 **Eventos principales:**
 
@@ -1058,5 +1060,5 @@ Se implementa **autenticación OAuth2 / OIDC** con **JWT** (expiración 1 hora) 
   <tr>
     <td>ADR-005</td>
     <td>Comunicación asíncrona (EDA)</td>
-    <td>✅ Aceptado</td>
+    <td>✅ Aceptado (MVP: Redis Pub/Sub; RabbitMQ en roadmap)</td>
     <td

@@ -547,9 +547,11 @@ classDiagram
 | `anomaly.detected` | Servicio Anomalías | Alertas, Logs, Panel Admin |
 | `payment.applied` | Servicio Pagos | Logs, Apps |
 
+> **Nota (MVP):** el bus de eventos está implementado con **Redis Pub/Sub** (no RabbitMQ). Los canales reales en el código son `pricing.calculated`, `pricing.settled` y `anomaly.detected`; RabbitMQ es evolución planificada (ver ADR-005 y `sprint_2.md` §13).
+
 ```mermaid
 flowchart LR
-    subgraph "Event Bus (RabbitMQ)"
+    subgraph "Event Bus (Redis Pub/Sub · MVP)"
         E1[range.calculated]
         E2[trip.completed]
         E3[anomaly.detected]

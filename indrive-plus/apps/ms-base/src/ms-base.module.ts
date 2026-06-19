@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { VehiclesModule } from './modules/vehicles/vehicles.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RealtimeModule } from './modules/realtime/realtime.module';
     VehiclesModule,
     TripsModule,
     RealtimeModule,
+    AuditModule,
   ],
 })
 export class MsBaseModule {}

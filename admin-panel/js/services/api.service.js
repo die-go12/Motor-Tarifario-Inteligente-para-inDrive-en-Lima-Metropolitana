@@ -13,11 +13,18 @@ class ApiService {
 
   resolveBase(path) {
     const normalized = path.startsWith('/') ? path : `/${path}`;
-    if (normalized.startsWith('/pricing')) {
+    if (
+      normalized.startsWith('/pricing/config') ||
+      normalized.startsWith('/pricing/anomalies')
+    ) {
       return API_CONFIG.GATEWAY;
+    }
+    if (normalized.startsWith('/pricing')) {
+      return API_CONFIG.MS_PRICING;
     }
     if (
       normalized.startsWith('/auth') ||
+      normalized.startsWith('/audit') ||
       normalized.startsWith('/users') ||
       normalized.startsWith('/trips') ||
       normalized.startsWith('/vehicles')

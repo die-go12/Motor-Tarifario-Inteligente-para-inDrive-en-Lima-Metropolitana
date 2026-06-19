@@ -198,6 +198,10 @@ export class TripsService {
     });
   }
 
+  findAll(): Promise<Trip[]> {
+    return this.tripsRepository.find();
+  }
+
   findByPassenger(passengerId: number): Promise<Trip[]> {
     return this.tripsRepository.find({ where: { passengerId } });
   }

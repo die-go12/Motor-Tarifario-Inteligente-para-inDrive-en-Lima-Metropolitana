@@ -110,6 +110,29 @@ class PricingService {
   }
 
   /**
+   * Obtener anomalías de pricing para auditoría
+   * @param {Object} params
+   * @returns {Promise<Array>}
+   */
+  async getAnomalies(params = {}) {
+    try {
+      const query = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          query.append(key, String(value));
+        }
+      });
+
+      const suffix = query.toString() ? `?${query.toString()}` : '';
+      const data = await apiService.get(`${API_ENDPOINTS.PRICING.ANOMALIES}${suffix}`);
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Get anomalies error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Obtener una cotización de precio
    * @param {Object|number} quoteParams
    * @returns {Promise<Object>} - {minimumPrice, maximumPrice}

@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
@@ -6,8 +7,10 @@ import {
   IsString,
   Length,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { UserRole } from '@app/shared';
+import { CreateVehicleDto } from '../../vehicles/dto/create-vehicle.dto';
 
 export class RegisterDto {
   @ApiProperty({ example: 'Juan Diego Lopez' })
@@ -34,4 +37,10 @@ export class RegisterDto {
   @IsString()
   @Length(1, 20)
   phone?: string;
+
+  @ApiPropertyOptional({ type: CreateVehicleDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreateVehicleDto)
+  vehicleProfile?: CreateVehicleDto;
 }

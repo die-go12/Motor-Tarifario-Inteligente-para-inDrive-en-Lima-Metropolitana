@@ -6,11 +6,13 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedUser, UserRole } from '@app/shared';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -50,17 +52,30 @@ export class UsersController {
   }
 
   @Roles(UserRole.ADMIN)
+  @Post()
+  create(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Body() dto: CreateUserDto,
+  ) {
+    return this.usersService.create(dto, admin.id);
+  }
+
+  @Roles(UserRole.ADMIN)
   @Patch(':id')
   updateOne(
+    @CurrentUser() admin: AuthenticatedUser,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserDto,
   ) {
-    return this.usersService.updateProfile(id, dto);
+    return this.usersService.updateProfile(id, dto, admin.id);
   }
 
   @Roles(UserRole.ADMIN)
   @Delete(':id')
-  removeOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  removeOne(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.usersService.remove(id, admin.id);
   }
 }

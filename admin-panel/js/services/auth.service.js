@@ -123,6 +123,10 @@ class AuthService {
         payload.phone = userData.phone;
       }
 
+      if (userData.vehicleProfile) {
+        payload.vehicleProfile = userData.vehicleProfile;
+      }
+
       const response = await apiService.post(API_ENDPOINTS.AUTH.REGISTER, payload);
       return {
         success: true,
@@ -130,6 +134,29 @@ class AuthService {
       };
     } catch (error) {
       console.error('Register error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Crear usuario como admin vía /users (dispara auditoría backend)
+   */
+  async adminCreateUser(userData) {
+    try {
+      const payload = {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        role: String(userData.role || '').toLowerCase()
+      };
+
+      if (userData.phone) {
+        payload.phone = userData.phone;
+      }
+
+      return await apiService.post(API_ENDPOINTS.USERS.LIST_ALL, payload);
+    } catch (error) {
+      console.error('Admin create user error:', error);
       throw error;
     }
   }

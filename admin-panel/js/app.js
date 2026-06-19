@@ -8,6 +8,7 @@ import {
   authService, 
   socketService,
   tripsService, 
+  vehiclesService,
   pricingService,
   API_ENDPOINTS,
   TRIP_STATUS,
@@ -78,6 +79,9 @@ async function initApp() {
 
   // Event listeners
   setupEventListeners();
+
+  // Sincroniza formulario de registro para mostrar datos de vehículo solo en rol conductor
+  toggleRegisterVehicleFields();
 }
 
 /**
@@ -394,6 +398,17 @@ async function loadFleet() {
     console.debug('Fleet users response:', users);
     const drivers = (users || []).filter((u) => u.role === USER_ROLES.DRIVER);
 
+    let vehiclesByDriver = {};
+    try {
+      const vehicles = await vehiclesService.getVehicles();
+      vehiclesByDriver = (vehicles || []).reduce((acc, vehicle) => {
+        acc[vehicle.driverId] = vehicle;
+        return acc;
+      }, {});
+    } catch (vehicleError) {
+      console.warn('No se pudieron cargar vehículos de conductores:', vehicleError);
+    }
+
     if (!drivers.length) {
       container.innerHTML = '<div class="empty">Sin conductores registrados</div>';
       return;
@@ -401,7 +416,16 @@ async function loadFleet() {
 
     container.innerHTML = drivers
       .map(
-        (u, i) => `
+        (u, i) => {
+          const vehicle = vehiclesByDriver[u.id];
+          const vehicleDetail = vehicle
+            ? `${vehicle.brand || '—'} ${vehicle.model || ''} • ${vehicle.plate || '—'}`
+            : 'Sin vehículo registrado';
+          const vehicleCapacity = vehicle?.capacity ? `${vehicle.capacity} pasajeros` : 'No definida';
+          const vehicleFuel = vehicle?.fuelType || 'No definido';
+          const vehicleYear = vehicle?.year || '—';
+
+          return `
         <div class="driver-card">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
             <div class="driver-av" style="background:${getColorByIndex(i)};color:var(--bg)">${getInitials(u.name)}</div>
@@ -413,9 +437,16 @@ async function loadFleet() {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div class="dstat"><div class="dstat-label">ID</div><div class="dstat-val">#${u.id}</div></div>
             <div class="dstat"><div class="dstat-label">Rol</div><div class="dstat-val">${u.role}</div></div>
+            <div class="dstat" style="grid-column:1 / span 2"><div class="dstat-label">Vehículo</div><div class="dstat-val">${vehicleDetail}</div></div>
+            <div class="dstat"><div class="dstat-label">Capacidad</div><div class="dstat-val">${vehicleCapacity}</div></div>
+            <div class="dstat"><div class="dstat-label">Año / Combustible</div><div class="dstat-val">${vehicleYear} • ${vehicleFuel}</div></div>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn-secondary" onclick="window.openVehicleModal(${u.id}, '${String(u.name || '').replace(/'/g, "\\'")}')">Editar vehículo</button>
           </div>
         </div>
-      `,
+      `;
+        },
       )
       .join('');
   } catch (error) {
@@ -553,6 +584,25 @@ function openNewDriverModal() {
           <label class="form-label">Contraseña</label>
           <input id="new-driver-pass" type="password" class="form-input" placeholder="Mínimo 8 caracteres">
         </div>
+        <div style="padding:10px;border:1px solid var(--border);border-radius:var(--r-md)">
+          <div style="font-weight:700;margin-bottom:10px">Vehículo del conductor</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <input id="new-driver-brand" class="form-input" placeholder="Marca (ej. Toyota)">
+            <input id="new-driver-model" class="form-input" placeholder="Modelo (ej. Yaris)">
+            <input id="new-driver-plate" class="form-input" placeholder="Placa (ej. ABC-123)">
+            <input id="new-driver-capacity" type="number" min="1" class="form-input" placeholder="Capacidad (pasajeros)">
+            <input id="new-driver-color" class="form-input" placeholder="Color (opcional)">
+            <input id="new-driver-year" type="number" min="2000" class="form-input" placeholder="Año (opcional)">
+            <select id="new-driver-fuelType" class="form-input">
+              <option value="">Combustible</option>
+              <option value="gasoline">gasoline</option>
+              <option value="diesel">diesel</option>
+              <option value="gas">gas</option>
+              <option value="electric">electric</option>
+              <option value="hybrid">hybrid</option>
+            </select>
+          </div>
+        </div>
         <button class="btn-primary" onclick="window.createDriver()">Crear conductor</button>
       </div>
     `;
@@ -597,6 +647,25 @@ function openNewUserModal(defaultRole = '') {
             <button id="toggle-driver-option" class="btn-secondary" style="padding:6px 10px;font-size:12px">Mostrar Conductor</button>
           </div>
         </div>
+        <div id="new-user-driver-fields" style="display:none;padding:10px;border:1px solid var(--border);border-radius:var(--r-md)">
+          <div style="font-weight:700;margin-bottom:10px">Vehículo del conductor</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <input id="new-user-brand" class="form-input" placeholder="Marca">
+            <input id="new-user-model" class="form-input" placeholder="Modelo">
+            <input id="new-user-plate" class="form-input" placeholder="Placa">
+            <input id="new-user-capacity" type="number" min="1" class="form-input" placeholder="Capacidad">
+            <input id="new-user-color" class="form-input" placeholder="Color (opcional)">
+            <input id="new-user-year" type="number" min="2000" class="form-input" placeholder="Año (opcional)">
+            <select id="new-user-fuelType" class="form-input">
+              <option value="">Combustible</option>
+              <option value="gasoline">gasoline</option>
+              <option value="diesel">diesel</option>
+              <option value="gas">gas</option>
+              <option value="electric">electric</option>
+              <option value="hybrid">hybrid</option>
+            </select>
+          </div>
+        </div>
         <button id="create-user-btn" class="btn-primary" onclick="window.createUser()">Crear usuario</button>
       </div>
     `;
@@ -615,6 +684,12 @@ function openNewUserModal(defaultRole = '') {
   const createBtn = $('create-user-btn');
   const toggleDriverBtn = $('toggle-driver-option');
   const roleSelect = $('new-user-role');
+  const driverFields = $('new-user-driver-fields');
+
+  function syncDriverFieldsVisibility() {
+    if (!driverFields || !roleSelect) return;
+    driverFields.style.display = roleSelect.value === USER_ROLES.DRIVER ? 'block' : 'none';
+  }
 
   async function checkEmail(value) {
     if (!value || value.indexOf('@') === -1) {
@@ -664,6 +739,57 @@ function openNewUserModal(defaultRole = '') {
       }
     });
   }
+
+  if (roleSelect) {
+    roleSelect.addEventListener('change', syncDriverFieldsVisibility);
+  }
+  syncDriverFieldsVisibility();
+}
+
+function collectVehicleProfile(prefix) {
+  const brand = $(`${prefix}-brand`)?.value.trim();
+  const model = $(`${prefix}-model`)?.value.trim();
+  const plate = $(`${prefix}-plate`)?.value.trim();
+  const capacity = Number($(`${prefix}-capacity`)?.value);
+  const color = $(`${prefix}-color`)?.value.trim();
+  const yearRaw = $(`${prefix}-year`)?.value;
+  const year = yearRaw ? Number(yearRaw) : undefined;
+  const fuelType = $(`${prefix}-fuelType`)?.value.trim();
+
+  if (!brand || !model || !plate || !capacity) {
+    return { error: 'Para conductor debes completar marca, modelo, placa y capacidad' };
+  }
+
+  const profile = {
+    brand,
+    model,
+    plate,
+    capacity,
+  };
+
+  if (color) profile.color = color;
+  if (year && !Number.isNaN(year)) profile.year = year;
+  if (fuelType) profile.fuelType = fuelType;
+
+  return { profile };
+}
+
+async function createUserWithAudit(name, email, password, role, vehicleProfile) {
+  const userPayload = { name, email, password, role };
+  const created =
+    typeof authService.adminCreateUser === 'function'
+      ? await authService.adminCreateUser(userPayload)
+      : await apiService.post(API_ENDPOINTS.USERS.LIST_ALL, userPayload);
+
+  if (role === USER_ROLES.DRIVER && vehicleProfile) {
+    const driverId = created?.id;
+    if (!driverId) {
+      throw new Error('No se pudo obtener el ID del conductor creado');
+    }
+    await vehiclesService.upsertByDriver(driverId, vehicleProfile);
+  }
+
+  return created;
 }
 
 /**
@@ -685,7 +811,17 @@ async function createUser() {
   }
 
   try {
-    await authService.register({ name, email, password, role });
+    let vehicleProfile;
+    if (role === USER_ROLES.DRIVER) {
+      const { profile, error } = collectVehicleProfile('new-user');
+      if (error) {
+        showToast(error, false);
+        return;
+      }
+      vehicleProfile = profile;
+    }
+
+    await createUserWithAudit(name, email, password, role, vehicleProfile);
     showToast(`Usuario ${email} creado`);
     closeModal();
     if (role === USER_ROLES.DRIVER) {
@@ -759,7 +895,13 @@ async function createDriver() {
   }
 
   try {
-    await authService.register({ name, email, password, role: USER_ROLES.DRIVER });
+    const { profile, error } = collectVehicleProfile('new-driver');
+    if (error) {
+      showToast(error, false);
+      return;
+    }
+
+    await createUserWithAudit(name, email, password, USER_ROLES.DRIVER, profile);
     showToast(`Conductor ${email} creado`);
     closeModal();
     await loadFleet();
@@ -772,7 +914,7 @@ async function createDriver() {
 }
 
 /**
- * Cargar registros de auditoría (placeholder de integración)
+ * Cargar registros de auditoría
  */
 async function loadAuditLogs() {
   const container = $('audit-table-wrap');
@@ -780,27 +922,142 @@ async function loadAuditLogs() {
 
   container.innerHTML = 'Cargando auditoría...';
   try {
-    // Actualmente el backend no expone logs de auditoría públicos.
-    // Aquí se deja la estructura preparada para cuando se implemente el endpoint.
-    container.innerHTML = `
-      <div class="panel-body" style="padding:24px">
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <div style="font-size:14px;color:var(--t1);font-weight:700">Auditoría de transacciones</div>
-          <div style="color:var(--t3);line-height:1.6">
-            El endpoint de auditoría no está disponible todavía en el backend.
-            Cuando se implemente, los registros de precios, anomalías y transacciones aparecerán aquí.
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;font-size:13px;color:var(--t2)">
-            Endpoint futuro: <code>/audit/logs</code> en el servicio de pricing.
-          </div>
-        </div>
+    const adminData = await apiService.get('/audit/logs?limit=100');
+    const adminLogs = adminData.logs || [];
+
+    let pricingLogs = [];
+    let configChanges = [];
+    try {
+      const pricingData = await apiService.get('/pricing/audit/logs?limit=50');
+      pricingLogs = pricingData.pricing || [];
+      configChanges = pricingData.configChanges || [];
+    } catch (err) {
+      console.warn('Could not fetch pricing logs:', err);
+    }
+
+    const rows = [];
+
+    // Procesar logs de admin (usuarios y configuración)
+    if (adminLogs && adminLogs.length > 0) {
+      adminLogs.forEach((log) => {
+        let type = '';
+        let detail = '';
+        let severity = 'INFO';
+
+        switch (log.action) {
+          case 'CREATE_USER':
+            type = 'CREAR USUARIO';
+            detail = log.entityName || 'Usuario creado';
+            break;
+          case 'UPDATE_USER':
+            type = 'ACTUALIZAR USUARIO';
+            detail = log.entityName || 'Usuario actualizado';
+            break;
+          case 'DELETE_USER':
+            type = 'ELIMINAR USUARIO';
+            detail = log.entityName || 'Usuario eliminado';
+            break;
+          case 'UPDATE_CONFIG':
+            type = 'CONFIG';
+            detail = log.details || 'Configuración actualizada';
+            break;
+          case 'UPDATE_WEIGHTS':
+            type = 'PESOS';
+            detail = log.details || 'Pesos actualizados';
+            break;
+          default:
+            type = log.action;
+            detail = log.details || '—';
+        }
+
+        rows.push({
+          type,
+          admin: log.admin ? log.admin.name : 'Sistema',
+          detail,
+          severity,
+          timestampMs: new Date(log.createdAt).getTime(),
+          timestamp: new Date(log.createdAt).toLocaleString('es-PE'),
+        });
+      });
+    }
+
+    // Procesar logs de pricing
+    if (pricingLogs && pricingLogs.length > 0) {
+      pricingLogs.forEach((log) => {
+        rows.push({
+          type: 'PRECIO',
+          admin: 'Sistema',
+          detail: `Distancia: ${log.distanceKm} km | Base: S/ ${log.basePrice?.toFixed(2) || '0.00'}`,
+          severity: 'INFO',
+          timestampMs: new Date(log.createdAt).getTime(),
+          timestamp: new Date(log.createdAt).toLocaleString('es-PE'),
+        });
+      });
+    }
+
+    if (configChanges && configChanges.length > 0) {
+      configChanges.forEach((log) => {
+        rows.push({
+          type: log.action === 'UPDATE_WEIGHTS' ? 'PESOS' : 'CONFIG',
+          admin: log.adminEmail || 'Admin',
+          detail: log.details || 'Configuracion actualizada',
+          severity: 'INFO',
+          timestampMs: new Date(log.createdAt).getTime(),
+          timestamp: new Date(log.createdAt).toLocaleString('es-PE'),
+        });
+      });
+    }
+
+    // Ordenar por timestamp descendente
+    rows.sort((a, b) => b.timestampMs - a.timestampMs);
+
+    if (rows.length === 0) {
+      container.innerHTML = '<div class="empty">No hay registros de auditoría</div>';
+      return;
+    }
+
+    const html = `
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Admin</th>
+            <th>Detalle</th>
+            <th>Fecha/Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows
+            .map(
+              (row) => `
+            <tr>
+              <td><span class="badge ${row.type === 'PRECIO' ? 'info' : 'action'}">${row.type}</span></td>
+              <td>${row.admin}</td>
+              <td style="max-width:400px;word-break:break-word">${row.detail}</td>
+              <td style="font-size:12px;color:var(--t3);white-space:nowrap">${row.timestamp}</td>
+            </tr>
+          `
+            )
+            .join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--r-md);font-size:12px;color:var(--t3)">
+        <strong>Totales:</strong> ${adminLogs.length} cambios de admin, ${pricingLogs.length} calculos de precios, ${configChanges.length} cambios de configuracion
       </div>
     `;
+
+    container.innerHTML = html;
   } catch (error) {
     console.error('Error loading audit logs:', error);
-    container.innerHTML = '<div class="empty">Error cargando auditoría</div>';
+    container.innerHTML = `
+      <div class="empty">
+        <div style="color:var(--err);font-weight:700">Error cargando auditoría</div>
+        <div style="color:var(--t3);font-size:12px;margin-top:8px">${error.message}</div>
+      </div>
+    `;
   }
 }
+
 
 /**
  * Cargar KPIs
@@ -825,7 +1082,26 @@ async function loadKPIs() {
 
     if (kpiTrips) kpiTrips.textContent = stats.total.toLocaleString();
     if (kpiGap) kpiGap.textContent = `S/ ${avgGap.toFixed(2)}`;
-    if (kpiDrivers) kpiDrivers.textContent = trips.filter(t => t.driverId).length;
+
+    // Contar conductores activos reales desde /users (no desde trips)
+    let driverCount = 0;
+    try {
+      let allUsers = await authService.listAllUsers();
+      if (allUsers && typeof allUsers === 'object') {
+        allUsers = Array.isArray(allUsers.data) ? allUsers.data
+          : Array.isArray(allUsers.users) ? allUsers.users
+          : allUsers;
+      }
+      driverCount = (allUsers || []).filter(
+        (u) => String(u.role || '').toLowerCase() === USER_ROLES.DRIVER
+               && u.isActive !== false
+      ).length;
+    } catch {
+      // fallback: conductores únicos con viaje asignado
+      driverCount = new Set(trips.filter((t) => t.driverId).map((t) => t.driverId)).size;
+    }
+    if (kpiDrivers) kpiDrivers.textContent = driverCount;
+
     if (kpiAnomalies) kpiAnomalies.textContent = pricingService.detectAnomalies(trips).length;
 
     AppState.trips = trips;
@@ -1164,7 +1440,17 @@ async function registerUser() {
   }
 
   try {
-    await authService.register({ name, email, password, role });
+    let vehicleProfile;
+    if (role === USER_ROLES.DRIVER) {
+      const { profile, error } = collectVehicleProfile('reg-driver');
+      if (error) {
+        showToast(error, false);
+        return;
+      }
+      vehicleProfile = profile;
+    }
+
+    await createUserWithAudit(name, email, password, role, vehicleProfile);
     showToast(`Usuario ${email} registrado (${role})`);
     $('reg-name').value = '';
     $('reg-email').value = '';
@@ -1172,6 +1458,98 @@ async function registerUser() {
     if (role === USER_ROLES.DRIVER) loadFleet();
   } catch (error) {
     showToast(error.message || 'No se pudo registrar el usuario', false);
+  }
+}
+
+function toggleRegisterVehicleFields() {
+  const role = $('reg-role')?.value;
+  const fields = $('reg-driver-fields');
+  if (!fields) return;
+  fields.style.display = role === USER_ROLES.DRIVER ? 'block' : 'none';
+}
+
+function openVehicleModal(driverId, driverName) {
+  const modalTitle = $('modal-title');
+  const modalBody = $('modal-body');
+  if (modalTitle) modalTitle.textContent = `Vehículo de ${driverName}`;
+
+  if (modalBody) {
+    modalBody.innerHTML = `
+      <div style="display:grid;gap:14px">
+        <div id="vehicle-modal-loading" style="color:var(--t3)">Cargando datos del vehículo...</div>
+        <div id="vehicle-modal-form" style="display:none;padding:10px;border:1px solid var(--border);border-radius:var(--r-md)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <input id="edit-vehicle-brand" class="form-input" placeholder="Marca">
+            <input id="edit-vehicle-model" class="form-input" placeholder="Modelo">
+            <input id="edit-vehicle-plate" class="form-input" placeholder="Placa">
+            <input id="edit-vehicle-capacity" type="number" min="1" class="form-input" placeholder="Capacidad">
+            <input id="edit-vehicle-color" class="form-input" placeholder="Color (opcional)">
+            <input id="edit-vehicle-year" type="number" min="2000" class="form-input" placeholder="Año (opcional)">
+            <select id="edit-vehicle-fuelType" class="form-input">
+              <option value="">Combustible</option>
+              <option value="gasoline">gasoline</option>
+              <option value="diesel">diesel</option>
+              <option value="gas">gas</option>
+              <option value="electric">electric</option>
+              <option value="hybrid">hybrid</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="window.saveVehicleForDriver(${driverId})">Guardar vehículo</button>
+      </div>
+    `;
+  }
+
+  openModal();
+  fillVehicleModal(driverId);
+}
+
+async function fillVehicleModal(driverId) {
+  try {
+    const vehicle = await vehiclesService.getByDriver(driverId);
+    $('edit-vehicle-brand').value = vehicle?.brand || '';
+    $('edit-vehicle-model').value = vehicle?.model || '';
+    $('edit-vehicle-plate').value = vehicle?.plate || '';
+    $('edit-vehicle-capacity').value = vehicle?.capacity || '';
+    $('edit-vehicle-color').value = vehicle?.color || '';
+    $('edit-vehicle-year').value = vehicle?.year || '';
+    $('edit-vehicle-fuelType').value = vehicle?.fuelType || '';
+  } catch (error) {
+    console.warn('Conductor sin vehículo previo o error al cargar:', error);
+  } finally {
+    const loading = $('vehicle-modal-loading');
+    const form = $('vehicle-modal-form');
+    if (loading) loading.style.display = 'none';
+    if (form) form.style.display = 'block';
+  }
+}
+
+async function saveVehicleForDriver(driverId) {
+  const { profile, error } = collectVehicleProfile('edit-vehicle');
+  if (error) {
+    showToast(error, false);
+    return;
+  }
+
+  try {
+    const updated = await vehiclesService.upsertByDriver(driverId, profile);
+    showToast('Vehículo actualizado');
+    closeModal();
+
+    // Asegurar que la vista Fleet es la activa para que el re-render sea visible
+    document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+    const fleetView = document.getElementById('view-fleet');
+    if (fleetView) fleetView.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach((n) => n.classList.remove('active'));
+    const fleetNav = document.querySelector('.nav-item[data-view="fleet"]');
+    if (fleetNav) fleetNav.classList.add('active');
+
+    // Pequeña pausa para que el modal termine su animación de cierre
+    await new Promise((resolve) => setTimeout(resolve, 80));
+    await loadFleet();
+  } catch (err) {
+    console.error('Error guardando vehículo de conductor:', err);
+    showToast(err.message || 'No se pudo guardar el vehículo', false);
   }
 }
 
@@ -1248,6 +1626,8 @@ window.loadFleet = loadFleet;
 window.loadUsers = loadUsers;
 window.openNewDriverModal = openNewDriverModal;
 window.createDriver = createDriver;
+window.openVehicleModal = openVehicleModal;
+window.saveVehicleForDriver = saveVehicleForDriver;
 window.loadAuditLogs = loadAuditLogs;
 window.openNewUserModal = openNewUserModal;
 window.createUser = createUser;
@@ -1261,6 +1641,7 @@ window.completeTrip = completeTrip;
 window.setChart = setChart;
 window.simulate = simulate;
 window.registerUser = registerUser;
+window.toggleRegisterVehicleFields = toggleRegisterVehicleFields;
 window.loadTrips = loadTrips;
 window.saveSettings = saveSettings;
 window.testConnection = testConnection;

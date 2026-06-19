@@ -50,10 +50,17 @@ async function api(method, path, body, token) {
 }
 
 async function ensureUser(profile) {
-  const registered = await api('POST', '/auth/register', {
+  const body = {
     ...profile,
     password: PASSWORD,
-  });
+  };
+  
+  // Add vehicle profile for drivers
+  if (profile.role === 'driver') {
+    body.vehicleProfile = VEHICLE;
+  }
+  
+  const registered = await api('POST', '/auth/register', body);
   if (registered.ok) {
     return registered.data;
   }

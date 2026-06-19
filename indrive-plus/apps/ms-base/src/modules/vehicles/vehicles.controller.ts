@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedUser, UserRole } from '@app/shared';
 import { VehiclesService } from './vehicles.service';
@@ -16,6 +26,28 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 @Controller('vehicles')
 export class VehiclesController {
   constructor(private readonly vehiclesService: VehiclesService) {}
+
+  @Get()
+  @Roles(UserRole.ADMIN)
+  findAll() {
+    return this.vehiclesService.findAll();
+  }
+
+  @Get('driver/:driverId')
+  @Roles(UserRole.ADMIN)
+  findByDriverId(@Param('driverId', ParseIntPipe) driverId: number) {
+    return this.vehiclesService.findByDriver(driverId);
+  }
+
+  @Put('driver/:driverId')
+  @Roles(UserRole.ADMIN)
+  upsertByDriver(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Param('driverId', ParseIntPipe) driverId: number,
+    @Body() dto: CreateVehicleDto,
+  ) {
+    return this.vehiclesService.upsertByDriver(driverId, dto, admin.id);
+  }
 
   @Post()
   register(

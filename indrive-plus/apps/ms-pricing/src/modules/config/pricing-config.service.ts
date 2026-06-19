@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { AuthenticatedUser } from '@app/shared';
 import { PricingConfig } from './schemas/pricing-config.schema';
 import { UpdatePricingConfigDto } from './dto/update-pricing-config.dto';
+import { AuditService } from '../audit/audit.service';
 
 const DEFAULT_CONFIG: PricingConfig = {
   costPerKmBase: 1.5,
@@ -24,6 +26,7 @@ export class PricingConfigService {
   constructor(
     @InjectModel(PricingConfig.name)
     private readonly configModel: Model<PricingConfig>,
+    private readonly auditService: AuditService,
   ) {}
 
   async getActive(): Promise<PricingConfig> {
@@ -34,10 +37,30 @@ export class PricingConfigService {
     return this.configModel.create(DEFAULT_CONFIG);
   }
 
-  async update(dto: UpdatePricingConfigDto): Promise<PricingConfig> {
-    await this.getActive();
-    return this.configModel
+  async update(
+    dto: UpdatePricingConfigDto,
+    admin?: AuthenticatedUser,
+  ): Promise<PricingConfig> {
+    const current = await this.getActive();
+    const payload = dto as Record<string, unknown>;
+    const oldValues: Record<string, unknown> = {};
+    const newValues: Record<string, unknown> = {};
+
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] !== undefined) {
+        oldValues[key] = (current as unknown as Record<string, unknown>)[key];
+        newValues[key] = payload[key];
+      }
+    });
+
+    const updated = (await this.configModel
       .findOneAndUpdate({}, { $set: dto }, { new: true })
-      .lean() as Promise<PricingConfig>;
+      .lean()) as PricingConfig;
+
+    if (admin) {
+      await this.auditService.logConfigChange(admin, oldValues, newValues);
+    }
+
+    return updated;
   }
 }

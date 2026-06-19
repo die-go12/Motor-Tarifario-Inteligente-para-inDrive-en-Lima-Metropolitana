@@ -10,14 +10,14 @@ export const AUTH_CONFIG = {
 
 export const API_CONFIG = {
   // Se usan URL directas de cada servicio cuando la gateway no proxea pricing/WS
-  GATEWAY: localStorage.getItem('api_gateway_url') || 'http://localhost:3001',
+  GATEWAY: localStorage.getItem('api_gateway_url') || 'http://localhost:3000',
 
   get MS_BASE() {
-    return localStorage.getItem('ms_base_url') || 'http://localhost:3002';
+    return localStorage.getItem('ms_base_url') || 'http://localhost:3001';
   },
 
   get MS_PRICING() {
-    return localStorage.getItem('ms_pricing_url') || 'http://localhost:3003';
+    return localStorage.getItem('ms_pricing_url') || 'http://localhost:3002';
   },
 
   get BASE_URL() {
@@ -54,11 +54,14 @@ export const API_ENDPOINTS = {
   PRICING: {
     QUOTE: '/pricing/quote',
     GET_CONFIG: '/pricing/config',
-    UPDATE_CONFIG: '/pricing/config'
+    UPDATE_CONFIG: '/pricing/config',
+    ANOMALIES: '/pricing/anomalies'
   },
   VEHICLES: {
     LIST: '/vehicles',
-    ME: '/vehicles/me'
+    ME: '/vehicles/me',
+    BY_DRIVER: (driverId) => `/vehicles/driver/${driverId}`,
+    UPSERT_BY_DRIVER: (driverId) => `/vehicles/driver/${driverId}`
   }
 };
 

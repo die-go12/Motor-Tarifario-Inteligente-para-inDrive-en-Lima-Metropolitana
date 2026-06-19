@@ -51,7 +51,7 @@
 |---------------|------------|-----------|----------|
 | **Transaccional** | PostgreSQL (contenedor local) | Base de datos relacional ACID. Almacena información estructurada de usuarios, vehículos y relaciones de viajes. | Usuario, Conductor, Vehículo, Viaje, Negociación, Oferta, RangoTarifario, Tarifa, Pago, Parámetro |
 | **Histórico + Auditoría** | MongoDB (contenedor local) | Base de datos NoSQL documental. Almacena payload completo de auditoría y trazabilidad (CAR-007). Guarda histórico de viajes validados por filtro de anomalías (CAR-005). | Anomalía, Histórico, LogAuditoria |
-| **Caché + Sesiones** | Redis (contenedor local) | Capa de memoria intermedia (in-memory). Maneja estado inmediato de asignación de viaje y persistencia de sesiones activas. | Sesiones activas, Rangos tarifarios recientes, Configuraciones de parámetros |
+| **Caché + Sesiones + Bus de eventos** | Redis (contenedor local) | Capa in-memory. Maneja estado inmediato de asignación de viaje, sesiones activas y el **bus de eventos (Pub/Sub)** entre microservicios (canales `pricing.calculated`, `pricing.settled`, `anomaly.detected`). RabbitMQ queda como evolución (ADR-005). | Sesiones activas, rangos tarifarios recientes, **canales de eventos** |
 
 ---
 
@@ -59,7 +59,7 @@
 
 | Herramienta | Propósito |
 |-------------|-----------|
-| **Docker Compose** | Orquestación local. Levanta e intercomunica 5 contenedores: NestJS Base, NestJS Motor Tarifario, PostgreSQL, MongoDB y Redis. |
+| **Docker Compose** | Orquestación local. Levanta e intercomunica los microservicios NestJS (api-gateway, ms-base, ms-pricing, ms-integration, ms-reports) y las bases PostgreSQL, MongoDB y Redis. |
 | **Docker** | Contenerización de microservicios para entornos consistentes. |
 | **Kubernetes** | Orquestación de contenedores para escalabilidad y resiliencia (proyección cloud). |
 

@@ -67,7 +67,14 @@ class TripsService {
    */
   async getAllTrips(filter = null) {
     try {
-      return await this.getMyTrips(filter);
+      const query = new URLSearchParams();
+      if (filter) {
+        query.set('status', filter);
+      }
+
+      const suffix = query.toString() ? `?${query.toString()}` : '';
+      const trips = await apiService.get(`${API_ENDPOINTS.TRIPS.LIST_ADMIN}${suffix}`);
+      return Array.isArray(trips) ? trips : [];
     } catch (error) {
       console.error('Get all trips error:', error);
       throw error;

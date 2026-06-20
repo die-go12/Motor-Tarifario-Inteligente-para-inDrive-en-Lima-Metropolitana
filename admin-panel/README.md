@@ -498,7 +498,7 @@ Base URL: `http://localhost:3000`
    { "email": "admin@indrive.pe", "password": "Admin1234" }
    ```
 
-2. **Get Trips**: `GET /trips`
+2. **Get Trips**: `GET /trips/all` (admin)
    - Header: `Authorization: Bearer <token>`
 
 3. **Quote**: `POST /pricing/quote`

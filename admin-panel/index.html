@@ -559,18 +559,51 @@
       <div id="view-safety" class="view">
         <div class="panel-header" style="margin-bottom:20px">
           <div class="panel-title">Safety Dashboard</div>
+          <button class="filter-btn" onclick="window.loadSafetySummary()">↻ Actualizar</button>
         </div>
 
         <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Demanda total</div>
+            <div class="kpi-value" id="report-total-quotes">—</div>
+            <div class="kpi-sub">Citas registradas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Viajes completados</div>
+            <div class="kpi-value" id="report-completed-trips">—</div>
+            <div class="kpi-sub">Cierres confirmados</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Ingresos totales</div>
+            <div class="kpi-value" id="report-total-revenue">S/ —</div>
+            <div class="kpi-sub">Acumulado operativo</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Distancia media</div>
+            <div class="kpi-value" id="report-average-distance">—</div>
+            <div class="kpi-sub">Promedio por viaje</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Anomalías por severidad</div>
+          </div>
+          <div class="panel-body" id="report-anomaly-breakdown" style="display:flex;flex-wrap:wrap;gap:10px">
+            <span class="badge">Cargando...</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid" style="margin-top:20px">
           <div class="kpi-card">
             <div class="kpi-label">Anomalías activas</div>
             <div class="kpi-value" id="safety-anomalies">0</div>
             <div class="kpi-sub">Requieren revisión</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-label">Viajes cancelados hoy</div>
+            <div class="kpi-label">Viajes cancelados</div>
             <div class="kpi-value" id="safety-cancelled">0</div>
-            <div class="kpi-sub">Total del día</div>
+            <div class="kpi-sub">Total registrado</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-label">Regla de pago activa</div>

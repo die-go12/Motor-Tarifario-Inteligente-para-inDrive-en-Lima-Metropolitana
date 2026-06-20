@@ -8,6 +8,7 @@ import {
   authService, 
   socketService,
   tripsService, 
+  reportsService,
   vehiclesService,
   pricingService,
   API_ENDPOINTS,
@@ -33,8 +34,13 @@ import { debounce } from './ui-utils.js';
 const AppState = {
   trips: [],
   currentTrip: null,
-  chart: null
+  chart: null,
+  summary: null
 };
+
+function totalBySeverity(anomaliesBySeverity = {}) {
+  return Object.values(anomaliesBySeverity).reduce((sum, value) => sum + Number(value || 0), 0);
+}
 
 // ==================== INICIALIZACIÓN ====================
 
@@ -344,7 +350,7 @@ async function loadTrips() {
 
   const filter = $('trip-status-filter')?.value || '';
   try {
-    const trips = await tripsService.getMyTrips(filter || null);
+    const trips = await tripsService.getAllTrips(filter || null);
     renderTripsTable(container, trips, false);
   } catch (error) {
     console.error('Error loading all trips:', error);
@@ -380,6 +386,7 @@ function goTo(viewName, navBtn) {
   if (viewName === 'fleet') loadFleet();
   if (viewName === 'users') loadUsers();
   if (viewName === 'audit') loadAuditLogs();
+  if (viewName === 'safety') loadSafetySummary();
 }
 
 /**
@@ -925,14 +932,11 @@ async function loadAuditLogs() {
     const adminData = await apiService.get('/audit/logs?limit=100');
     const adminLogs = adminData.logs || [];
 
-    let pricingLogs = [];
-    let configChanges = [];
+    let anomalies = [];
     try {
-      const pricingData = await apiService.get('/pricing/audit/logs?limit=50');
-      pricingLogs = pricingData.pricing || [];
-      configChanges = pricingData.configChanges || [];
+      anomalies = await pricingService.getAnomalies({ limit: 50 });
     } catch (err) {
-      console.warn('Could not fetch pricing logs:', err);
+      console.warn('Could not fetch pricing anomalies:', err);
     }
 
     const rows = [];
@@ -981,29 +985,16 @@ async function loadAuditLogs() {
       });
     }
 
-    // Procesar logs de pricing
-    if (pricingLogs && pricingLogs.length > 0) {
-      pricingLogs.forEach((log) => {
+    // Procesar anomalías auditadas desde pricing
+    if (anomalies && anomalies.length > 0) {
+      anomalies.forEach((log) => {
         rows.push({
-          type: 'PRECIO',
+          type: 'ANOMALÍA',
           admin: 'Sistema',
-          detail: `Distancia: ${log.distanceKm} km | Base: S/ ${log.basePrice?.toFixed(2) || '0.00'}`,
-          severity: 'INFO',
-          timestampMs: new Date(log.createdAt).getTime(),
-          timestamp: new Date(log.createdAt).toLocaleString('es-PE'),
-        });
-      });
-    }
-
-    if (configChanges && configChanges.length > 0) {
-      configChanges.forEach((log) => {
-        rows.push({
-          type: log.action === 'UPDATE_WEIGHTS' ? 'PESOS' : 'CONFIG',
-          admin: log.adminEmail || 'Admin',
-          detail: log.details || 'Configuracion actualizada',
-          severity: 'INFO',
-          timestampMs: new Date(log.createdAt).getTime(),
-          timestamp: new Date(log.createdAt).toLocaleString('es-PE'),
+          detail: `Viaje #${log.tripId || '—'} | ${log.anomalyType || 'Pricing'} | Δ ${Number(log.deviation || 0).toFixed(2)}`,
+          severity: String(log.severity || 'INFO').toUpperCase(),
+          timestampMs: new Date(log.detectedAt || log.createdAt || log.updatedAt || Date.now()).getTime(),
+          timestamp: new Date(log.detectedAt || log.createdAt || log.updatedAt || Date.now()).toLocaleString('es-PE'),
         });
       });
     }
@@ -1031,7 +1022,7 @@ async function loadAuditLogs() {
             .map(
               (row) => `
             <tr>
-              <td><span class="badge ${row.type === 'PRECIO' ? 'info' : 'action'}">${row.type}</span></td>
+              <td><span class="badge ${row.type === 'ANOMALÍA' ? 'warn' : row.type === 'PRECIO' ? 'info' : 'action'}">${row.type}</span></td>
               <td>${row.admin}</td>
               <td style="max-width:400px;word-break:break-word">${row.detail}</td>
               <td style="font-size:12px;color:var(--t3);white-space:nowrap">${row.timestamp}</td>
@@ -1042,7 +1033,7 @@ async function loadAuditLogs() {
         </tbody>
       </table>
       <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--r-md);font-size:12px;color:var(--t3)">
-        <strong>Totales:</strong> ${adminLogs.length} cambios de admin, ${pricingLogs.length} calculos de precios, ${configChanges.length} cambios de configuracion
+        <strong>Totales:</strong> ${adminLogs.length} cambios de admin, ${anomalies.length} anomalías auditadas
       </div>
     `;
 
@@ -1058,13 +1049,69 @@ async function loadAuditLogs() {
   }
 }
 
+/**
+ * Cargar resumen de seguridad y métricas agregadas
+ */
+async function loadSafetySummary() {
+  const totalQuotesEl = $('report-total-quotes');
+  const completedTripsEl = $('report-completed-trips');
+  const revenueEl = $('report-total-revenue');
+  const averageDistanceEl = $('report-average-distance');
+  const anomalyBreakdownEl = $('report-anomaly-breakdown');
+  const safetyAnomaliesEl = $('safety-anomalies');
+  const safetyCancelledEl = $('safety-cancelled');
+
+  try {
+    const [summary, trips] = await Promise.all([
+      reportsService.getSummary(),
+      tripsService.getAllTrips()
+    ]);
+
+    AppState.summary = summary;
+
+    const totalAnomalies = totalBySeverity(summary.anomaliesBySeverity);
+    const cancelledTrips = trips.filter((trip) => trip.status === 'CANCELLED').length;
+
+    if (totalQuotesEl) totalQuotesEl.textContent = Number(summary.totalQuotes || 0).toLocaleString();
+    if (completedTripsEl) completedTripsEl.textContent = Number(summary.completedTrips || 0).toLocaleString();
+    if (revenueEl) revenueEl.textContent = `S/ ${Number(summary.totalRevenue || 0).toFixed(2)}`;
+    if (averageDistanceEl) averageDistanceEl.textContent = `${Number(summary.averageDistanceKm || 0).toFixed(2)} km`;
+    if (safetyAnomaliesEl) safetyAnomaliesEl.textContent = totalAnomalies.toLocaleString();
+    if (safetyCancelledEl) safetyCancelledEl.textContent = cancelledTrips.toLocaleString();
+
+    if (anomalyBreakdownEl) {
+      const severities = summary.anomaliesBySeverity || {};
+      anomalyBreakdownEl.innerHTML = `
+        <span class="badge up">LOW ${Number(severities.LOW || severities.low || 0).toLocaleString()}</span>
+        <span class="badge warn">MEDIUM ${Number(severities.MEDIUM || severities.medium || 0).toLocaleString()}</span>
+        <span class="badge err">HIGH ${Number(severities.HIGH || severities.high || 0).toLocaleString()}</span>
+      `;
+    }
+  } catch (error) {
+    console.error('Error loading safety summary:', error);
+    [totalQuotesEl, completedTripsEl, revenueEl, averageDistanceEl, safetyAnomaliesEl, safetyCancelledEl].forEach((el) => {
+      if (el) el.textContent = '—';
+    });
+    if (anomalyBreakdownEl) {
+      anomalyBreakdownEl.innerHTML = '<span class="badge">Sin datos</span>';
+    }
+  }
+}
+
 
 /**
  * Cargar KPIs
  */
 async function loadKPIs() {
   try {
-    const trips = await tripsService.getMyTrips();
+    const [summaryResult, tripsResult, usersResult] = await Promise.allSettled([
+      reportsService.getSummary(),
+      tripsService.getAllTrips(),
+      authService.listAllUsers()
+    ]);
+
+    const summary = summaryResult.status === 'fulfilled' ? summaryResult.value : null;
+    const trips = tripsResult.status === 'fulfilled' ? tripsResult.value : [];
     const stats = tripsService.calculateStats(trips);
     const completed = trips.filter(t => t.status === TRIP_STATUS.COMPLETED);
 
@@ -1080,13 +1127,16 @@ async function loadKPIs() {
     const kpiDrivers = $('kpi-drivers');
     const kpiAnomalies = $('kpi-anomalies');
 
-    if (kpiTrips) kpiTrips.textContent = stats.total.toLocaleString();
+    if (kpiTrips) {
+      const totalDemand = summary ? summary.totalQuotes : stats.total;
+      kpiTrips.textContent = Number(totalDemand || 0).toLocaleString();
+    }
     if (kpiGap) kpiGap.textContent = `S/ ${avgGap.toFixed(2)}`;
 
     // Contar conductores activos reales desde /users (no desde trips)
     let driverCount = 0;
     try {
-      let allUsers = await authService.listAllUsers();
+      let allUsers = usersResult.status === 'fulfilled' ? usersResult.value : null;
       if (allUsers && typeof allUsers === 'object') {
         allUsers = Array.isArray(allUsers.data) ? allUsers.data
           : Array.isArray(allUsers.users) ? allUsers.users
@@ -1102,9 +1152,13 @@ async function loadKPIs() {
     }
     if (kpiDrivers) kpiDrivers.textContent = driverCount;
 
-    if (kpiAnomalies) kpiAnomalies.textContent = pricingService.detectAnomalies(trips).length;
+    if (kpiAnomalies) {
+      const anomaliesBySeverity = summary?.anomaliesBySeverity || {};
+      kpiAnomalies.textContent = totalBySeverity(anomaliesBySeverity).toLocaleString();
+    }
 
     AppState.trips = trips;
+    AppState.summary = summary;
   } catch (error) {
     console.error('Error loading KPIs:', error);
     // Mostrar valores placeholder
@@ -1126,7 +1180,7 @@ async function loadLiveTrips() {
   showLoading(container);
 
   try {
-    const trips = await tripsService.getMyTrips();
+    const trips = await tripsService.getAllTrips();
     AppState.trips = trips;
     renderTripsTable(container, trips.slice(0, 8), true);
   } catch (error) {
@@ -1629,6 +1683,7 @@ window.createDriver = createDriver;
 window.openVehicleModal = openVehicleModal;
 window.saveVehicleForDriver = saveVehicleForDriver;
 window.loadAuditLogs = loadAuditLogs;
+window.loadSafetySummary = loadSafetySummary;
 window.openNewUserModal = openNewUserModal;
 window.createUser = createUser;
 window.updateWeights = updateWeights;

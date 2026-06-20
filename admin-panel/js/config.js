@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
   },
   TRIPS: {
     LIST: '/trips',
+    LIST_ADMIN: '/trips/all',
     CREATE: '/trips',
     QUOTE: '/trips/quote',
     GET_ONE: (id) => `/trips/${id}`,
@@ -56,6 +57,9 @@ export const API_ENDPOINTS = {
     GET_CONFIG: '/pricing/config',
     UPDATE_CONFIG: '/pricing/config',
     ANOMALIES: '/pricing/anomalies'
+  },
+  REPORTS: {
+    SUMMARY: '/reports/summary'
   },
   VEHICLES: {
     LIST: '/vehicles',

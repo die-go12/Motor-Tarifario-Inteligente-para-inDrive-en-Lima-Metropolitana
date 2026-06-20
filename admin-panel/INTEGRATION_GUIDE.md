@@ -62,6 +62,10 @@ Body: { origin, destination, distanceKm }
 GET /trips
 Headers: { Authorization: Bearer TOKEN }
 
+// Obtener todos los viajes (ADMIN)
+GET /trips/all
+Headers: { Authorization: Bearer TOKEN }
+
 // Obtener detalle de viaje
 GET /trips/:id
 Headers: { Authorization: Bearer TOKEN }
@@ -127,6 +131,17 @@ Headers: { Authorization: Bearer TOKEN }
 PUT /pricing/config
 Headers: { Authorization: Bearer TOKEN }
 Body: { distanceWeight, fuelWeight, ... }
+
+// Anomalías auditadas (ADMIN / AUDITOR)
+GET /pricing/anomalies?limit=50
+Headers: { Authorization: Bearer TOKEN }
+```
+
+#### Reports (`/reports`)
+```javascript
+// Resumen agregado del sistema (ADMIN / AUDITOR)
+GET /reports/summary
+Headers: { Authorization: Bearer TOKEN }
 ```
 
 ## Uso de Servicios
@@ -179,7 +194,7 @@ async function loadTrips() {
   showLoading(container);
 
   try {
-    const trips = await tripsService.getMyTrips();
+    const trips = await tripsService.getAllTrips();
     renderTripsTable(container, trips);
   } catch (error) {
     showToast(`Error: ${error.message}`, false);

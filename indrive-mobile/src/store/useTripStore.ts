@@ -51,7 +51,7 @@ interface TripState {
   actualizarUbicacionConductor: (coords: Coords) => void;
   agregarOferta: (oferta: Oferta) => void;
   setRutaCoords: (coords: Coords[]) => void;
-  setTarifaFinal: (monto: number) => void;
+  setTarifaFinal: (monto: number, minimo?: number, maximo?: number) => void;
   reset: () => void;
 }
 
@@ -81,10 +81,18 @@ export const useTripStore = create<TripState>((set) => ({
 
   setRutaCoords: (coords) => set({ rutaCoords: coords }),
 
-  setTarifaFinal: (monto) =>
+  setTarifaFinal: (monto, minimo, maximo) =>
     set((state) => ({
       viajeActivo: state.viajeActivo
-        ? { ...state.viajeActivo, tarifaFinal: monto, status: 'COMPLETED' }
+        ? {
+            ...state.viajeActivo,
+            tarifaFinal: monto,
+            status: 'COMPLETED',
+            tarifa: {
+              minimo: minimo !== undefined ? minimo : state.viajeActivo.tarifa.minimo,
+              maximo: maximo !== undefined ? maximo : state.viajeActivo.tarifa.maximo,
+            },
+          }
         : null,
     })),
 

@@ -105,24 +105,18 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
       setSugerencias([]);
       return;
     }
-
-    const mockPlaces = [
-      { placeId: 'mock-1', descripcion: 'Larcomar, Miraflores, Lima', principal: 'Larcomar' },
-      { placeId: 'mock-2', descripcion: 'Jockey Plaza, Santiago de Surco, Lima', principal: 'Jockey Plaza' },
-      { placeId: 'mock-3', descripcion: 'Plaza San Miguel, San Miguel, Lima', principal: 'Plaza San Miguel' },
-      { placeId: 'mock-4', descripcion: 'Parque de la Exposición, Cercado de Lima, Lima', principal: 'Parque de la Exposición' },
-      { placeId: 'mock-5', descripcion: 'San Isidro Financiero, San Isidro, Lima', principal: 'San Isidro' }
-    ];
-
     if (Platform.OS === 'web') {
-      const filtered = mockPlaces.filter(p =>
-        p.descripcion.toLowerCase().includes(texto.toLowerCase()) ||
-        p.principal.toLowerCase().includes(texto.toLowerCase())
+      const mockPlaces = [
+        { placeId: 'san_isidro', descripcion: 'San Isidro, Lima, Perú', principal: 'San Isidro' },
+        { placeId: 'miraflores', descripcion: 'Miraflores, Lima, Perú', principal: 'Miraflores' },
+        { placeId: 'surco', descripcion: 'Santiago de Surco, Lima, Perú', principal: 'Santiago de Surco' },
+        { placeId: 'san_miguel', descripcion: 'San Miguel, Lima, Perú', principal: 'San Miguel' },
+      ];
+      setSugerencias(
+        mockPlaces.filter((p) => p.descripcion.toLowerCase().includes(texto.toLowerCase()))
       );
-      setSugerencias(filtered);
       return;
     }
-
     setBuscando(true);
     try {
       const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(texto)}&location=${LIMA_CENTRO.latitude},${LIMA_CENTRO.longitude}&radius=${LIMA_RADIO_BUSQUEDA}&components=country:pe&key=${GOOGLE_MAPS_API_KEY}`;
@@ -137,20 +131,9 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
             principal: p.structured_formatting.main_text,
           }))
         );
-      } else {
-        const filtered = mockPlaces.filter(p =>
-          p.descripcion.toLowerCase().includes(texto.toLowerCase()) ||
-          p.principal.toLowerCase().includes(texto.toLowerCase())
-        );
-        setSugerencias(filtered);
       }
     } catch (e) {
       console.error('Error buscando lugares:', e);
-      const filtered = mockPlaces.filter(p =>
-        p.descripcion.toLowerCase().includes(texto.toLowerCase()) ||
-        p.principal.toLowerCase().includes(texto.toLowerCase())
-      );
-      setSugerencias(filtered);
     } finally {
       setBuscando(false);
     }
@@ -161,33 +144,27 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
     setSugerencias([]);
     setDestino(lugar.principal);
 
-    const mockCoords: Record<string, Coords> = {
-      'mock-1': { latitude: -12.132, longitude: -77.030 },
-      'mock-2': { latitude: -12.086, longitude: -76.976 },
-      'mock-3': { latitude: -12.077, longitude: -77.085 },
-      'mock-4': { latitude: -12.060, longitude: -77.036 },
-      'mock-5': { latitude: -12.096, longitude: -77.027 }
-    };
-
     // Obtener detalles y calcular ruta
     try {
-      let lat = -12.046374;
-      let lng = -77.042793;
+      let coords = { lat: LIMA_CENTRO.latitude, lng: LIMA_CENTRO.longitude };
 
-      if (lugar.placeId.startsWith('mock-')) {
-        const coords = mockCoords[lugar.placeId] || mockCoords['mock-1'];
-        lat = coords.latitude;
-        lng = coords.longitude;
+      if (Platform.OS === 'web') {
+        if (lugar.placeId === 'san_isidro') {
+          coords = { lat: -12.0913, lng: -77.0378 };
+        } else if (lugar.placeId === 'miraflores') {
+          coords = { lat: -12.1221, lng: -77.0298 };
+        } else if (lugar.placeId === 'surco') {
+          coords = { lat: -12.1256, lng: -76.9854 };
+        }
       } else {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${lugar.placeId}&fields=geometry&key=${GOOGLE_MAPS_API_KEY}`;
         const detailsResp = await fetch(detailsUrl);
         const detailsJson = await detailsResp.json();
-        const coords = detailsJson.result.geometry.location;
-        lat = coords.lat;
-        lng = coords.lng;
+        const detailsCoords = detailsJson.result.geometry.location;
+        coords = { lat: detailsCoords.lat, lng: detailsCoords.lng };
       }
 
-      setDestinoCoords({ latitude: lat, longitude: lng });
+      setDestinoCoords({ latitude: coords.lat, longitude: coords.lng });
 
       // Cotización pre-viaje: el backend (Integración + Motor) devuelve
       // distancia, duración, polyline y el TECHO (visualización asimétrica).

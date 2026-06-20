@@ -77,8 +77,8 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
     });
 
     // Escuchar finalización del viaje
-    socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number }) => {
-      setTarifaFinal(data.tarifaFinal);
+    socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number; minimumPrice?: number; maximumPrice?: number }) => {
+      setTarifaFinal(data.tarifaFinal, data.minimumPrice, data.maximumPrice);
     });
 
     return () => {

@@ -69,8 +69,8 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
       actualizarEstado('IN_PROGRESS');
     });
 
-    socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number }) => {
-      setTarifaFinal(data.tarifaFinal);
+    socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number; minimumPrice?: number; maximumPrice?: number }) => {
+      setTarifaFinal(data.tarifaFinal, data.minimumPrice, data.maximumPrice);
     });
 
     socket.on(SERVER_EVENTS.TRIP_CANCELLED, () => {

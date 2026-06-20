@@ -24,25 +24,29 @@
 
 Login exitoso con credenciales de administrador. El Dashboard carga los KPIs principales (Total Trips, Active Drivers, Avg Negotiation Gap, Pricing Anomalies) con datos reales desde el backend.
 
-![Dashboard Admin](imgs/01-dashboard-admin.png)
+|                             |                                         |
+|-----------------------------|-----------------------------------------|
+|<img width="1256" height="862" alt="image" src="https://github.com/user-attachments/assets/b64bbae7-7925-405c-b8ec-819ca4f2b024" />|<img width="1919" height="864" alt="image" src="https://github.com/user-attachments/assets/5359a2c1-135b-4548-a89f-6d5630f34a0c" />|
 
 ### 1.2 Live Transaction Audit
 
 La tabla de auditoría en vivo del Dashboard muestra los viajes registrados con su ruta, monto ofertado por el pasajero y por el conductor.
 
-![Live Transaction Audit](imgs/02-live-transaction-audit.png)
+<img width="1292" height="873" alt="image" src="https://github.com/user-attachments/assets/c8f89288-dc99-4665-adac-fb858073e26f" />
+
 
 ### 1.3 Gestión de Viajes
 
 La vista de Viajes muestra el listado completo de viajes registrados en el sistema, con distancia recorrida y los montos negociados.
 
-![Gestión de Viajes](imgs/03-gestion-viajes.png)
+<img width="1292" height="859" alt="image" src="https://github.com/user-attachments/assets/6a5170ec-0be6-46b7-8eba-f0ae37c8ee4e" />
+
 
 ### 1.4 Gestión de Usuarios
 
 Lista completa de usuarios registrados, segmentados por rol (Admin, Passenger, Driver, Auditor), con datos reales provenientes de la base de datos.
 
-![Lista de Usuarios](imgs/04-usuarios-lista.png)
+<img width="1919" height="866" alt="image" src="https://github.com/user-attachments/assets/f876fff2-9c60-47e8-8c9a-701a2f2e5bb4" />
 
 ---
 
@@ -55,7 +59,8 @@ Se reemplazaron los antiguos sliders de porcentaje (que no representaban correct
 - **Costo extra por capacidad (S/)** → `capacityExtraCost`
 - **Peso histórico zona** → `historicWeight`
 
-![Variables Base - carga inicial](imgs/07-pricing-variables-base.png)
+<img width="1291" height="873" alt="image" src="https://github.com/user-attachments/assets/663446fe-1b29-44b8-939b-b4a6c87d1a48" />
+
 
 **Prueba de persistencia:** se modificó el costo por km de `1.50` a `1.80`, se guardó, y al recargar la página el valor se mantuvo correctamente (sin corromperse ni revertirse).
 

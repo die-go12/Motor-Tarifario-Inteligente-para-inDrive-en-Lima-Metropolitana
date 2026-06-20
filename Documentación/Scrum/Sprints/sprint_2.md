@@ -297,6 +297,8 @@ Por ser el último sprint, el cierre consolida:
 > Evidencia fotográfica de la reunión del Sprint 2.
 
 ![Evidencia de Reunión](../imgs/evidencia.jpeg)
+<img width="1512" height="795" alt="image" src="https://github.com/user-attachments/assets/81dfcae0-2672-42ce-93d2-75568e305fe9" />
+
 
 ### Participantes
 

@@ -12,6 +12,7 @@ El sistema está basado en una arquitectura de microservicios diseñada para sop
 
 ### 1.1. Arquitectura de Alto Nivel
 * **Capa de Presentación:**
+  
     * **App Móvil (React Native + Expo):** Utilizada por Pasajeros y Conductores para interactuar con los flujos de viaje en tiempo real de forma directa con el servicio base (`ms-base`).
     * **Panel Web Admin (Lima Ops):** Utilizado por Administradores y Auditores para la gestión de métricas, configuraciones y auditoría mediante un `API Gateway`.
 * **Capa de Orquestación y Ruteo:**

@@ -21,94 +21,90 @@
 
 ---
 
-## 📌 Visión General del Sprint 1
+## 📌 Visión General
 
-| Sprint | Nombre | Historias | Story Points | Duración |
-|--------|--------|-----------|--------------|----------|
-| Sprint 1 | Fase Pre-viaje | US-001, US-002, US-003, US-004 | 16 SP | 2 semanas |
+| Sprint | Nombre | Historias | Story Points | Estado |
+|--------|--------|-----------|--------------|--------|
+| Sprint 1 | Fase Pre-viaje | US-001, US-002, US-003, US-004 | 16 SP | ✅ Completado |
+| Sprint 2 | Post-viaje + Administración | US-005, US-006, US-007, US-008 | 18 SP | ✅ Completado |
 
----
-
-## 🎯 Sprint Goal
-
-Implementar el flujo completo de pre-viaje: solicitud de viaje, cálculo de rango tarifario, visualización asimétrica, negociación controlada y aceptación bilateral.
+> Este documento detalla el **Sprint Backlog del Sprint 2** (sprint en curso al cierre del proyecto). El detalle del Sprint 1 se conserva en su [retrospectiva](../Scrum/Retrospectivas/retrospective.md) y en el incremento ya integrado a `main`.
 
 ---
 
-# 🧾 US-001 – Solicitud de viaje con cálculo de rango (5 SP)
+## 🎯 Sprint Goal (Sprint 2)
+
+Consolidar el MVP integrado: liquidación post-viaje con la regla de pago invariante, parametrización y simulación del motor desde el panel administrativo, y registro/reportes para auditoría.
+
+---
+
+# 🧾 US-005 – Recálculo post-viaje (5 SP)
 
 ### Objetivo
-Generar un rango tarifario inteligente en menos de 5 segundos.
+Obtener el precio real del servicio al finalizar el viaje para alimentar la regla de pago.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Endpoint solicitud de viaje | Backend | Done |
-| Integración Google Maps (modo mock) | Backend | To Do |
-| Integración OSINERGMIN (modo mock) | Backend | To Do |
-| API de tráfico en tiempo real (simulado) | Backend | To Do |
-| Algoritmo de cálculo de rango (7 variables) | Backend | In Progress |
-| Manejo de fallos externos (degradación elegante) | Backend | In Progress |
-| Pruebas unitarias e integración | QA | In Progress |
+| Captura del precio real al completar el viaje | Móvil | Done |
+| Endpoint de liquidación (`/settle`) | Backend | Done |
+| Persistencia del registro post-viaje | Backend | Done |
+
+> **Alcance ajustado:** el recálculo con GPS real se reemplazó por el precio real ingresado por el conductor; el GPS real queda en el roadmap (ver [Gestión de Cambio](../Presentacion_Final/gestion_de_cambio.md)).
 
 ---
 
-# 🧾 US-002 – Visualización asimétrica del precio (4 SP)
+# 🧾 US-006 – Aplicación de la regla de pago invariante (5 SP)
 
 ### Objetivo
-Mostrar información distinta según el rol del usuario.
+Aplicar `pago = max(mínimo, min(precio_real, máximo))` protegiendo bilateralmente a pasajero y conductor.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Vista pasajero (solo máximo) | Frontend | In Progress |
-| Vista conductor (solo mínimo) | Frontend | In Progress |
-| Vista administrador (rango completo) | Frontend | In Progress |
-| Control de acceso por roles | Frontend | In Progress |
-| Pruebas de seguridad y autorización | QA | To Do |
+| Implementación de la regla de pago en `ms-pricing` | Backend | Done |
+| Liquidación asimétrica por rol (cada uno ve solo su límite garantizado) | Backend / Móvil | Done |
+| Persistencia del pago al completar el viaje | Backend | Done |
+| Envío del `precio_real` al filtro de anomalías | Backend | Done |
 
 ---
 
-# 🧾 US-003 – Negociación acotada dentro del rango (4 SP)
+# 🧾 US-007 – Configuración de parámetros desde panel admin (3 SP)
 
 ### Objetivo
-Permitir negociación dentro de límites controlados del rango tarifario.
+Ajustar los pesos, el multiplicador de tráfico y los umbrales del motor sin desplegar código.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Endpoint de ofertas y contraofertas | Backend | To Do |
-| Validación de rango permitido | Backend | To Do |
-| Interfaz de negociación en tiempo real | Frontend | In Progress |
-| Registro de ofertas (trazabilidad) | Backend | To Do |
-| Gestión de contraofertas | Backend | To Do |
-| Pruebas de límites y validaciones | QA | To Do |
+| Endpoint `GET/PUT /pricing/config` | Backend | Done |
+| Editor visual de parámetros (valores reales del motor) | Panel | Done |
+| Umbrales de anomalías configurables (CA-007-03) | Backend / Panel | Done |
+| Simulador de oferta/demanda | Panel | Done |
+| Control de acceso por rol (admin escribe / auditor solo lee) | Backend | Done |
 
 ---
 
-# 🧾 US-004 – Aceptación bilateral e inicio de viaje (3 SP)
+# 🧾 US-008 – Visualización de reportes y métricas (5 SP)
 
 ### Objetivo
-Formalizar el inicio del viaje mediante aceptación de ambas partes y transición del estado del viaje.
+Visualizar el estado del sistema para la toma de decisiones del administrador.
 
 | Tarea | Responsable | Estado |
 |------|-------------|--------|
-| Endpoint de aceptación bilateral | Backend | To Do |
-| Máquina de estados del viaje (CREATED → NEGOTIATION → ACCEPTED → IN_PROGRESS) | Backend | In Progress |
-| Registro de aceptación con timestamp | Backend | To Do |
-| Sistema de notificaciones | Frontend | To Do |
-| Activación de GPS al inicio del viaje | Backend | To Do |
-| Pruebas de flujo completo end-to-end | QA | To Do |
+| Microservicio `ms-reports` (read-model por eventos Redis Pub/Sub) | Backend | Done |
+| `GET /reports/summary` (admin/auditor) + `GET /trips/all` (admin) | Backend | Done |
+| Integración visual de reportes y auditoría de anomalías | Panel | Done |
+| Reportes avanzados (zona/franja horaria, tiempos, filtros) | — | To Do (roadmap) |
 
 ---
 
-## 📊 Resumen del Sprint 1
+## 📊 Resumen del Sprint 2
 
 | Métrica | Valor |
 |--------|------|
-| Historias | 4 |
-| Story Points | 16 SP |
-| Tareas totales | 24 |
-| Done | 1 |
-| In Progress | 7 |
-| To Do | 16 |
+| Historias | 4 (US-005 … US-008) |
+| Story Points | 18 SP |
+| Tareas totales | 16 |
+| Done | 15 |
+| Diferido a roadmap | 1 |
 
 ---
 
@@ -116,8 +112,8 @@ Formalizar el inicio del viaje mediante aceptación de ambas partes y transició
 
 | CAR | Relación |
 |-----|----------|
-| CAR-001 | US-001 |
-| CAR-002 | US-002 |
-| CAR-003 | US-003 |
-| CAR-007 | US-001 / US-003 / US-004 |
-| CAR-009 | US-001 |
+| CAR-004 | US-005, US-006 |
+| CAR-005 | US-006 (filtro de anomalías) |
+| CAR-006 | US-007 |
+| CAR-007 | US-005, US-006, US-007, US-008 |
+| CAR-008 | US-008 |

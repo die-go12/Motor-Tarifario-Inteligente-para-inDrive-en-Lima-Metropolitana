@@ -120,6 +120,8 @@ Se adopta una **arquitectura basada en microservicios** con los siguientes servi
 - Servicio de Reportes y Analítica
 - Panel Administrativo
 
+> **Actualización (Sprint 2):** el MVP entregado consolidó el diseño en **4 microservicios de negocio + API Gateway**: `api-gateway`, `ms-base` (auth, usuarios, vehículos, viajes, negociación y WebSocket), `ms-pricing` (motor + anomalías + auditoría), `ms-integration` (integraciones externas) y `ms-reports` (reportes). Los servicios de **Anomalías y Logs** viven **dentro de `ms-pricing`** (auditoría por eventos); el *split* adicional y OpenSearch quedan en **roadmap**. Ver [Gestión de Cambio — Cambio 4](../Presentacion_Final/gestion_de_cambio.md).
+
 ### Alternativas consideradas
 
 </div>
@@ -471,6 +473,8 @@ Se implementa una **estrategia de base de datos poliglota**:
   </tr>
 </table>
 
+> **Actualización (Sprint 2):** el MVP entregado usa **PostgreSQL + MongoDB + Redis**. La auditoría y la trazabilidad (`pricing_logs`, `anomaly_logs`, `pricing_history`) se sirven desde **MongoDB**; **OpenSearch queda en roadmap**. Ver [Gestión de Cambio](../Presentacion_Final/gestion_de_cambio.md).
+
 <div style="text-align: justify">
 
 ### Alternativas consideradas
@@ -568,7 +572,7 @@ El sistema necesita desacoplar el registro de logs, la validación de anomalías
 
 Se adopta una **arquitectura orientada a eventos (EDA)** con RabbitMQ como message broker (MVP local) y proyección a AWS MSK (Kafka) en cloud.
 
-> **Actualización (Sprint 2):** en el MVP entregado el bus de eventos se implementó con **Redis Pub/Sub** (canales reales `pricing.calculated`, `pricing.settled`, `anomaly.detected`); los microservicios `ms-pricing` y `ms-reports` publican/consumen sobre Redis. La migración a **RabbitMQ** (y la proyección a Kafka) queda como **roadmap** consciente. Ver `Documentación/Scrum/sprint_2.md` §13.
+> **Actualización (Sprint 2):** en el MVP entregado el bus de eventos se implementó con **Redis Pub/Sub** (canales reales `pricing.calculated`, `pricing.settled`, `anomaly.detected`); los microservicios `ms-pricing` y `ms-reports` publican/consumen sobre Redis. La migración a **RabbitMQ** (y la proyección a Kafka) queda como **roadmap** consciente. Ver [Sprint 2 §13](../Scrum/Sprints/sprint_2.md).
 
 **Eventos principales:**
 
@@ -958,6 +962,8 @@ Se implementa **autenticación OAuth2 / OIDC** con **JWT** (expiración 1 hora) 
 - TLS 1.3 en todas las comunicaciones
 - AES-256 para datos sensibles en reposo
 - Cumplimiento OWASP API Top 10 y OWASP MASVS
+
+> **Actualización (Sprint 2):** el MVP entregado implementa **JWT** (access token *stateless* + **refresh token persistido con rotación vía `jti`**) y **RBAC con 4 roles** (passenger, driver, admin, auditor); `ms-pricing` valida el JWT de forma independiente y la visualización asimétrica se filtra por rol en el presentador/DTO. **MFA, Keycloak/OIDC y los controles TLS 1.3 / AES-256** quedan como **roadmap** / *hardening* posterior. Ver [Gestión de Cambio](../Presentacion_Final/gestion_de_cambio.md).
 
 ### Alternativas consideradas
 

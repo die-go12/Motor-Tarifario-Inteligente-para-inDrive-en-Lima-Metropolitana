@@ -3,7 +3,19 @@
 > Registro **formal** de los cambios gestionados durante el desarrollo del MVP, siguiendo el proceso:
 > **Identificación → Análisis de impacto → Evaluación y aprobación → Implementación → Seguimiento y validación.**
 >
-> Este documento cubre el **proceso de cambio** (cómo se gestionó cada cambio). La lista de funcionalidades futuras (roadmap) está en [Sprint 2 §13](../Scrum/sprint_2.md).
+> Este documento cubre el **proceso de cambio** (cómo se gestionó cada cambio). La lista de funcionalidades futuras (roadmap) está en [Sprint 2 §13](../Scrum/Sprints/sprint_2.md).
+
+---
+
+## Resumen de cambios gestionados
+
+| # | Cambio | De → A | Estado |
+| --- | --- | --- | --- |
+| 1 | Fuentes externas | APIs en vivo → dato real local + tráfico simulado | Implementado |
+| 2 | Bus de eventos | RabbitMQ → Redis Pub/Sub | Implementado |
+| 3 | Recálculo post-viaje | GPS real → precio real ingresado | Implementado |
+| 4 | Alcance de servicios | ~7 servicios + OpenSearch/MFA → 4 + API Gateway | Implementado |
+| 5 | Rango de negociación | Rango de ancho cero → spread mínimo garantizado | Implementado |
 
 ---
 
@@ -34,3 +46,26 @@
 3. **Evaluación y aprobación:** se aprueba consolidar en **4 microservicios de negocio + API Gateway**: anomalías y logs viven dentro de `ms-pricing` (auditoría) y los reportes en `ms-reports`. OpenSearch, MFA y el split adicional quedan diferidos.
 4. **Implementación:** `api-gateway`, `ms-base`, `ms-pricing`, `ms-integration`, `ms-reports` operativos y orquestados con Docker.
 5. **Seguimiento y validación:** sistema funcional end-to-end. Servicios e infraestructura restantes = roadmap.
+
+## Cambio 5 — Negociación: rango de ancho cero → spread mínimo garantizado
+1. **Identificación:** cuando los multiplicadores dinámicos (tráfico/hora/tiempo) eran 1.0, el motor producía un rango con **máximo igual al mínimo** (ancho cero); la negociación se rompía porque ninguna oferta podía caer dentro de `[X, X]`.
+2. **Análisis de impacto:** afecta CAR-003 (negociación acotada). Sin una banda de precio no hay margen de negociación válido entre pasajero y conductor.
+3. **Evaluación y aprobación:** se aprueba garantizar un **spread mínimo del rango** mediante un parámetro configurable (`minRangeRatio`, 20 % por defecto), respetando los topes existentes (×2.0, límites S/3–150 y ratio máximo ×3.5).
+4. **Implementación:** `ms-pricing` calcula el máximo con un piso `máximo ≥ mínimo × minRangeRatio`; el parámetro vive en la configuración dinámica del motor.
+5. **Seguimiento y validación:** las pruebas del motor cubren el caso sin *surge*; el rango siempre conserva una banda de negociación.
+
+---
+
+## Panorama: diseño original vs. entregado
+
+Vista consolidada de las desviaciones **conscientes** entre el diseño inicial (documentado en los ADR) y lo entregado en el MVP. Cada fila indica dónde queda registrada formalmente.
+
+| Lo que contemplaba el diseño | Lo entregado en el MVP | Por qué | Dónde se documenta |
+| --- | --- | --- | --- |
+| **6 componentes:** Motor, Integración, Anomalías, Logs/Auditoría, Reportes, Panel | **4 microservicios + API Gateway** (`api-gateway`, `ms-base`, `ms-pricing` con Anomalías + Logs, `ms-integration`, `ms-reports`) | Reducir complejidad operativa del MVP; Anomalías y Logs no justificaban servicios propios | Cambio 4 · ADR-001 |
+| Bus de eventos **RabbitMQ** (+ Kafka en cloud) | **Redis Pub/Sub** (`pricing.calculated`, `pricing.settled`, `anomaly.detected`) | Redis ya estaba en el stack → sin infraestructura nueva, menor latencia | Cambio 2 · ADR-005 |
+| BD poliglota con **OpenSearch** para logs | **PostgreSQL + MongoDB + Redis**; logs/auditoría en MongoDB | OpenSearch añadía un motor extra no justificado para el volumen del MVP | ADR-004 |
+| Auth con **Keycloak/OIDC + MFA admin** + TLS/AES | **JWT** (access + refresh con rotación `jti`) + **RBAC 4 roles** | Control de acceso esencial sin sobre-infraestructura; MFA y *hardening* diferidos | ADR-008 |
+| Recálculo post-viaje con **GPS real** | **Precio real ingresado** por el conductor | Infraestructura de GPS real no disponible en el MVP | Cambio 3 |
+
+> Las desviaciones son **conscientes y trazadas**: el diseño original permanece en los ADR y aquí se registra qué se entregó y por qué. Lo no entregado vive en el roadmap ([Sprint 2 §13](../Scrum/Sprints/sprint_2.md)).

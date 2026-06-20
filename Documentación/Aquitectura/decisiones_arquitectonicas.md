@@ -1030,8 +1030,6 @@ Se implementa **autenticación OAuth2 / OIDC** con **JWT** (expiración 1 hora) 
 
 ## Resumen de ADR
 
-</div>
-
 <table align="center">
   <tr>
     <th>ID</th>
@@ -1067,4 +1065,24 @@ Se implementa **autenticación OAuth2 / OIDC** con **JWT** (expiración 1 hora) 
     <td>ADR-005</td>
     <td>Comunicación asíncrona (EDA)</td>
     <td>✅ Aceptado (MVP: Redis Pub/Sub; RabbitMQ en roadmap)</td>
-    <td
+    <td>CAR-007, CAR-010</td>
+  </tr>
+  <tr>
+    <td>ADR-006</td>
+    <td>Degradación elegante ante fallos de APIs externas</td>
+    <td>✅ Aceptado</td>
+    <td>CAR-009, CAR-010</td>
+  </tr>
+  <tr>
+    <td>ADR-007</td>
+    <td>Filtro de anomalías para protección del histórico</td>
+    <td>✅ Aceptado</td>
+    <td>CAR-005, CAR-006</td>
+  </tr>
+  <tr>
+    <td>ADR-008</td>
+    <td>Autenticación y autorización por roles (RBAC)</td>
+    <td>✅ Aceptado</td>
+    <td>CAR-002, CAR-006</td>
+  </tr>
+</table>

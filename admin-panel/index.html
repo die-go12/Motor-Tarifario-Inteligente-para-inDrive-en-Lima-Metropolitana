@@ -426,29 +426,28 @@
         <div class="pricing-grid">
           <div class="config-card">
             <div class="config-title">⚙️ Variables Base (Mínimo)</div>
-            <div class="config-row">
-              <span class="config-label">Distancia (km)</span>
-              <span class="config-val" id="w-dist-v">40%</span>
+            <div style="margin-bottom:16px">
+              <label class="form-label">Costo por km (S/)</label>
+              <input type="number" id="cfg-cost-km" class="config-input" value="1.50" step="0.01" min="0">
+              <small style="color:var(--t3);font-size:11px">Costo base por kilómetro recorrido</small>
             </div>
-            <input type="range" id="w-dist" class="slider" value="40" min="0" max="100" onchange="window.updateWeights ? window.updateWeights() : null">
-
-            <div class="config-row" style="margin-top:16px">
-              <span class="config-label">Combustible</span>
-              <span class="config-val" id="w-fuel-v">25%</span>
+            <div style="margin-bottom:16px">
+              <label class="form-label">Consumo combustible (L/km)</label>
+              <input type="number" id="cfg-fuel-consumption" class="config-input" value="0.10" step="0.01" min="0">
+              <small style="color:var(--t3);font-size:11px">Litros consumidos por kilómetro</small>
             </div>
-            <input type="range" id="w-fuel" class="slider" value="25" min="0" max="100" onchange="window.updateWeights ? window.updateWeights() : null">
-
-            <div class="config-row" style="margin-top:16px">
-              <span class="config-label">Capacidad vehículo</span>
-              <span class="config-val" id="w-cap-v">20%</span>
+            <div style="margin-bottom:16px">
+              <label class="form-label">Costo extra por capacidad (S/)</label>
+              <input type="number" id="cfg-capacity-cost" class="config-input" value="0.50" step="0.01" min="0">
+              <small style="color:var(--t3);font-size:11px">Costo adicional por pasajero más allá del primero</small>
             </div>
-            <input type="range" id="w-cap" class="slider" value="20" min="0" max="100" onchange="window.updateWeights ? window.updateWeights() : null">
-
-            <div class="config-row" style="margin-top:16px">
-              <span class="config-label">Histórico zona</span>
-              <span class="config-val" id="w-hist-v">15%</span>
+            <div style="margin-bottom:16px">
+              <label class="form-label">Peso histórico zona</label>
+              <input type="number" id="cfg-historic-weight" class="config-input" value="0.15" step="0.01" min="0" max="1">
+              <small style="color:var(--t3);font-size:11px">Factor de ajuste basado en viajes similares (0-1)</small>
             </div>
-            <input type="range" id="w-hist" class="slider" value="15" min="0" max="100" onchange="window.updateWeights ? window.updateWeights() : null">
+            <button class="btn-primary" onclick="window.saveBaseConfig()" style="width:100%">Guardar Variables Base</button>
+            <div id="base-config-msg" style="margin-top:10px;font-size:12px"></div>
           </div>
 
           <div class="config-card">

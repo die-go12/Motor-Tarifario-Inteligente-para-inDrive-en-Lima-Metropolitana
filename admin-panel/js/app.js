@@ -63,6 +63,7 @@ async function initApp() {
   try {
     await pricingService.loadConfig();
     syncPricingConfigFields();
+    syncBaseConfigFields();
     console.log('Configuración de pricing cargada');
   } catch (error) {
     console.warn('Usando pesos de pricing por defecto:', error.message);
@@ -388,6 +389,10 @@ function goTo(viewName, navBtn) {
   if (viewName === 'users') loadUsers();
   if (viewName === 'audit') loadAuditLogs();
   if (viewName === 'safety') loadSafetySummary();
+  if (viewName === 'pricing') {
+    syncPricingConfigFields();
+    syncBaseConfigFields();
+  }
 }
 
 /**
@@ -1677,6 +1682,52 @@ function syncPricingConfigFields() {
   }
 }
 
+async function saveBaseConfig() {
+  const costPerKmBase = parseFloat($('cfg-cost-km')?.value);
+  const fuelConsumptionPerKm = parseFloat($('cfg-fuel-consumption')?.value);
+  const capacityExtraCost = parseFloat($('cfg-capacity-cost')?.value);
+  const historicWeight = parseFloat($('cfg-historic-weight')?.value);
+  const msgEl = $('base-config-msg');
+
+  if (!msgEl) return;
+
+  if ([costPerKmBase, fuelConsumptionPerKm, capacityExtraCost, historicWeight].some(isNaN)) {
+    msgEl.textContent = 'Valores inválidos';
+    msgEl.style.color = '#f87171';
+    return;
+  }
+
+  try {
+    await pricingService.updateConfig({
+      costPerKmBase,
+      fuelConsumptionPerKm,
+      capacityExtraCost,
+      historicWeight
+    });
+    msgEl.textContent = '✓ Variables base guardadas correctamente';
+    msgEl.style.color = '#4ade80';
+    syncBaseConfigFields();
+  } catch (error) {
+    msgEl.textContent = `Error: ${error.message}`;
+    msgEl.style.color = '#f87171';
+  }
+}
+
+function syncBaseConfigFields() {
+  const config = pricingService.config;
+  if (!config) return;
+
+  const costKm = $('cfg-cost-km');
+  const fuelCons = $('cfg-fuel-consumption');
+  const capCost = $('cfg-capacity-cost');
+  const histWeight = $('cfg-historic-weight');
+
+  if (costKm) costKm.value = String(config.costPerKmBase ?? 1.50);
+  if (fuelCons) fuelCons.value = String(config.fuelConsumptionPerKm ?? 0.10);
+  if (capCost) capCost.value = String(config.capacityExtraCost ?? 0.50);
+  if (histWeight) histWeight.value = String(config.historicWeight ?? 0.15);
+}
+
 async function saveAnomalyThresholds() {
   const medium = parseFloat($('anomaly-medium').value);
   const high = parseFloat($('anomaly-high').value);
@@ -1735,6 +1786,7 @@ window.loadSafetySummary = loadSafetySummary;
 window.openNewUserModal = openNewUserModal;
 window.createUser = createUser;
 window.updateWeights = updateWeights;
+window.saveBaseConfig = saveBaseConfig;
 window.saveAnomalyThresholds = saveAnomalyThresholds;
 window.triggerEmergency = triggerEmergency;
 window.handleLogout = handleLogout;

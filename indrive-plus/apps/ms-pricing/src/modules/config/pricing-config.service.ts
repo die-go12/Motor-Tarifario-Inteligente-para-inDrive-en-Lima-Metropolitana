@@ -19,6 +19,7 @@ const DEFAULT_CONFIG: PricingConfig = {
   minAbsoluteFare: 3.0,
   maxAbsoluteFare: 150.0,
   maxRangeRatio: 3.5,
+  minRangeRatio: 1.2,
   anomalyMediumDeviation: 0.2,
   anomalyHighDeviation: 0.5,
 };

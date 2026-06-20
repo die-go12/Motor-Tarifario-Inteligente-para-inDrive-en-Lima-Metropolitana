@@ -69,9 +69,12 @@ export class PricingService {
       (request.hourMultiplier - 1) * config.hourWeight +
       (request.timeMultiplier - 1) * config.timeWeight;
     const cappedFactor = Math.min(dynamicFactor, config.trafficMultiplierCap);
-    const dynamicMaximum = minimumPrice * cappedFactor;
+    const flooredMaximum = Math.max(
+      minimumPrice * cappedFactor,
+      minimumPrice * config.minRangeRatio,
+    );
     const cappedMaximum = Math.min(
-      dynamicMaximum,
+      flooredMaximum,
       config.maxAbsoluteFare,
       minimumPrice * config.maxRangeRatio,
     );

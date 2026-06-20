@@ -17,6 +17,7 @@ import { useTripStore, Oferta } from '../../store/useTripStore';
 import { PassengerStackParamList } from '../../navigation/PassengerNavigator';
 import { getSocket, SERVER_EVENTS, PASSENGER_EVENTS } from '../../services/socket';
 import { formatSoles } from '../../utils/format';
+import { api } from '../../services/api';
 
 type Props = {
   navigation: NativeStackNavigationProp<PassengerStackParamList, 'Negotiation'>;
@@ -31,7 +32,7 @@ interface BackendOffer {
 }
 
 export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
-  const { viajeActivo, ofertas, agregarOferta, actualizarEstado, setTarifaFinal, reset } =
+  const { viajeActivo, ofertas, agregarOferta, actualizarEstado, setTarifaFinal, reset, setViajeActivo } =
     useTripStore();
 
   useEffect(() => {
@@ -94,7 +95,14 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
       tripId: Number(viajeActivo.id),
       offerId: oferta.offerId,
     });
-    actualizarEstado('ASSIGNED');
+    setViajeActivo({
+      ...viajeActivo,
+      status: 'ASSIGNED',
+      conductorId: oferta.conductorId,
+      conductorNombre: oferta.conductorNombre,
+      vehiculoPlaca: oferta.vehiculoPlaca,
+      vehiculoModelo: oferta.vehiculoModelo,
+    });
     navigation.navigate('PassengerMap');
   };
 

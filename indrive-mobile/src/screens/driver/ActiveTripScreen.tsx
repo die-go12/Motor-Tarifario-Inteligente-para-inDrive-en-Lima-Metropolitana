@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
+import { CampoEntrada } from '../../components/CampoEntrada';
 import { MapViewCompatible, MarkerCompatible, PolylineCompatible } from '../../components/MapViewCompatible';
 import * as Location from 'expo-location';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -67,9 +69,22 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
     actualizarEstado('IN_PROGRESS');
   };
 
+  const [mostrarModalFinalizar, setMostrarModalFinalizar] = useState(false);
+  const [precioReal, setPrecioReal] = useState('');
+
   const finalizarViaje = () => {
+    setPrecioReal(String(viajeActivo?.tarifa?.minimo || ''));
+    setMostrarModalFinalizar(true);
+  };
+
+  const confirmarFinalizarViaje = () => {
     const socket = getSocket();
-    socket?.emit(DRIVER_EVENTS.COMPLETE_TRIP, { tripId: Number(tripId) });
+    const precio = parseFloat(precioReal) || viajeActivo?.tarifa?.minimo || 0;
+    socket?.emit(DRIVER_EVENTS.COMPLETE_TRIP, {
+      tripId: Number(tripId),
+      realPrice: precio,
+    });
+    setMostrarModalFinalizar(false);
   };
 
   // Pantalla de cobro final
@@ -139,6 +154,39 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
           )}
         </TarjetaBase>
       </View>
+
+      {mostrarModalFinalizar && (
+        <View style={estilos.overlay}>
+          <TarjetaBase estilo={estilos.dialogoPrecio}>
+            <Text style={estilos.dialogoTitulo}>Ingreso de Precio Real</Text>
+            <Text style={estilos.dialogoDescripcion}>
+              Si hubo desvíos o tráfico extremo, ingresa el precio real en soles. 
+              El motor aplicará la regla de negocio para proteger a ambas partes.
+            </Text>
+            <CampoEntrada
+              etiqueta="Precio real del viaje (S/)"
+              placeholder={String(viajeActivo?.tarifa?.minimo || '0.00')}
+              value={precioReal}
+              onChangeText={setPrecioReal}
+              keyboardType="numeric"
+            />
+            <View style={estilos.dialogoBotones}>
+              <TouchableOpacity 
+                style={[estilos.botonDialogo, estilos.botonCancelar]}
+                onPress={() => setMostrarModalFinalizar(false)}
+              >
+                <Text style={estilos.textoBotonCancelar}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[estilos.botonDialogo, estilos.botonConfirmar]}
+                onPress={confirmarFinalizarViaje}
+              >
+                <Text style={estilos.textoBotonConfirmar}>Cobrar</Text>
+              </TouchableOpacity>
+            </View>
+          </TarjetaBase>
+        </View>
+      )}
     </View>
   );
 };
@@ -168,4 +216,57 @@ const estilos = StyleSheet.create({
   montoFinal: { ...theme.typography.h1, color: theme.colors.primary, fontSize: 48 },
   formulaFinal: { ...theme.typography.caption, color: theme.colors.textMuted },
   botonFinal: { width: '100%' },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.xl,
+    zIndex: 9999,
+  },
+  dialogoPrecio: {
+    width: '100%',
+    gap: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.borderSubtle,
+    borderWidth: 1,
+  },
+  dialogoTitulo: {
+    ...theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
+    fontFamily: 'Inter-Bold',
+  },
+  dialogoDescripcion: {
+    ...theme.typography.caption,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xs,
+  },
+  dialogoBotones: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.sm,
+  },
+  botonDialogo: {
+    flex: 1,
+    height: 48,
+    borderRadius: theme.rounded.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  botonCancelar: {
+    backgroundColor: theme.colors.surfaceSecondary,
+  },
+  botonConfirmar: {
+    backgroundColor: theme.colors.primary,
+  },
+  textoBotonCancelar: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    fontFamily: 'Inter-Bold',
+  },
+  textoBotonConfirmar: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.background,
+    fontFamily: 'Inter-Bold',
+  },
 });

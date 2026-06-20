@@ -46,6 +46,11 @@ interface TripPayload {
   tripId: number;
 }
 
+interface CompleteTripPayload {
+  tripId: number;
+  realPrice: number;
+}
+
 interface SocketData {
   user: AuthenticatedUser;
 }
@@ -161,6 +166,29 @@ export class RealtimeGateway implements OnGatewayConnection {
       this.emitToUser(trip.passengerId, ServerEvent.TRIP_CANCELLED, trip);
       if (trip.driverId !== null) {
         this.emitToUser(trip.driverId, ServerEvent.TRIP_CANCELLED, trip);
+      }
+    });
+  }
+
+  @SubscribeMessage(DriverClientEvent.COMPLETE_TRIP)
+  async onCompleteTrip(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: CompleteTripPayload,
+  ): Promise<void> {
+    const user = this.userOf(client);
+    await this.guard(client, async () => {
+      const trip = await this.tripsService.complete(
+        payload.tripId,
+        user.id,
+        payload.realPrice,
+      );
+      this.emitToUser(trip.passengerId, ServerEvent.TRIP_COMPLETED, {
+        tarifaFinal: trip.finalPrice,
+      });
+      if (trip.driverId !== null) {
+        this.emitToUser(trip.driverId, ServerEvent.TRIP_COMPLETED, {
+          tarifaFinal: trip.finalPrice,
+        });
       }
     });
   }

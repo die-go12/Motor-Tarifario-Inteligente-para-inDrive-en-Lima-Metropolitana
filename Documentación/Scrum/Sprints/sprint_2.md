@@ -149,8 +149,8 @@ Al cierre del Sprint 1, el panel administrativo y la aplicación móvil estaban 
 ### HU-08 — Panel / simulación
 | Tarea | Estado |
 | --- | --- |
-| Editor de configuración (`/pricing/config`) | 🟡 |
-| Simulador con controles de oferta/demanda | ⚪ |
+| Editor de configuración (`/pricing/config`) | ✅ |
+| Simulador con controles de oferta/demanda | ✅ |
 
 ### HU-09 — Auditoría
 | Tarea | Estado |

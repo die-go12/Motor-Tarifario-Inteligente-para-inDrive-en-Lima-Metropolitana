@@ -26,6 +26,9 @@
 ## Gestión de cambio
 - [gestion_de_cambio.md](gestion_de_cambio.md) — cambios gestionados (proceso de 5 pasos).
 
+## Reporte de Vulnerabilidades
+ [vulnerabilidades_sistema_sprint2.md](vulnerabilidades_sistema_sprint2.md)
+
 ---
 
 ### 📁 Estructura de esta carpeta

@@ -310,11 +310,11 @@ El desarrollo del proyecto se organiza bajo la metodología <strong>Scrum</stron
 
 | Integrante                       |                               Rol |
 | -------------------------------- | --------------------------------: |
-| Nardy Liz Condori Mamani         | Scrum Master / Product Owner / QA |
-| Enrique Alejandro Orosco Mendoza |                         Developer |
-| Matias Dario Huerta Cruz         |                         Developer |
-| Luis Martin Valenzuela Valer     |                         Developer |
-| Juan Diego Lopez Vega            |                         Developer |
+|Nardy Liz Condori Mamani |Scrum Master / Product Owner / Frontend (Panel Admin)|
+|Enrique Alejandro Orosco Mendoza |Developer (Dockerización)|
+|Matías Dario Huerta Cruz |Developer (Mobile)|
+|Luis Martin Valenzuela Valer |QA / Testing |
+|Juan Diego Lopez Vega |Developer (Backend)|
 
 ---
 

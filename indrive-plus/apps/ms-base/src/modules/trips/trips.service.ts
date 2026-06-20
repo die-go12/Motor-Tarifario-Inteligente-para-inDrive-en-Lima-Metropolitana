@@ -41,8 +41,8 @@ export class TripsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async estimate(origin: string, destination: string): Promise<TripEstimate> {
-    const { context, quote } = await this.resolveQuote(origin, destination);
+  async estimate(origin: string, destination: string, capacity?: number): Promise<TripEstimate> {
+    const { context, quote } = await this.resolveQuote(origin, destination, capacity);
     return {
       distanceKm: context.distanceKm,
       durationMin: context.durationMin,
@@ -53,7 +53,7 @@ export class TripsService {
       pricingFactors: {
         distanceKm: context.distanceKm,
         fuelPricePerGallon: context.fuelPricePerGallon,
-        vehicleCapacity: DEFAULT_VEHICLE_CAPACITY,
+        vehicleCapacity: capacity || DEFAULT_VEHICLE_CAPACITY,
         trafficMultiplier: context.trafficMultiplier,
         hourMultiplier: context.hourMultiplier,
         durationMin: context.durationMin,
@@ -66,6 +66,7 @@ export class TripsService {
     const { context, quote } = await this.resolveQuote(
       dto.origin,
       dto.destination,
+      dto.capacity,
     );
     const trip = this.tripsRepository.create({
       passengerId,
@@ -85,22 +86,23 @@ export class TripsService {
   private async resolveQuote(
     origin: string,
     destination: string,
+    capacity?: number,
   ): Promise<{ context: TripContext; quote: PriceQuote }> {
     const context = await this.integrationClient.getTripContext(
       origin,
       destination,
     );
     const quote = await this.pricingClient.quote(
-      this.buildQuoteRequest(context),
+      this.buildQuoteRequest(context, capacity),
     );
     return { context, quote };
   }
 
-  private buildQuoteRequest(context: TripContext): QuoteRequest {
+  private buildQuoteRequest(context: TripContext, capacity?: number): QuoteRequest {
     return {
       distanceKm: context.distanceKm,
       fuelPricePerGallon: context.fuelPricePerGallon,
-      vehicleCapacity: DEFAULT_VEHICLE_CAPACITY,
+      vehicleCapacity: capacity || DEFAULT_VEHICLE_CAPACITY,
       trafficMultiplier: context.trafficMultiplier,
       hourMultiplier: context.hourMultiplier,
       timeMultiplier: context.timeMultiplier,

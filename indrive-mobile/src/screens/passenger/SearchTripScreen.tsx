@@ -68,6 +68,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
   const [buscando, setBuscando] = useState(false);
   const [solicitando, setSolicitando] = useState(false);
   const [ofertaInicial, setOfertaInicial] = useState('');
+  const [capacidad, setCapacidad] = useState(4);
 
   const [origenCoords, setOrigenCoords] = useState<Coords>(LIMA_CENTRO);
   const [origenDireccion, setOrigenDireccion] = useState('Obteniendo ubicación...');
@@ -151,10 +152,36 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  const obtenerCotizacion = async (lugar: PlaceSuggestion, cap: number) => {
+    try {
+      const { data: tripData } = await api.post('/trips/quote', {
+        origin: origenDireccion,
+        destination: lugar.descripcion,
+        capacity: cap,
+      });
+
+      setPreview({
+        distanciaKm: tripData.distanceKm,
+        duracionMin: tripData.durationMin,
+        tarifaMax: tripData.maximumPrice,
+        pricingFactors: tripData.pricingFactors || null,
+      });
+
+      if (tripData.polyline) {
+        setRutaCoords(decodePolyline(tripData.polyline));
+      }
+
+      setOfertaInicial(String(tripData.maximumPrice));
+    } catch (e) {
+      console.error('Error al actualizar cotización:', e);
+    }
+  };
+
   const seleccionarLugar = async (lugar: PlaceSuggestion) => {
     setLugarSeleccionado(lugar);
     setSugerencias([]);
     setDestino(lugar.principal);
+    setCapacidad(4);
 
     // Obtener detalles y calcular ruta
     try {
@@ -178,25 +205,8 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
 
       setDestinoCoords({ latitude: coords.lat, longitude: coords.lng });
 
-      // Cotización pre-viaje: el backend (Integración + Motor) devuelve
-      // distancia, duración, polyline y el TECHO (visualización asimétrica).
-      const { data: tripData } = await api.post('/trips/quote', {
-        origin: origenDireccion,
-        destination: lugar.descripcion,
-      });
-
-      setPreview({
-        distanciaKm: tripData.distanceKm,
-        duracionMin: tripData.durationMin,
-        tarifaMax: tripData.maximumPrice,
-        pricingFactors: tripData.pricingFactors || null,
-      });
-
-      if (tripData.polyline) {
-        setRutaCoords(decodePolyline(tripData.polyline));
-      }
-
-      setOfertaInicial(String(tripData.maximumPrice));
+      // Consultar cotización inicial con capacidad 4
+      await obtenerCotizacion(lugar, 4);
     } catch (e) {
       console.error('Error calculando ruta:', e);
     }
@@ -209,6 +219,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
       const { data } = await api.post('/trips', {
         origin: origenDireccion,
         destination: lugarSeleccionado.descripcion,
+        capacity: capacidad,
       });
       const origen: Coords = origenCoords;
       setViajeActivo({
@@ -282,114 +293,47 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={estilos.previewValor}>{formatDuracion(preview.duracionMin)}</Text>
             </View>
 
-            {/* ⭐ DESGLOSE DEL MOTOR TARIFARIO — 7 métricas */}
-            {preview.pricingFactors && (
-              <View style={estilos.desgloseContainer}>
-                <View style={estilos.desgloseTituloFila}>
-                  <Text style={estilos.desgloseTitulo}>Motor Tarifario Inteligente</Text>
-                  <View style={estilos.badgeMotor}>
-                    <Text style={estilos.badgeMotorTexto}>7 factores</Text>
-                  </View>
-                </View>
-                <Text style={estilos.desgloseSubtitulo}>
-                  Factores que determinan tu tarifa
-                </Text>
+            {/* Selector de Capacidad / Categoría de Vehículo */}
+            <View style={estilos.selectorCategoria}>
+              <Text style={estilos.selectorTitulo}>Categoría de vehículo</Text>
+              <View style={estilos.opcionesCategoria}>
+                <TouchableOpacity
+                  style={[
+                    estilos.opcionTarjeta,
+                    capacidad === 4 && estilos.opcionSeleccionada,
+                  ]}
+                  onPress={() => {
+                    if (capacidad !== 4 && lugarSeleccionado) {
+                      setCapacidad(4);
+                      obtenerCotizacion(lugarSeleccionado, 4);
+                    }
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={estilos.opcionIcono}>🚗</Text>
+                  <Text style={estilos.opcionNombre}>Normal</Text>
+                  <Text style={estilos.opcionCapacidad}>Hasta 4 pasajeros</Text>
+                </TouchableOpacity>
 
-                {/* 1. Distancia */}
-                <View style={estilos.factorFila}>
-                  <View style={estilos.factorIconContainer}>
-                    <Text style={estilos.factorIcon}>📏</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Distancia</Text>
-                    <Text style={estilos.factorOrigen}>Google Maps API</Text>
-                  </View>
-                  <Text style={estilos.factorValor}>{formatDistancia(preview.pricingFactors.distanceKm)}</Text>
-                </View>
-
-                {/* 2. Precio de combustible */}
-                <View style={estilos.factorFila}>
-                  <View style={estilos.factorIconContainer}>
-                    <Text style={estilos.factorIcon}>⛽</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Precio de combustible</Text>
-                    <Text style={estilos.factorOrigen}>OSINERGMIN API</Text>
-                  </View>
-                  <Text style={estilos.factorValor}>S/ {preview.pricingFactors.fuelPricePerGallon.toFixed(2)}/gal</Text>
-                </View>
-
-                {/* 3. Capacidad del vehículo */}
-                <View style={estilos.factorFila}>
-                  <View style={estilos.factorIconContainer}>
-                    <Text style={estilos.factorIcon}>🚗</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Capacidad del vehículo</Text>
-                    <Text style={estilos.factorOrigen}>Base de datos</Text>
-                  </View>
-                  <Text style={estilos.factorValor}>{preview.pricingFactors.vehicleCapacity} pas.</Text>
-                </View>
-
-                {/* 4. Multiplicador de tráfico */}
-                <View style={estilos.factorFila}>
-                  <View style={[estilos.factorIconContainer, preview.pricingFactors.trafficMultiplier > 1.3 && estilos.factorAlto]}>
-                    <Text style={estilos.factorIcon}>🚦</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Multiplicador de tráfico</Text>
-                    <Text style={estilos.factorOrigen}>Traffic API (tiempo real)</Text>
-                  </View>
-                  <Text style={[
-                    estilos.factorValor,
-                    preview.pricingFactors.trafficMultiplier > 1.3 && estilos.factorValorAlto,
-                  ]}>×{preview.pricingFactors.trafficMultiplier.toFixed(2)}</Text>
-                </View>
-
-                {/* 5. Factor hora/demanda zonal */}
-                <View style={estilos.factorFila}>
-                  <View style={[estilos.factorIconContainer, preview.pricingFactors.hourMultiplier > 1.2 && estilos.factorAlto]}>
-                    <Text style={estilos.factorIcon}>🕐</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Factor hora/demanda</Text>
-                    <Text style={estilos.factorOrigen}>Redis caché (TTL 1h)</Text>
-                  </View>
-                  <Text style={[
-                    estilos.factorValor,
-                    preview.pricingFactors.hourMultiplier > 1.2 && estilos.factorValorAlto,
-                  ]}>×{preview.pricingFactors.hourMultiplier.toFixed(2)}</Text>
-                </View>
-
-                {/* 6. Tiempo estimado de viaje */}
-                <View style={estilos.factorFila}>
-                  <View style={estilos.factorIconContainer}>
-                    <Text style={estilos.factorIcon}>⏱️</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Tiempo estimado de viaje</Text>
-                    <Text style={estilos.factorOrigen}>Google Directions API</Text>
-                  </View>
-                  <Text style={estilos.factorValor}>{formatDuracion(preview.pricingFactors.durationMin)}</Text>
-                </View>
-
-                {/* 7. Factor histórico de precios */}
-                <View style={[estilos.factorFila, { borderBottomWidth: 0 }]}>
-                  <View style={estilos.factorIconContainer}>
-                    <Text style={estilos.factorIcon}>📊</Text>
-                  </View>
-                  <View style={estilos.factorInfo}>
-                    <Text style={estilos.factorNombre}>Factor histórico</Text>
-                    <Text style={estilos.factorOrigen}>MongoDB (franja horaria)</Text>
-                  </View>
-                  <Text style={estilos.factorValor}>
-                    {preview.pricingFactors.historicAveragePrice > 0
-                      ? formatSoles(preview.pricingFactors.historicAveragePrice)
-                      : 'N/A'}
-                  </Text>
-                </View>
+                <TouchableOpacity
+                  style={[
+                    estilos.opcionTarjeta,
+                    capacidad === 6 && estilos.opcionSeleccionada,
+                  ]}
+                  onPress={() => {
+                    if (capacidad !== 6 && lugarSeleccionado) {
+                      setCapacidad(6);
+                      obtenerCotizacion(lugarSeleccionado, 6);
+                    }
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={estilos.opcionIcono}>🚙</Text>
+                  <Text style={estilos.opcionNombre}>XL (Extra)</Text>
+                  <Text style={estilos.opcionCapacidad}>Hasta 6 pasajeros</Text>
+                </TouchableOpacity>
               </View>
-            )}
+            </View>
 
             {/* ⭐ VISUALIZACIÓN ASIMÉTRICA: Pasajero solo ve el techo tarifario */}
             <View style={[estilos.previewFila, estilos.tarifaDestacada]}>
@@ -447,85 +391,46 @@ const estilos = StyleSheet.create({
   },
   tarifaLabel: { ...theme.typography.bodyMd, color: theme.colors.textSecondary },
   tarifaValor: { ...theme.typography.h2, color: theme.colors.primary },
-  // Desglose del motor tarifario
-  desgloseContainer: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.rounded.lg,
-    padding: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(198, 247, 10, 0.15)',
+  // Selector de categoría de vehículo
+  selectorCategoria: {
+    marginVertical: theme.spacing.sm,
     gap: theme.spacing.sm,
   },
-  desgloseTituloFila: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  desgloseTitulo: {
-    ...theme.typography.bodyLg,
-    color: theme.colors.primary,
+  selectorTitulo: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textSecondary,
     fontFamily: 'Inter-Bold',
   },
-  badgeMotor: {
-    backgroundColor: 'rgba(198, 247, 10, 0.12)',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 2,
-    borderRadius: theme.rounded.full,
-  },
-  badgeMotorTexto: {
-    ...theme.typography.caption,
-    color: theme.colors.primary,
-    fontSize: 11,
-    fontFamily: 'Inter-Bold',
-  },
-  desgloseSubtitulo: {
-    ...theme.typography.caption,
-    color: theme.colors.textMuted,
-    marginBottom: theme.spacing.xs,
-  },
-  factorFila: {
+  opcionesCategoria: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderSubtle,
     gap: theme.spacing.md,
   },
-  factorIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: theme.colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  factorAlto: {
-    backgroundColor: 'rgba(255, 107, 107, 0.15)',
-  },
-  factorIcon: {
-    fontSize: 18,
-  },
-  factorInfo: {
+  opcionTarjeta: {
     flex: 1,
+    backgroundColor: theme.colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.borderSubtle,
+    borderRadius: theme.rounded.md,
+    padding: theme.spacing.md,
+    alignItems: 'center',
+    gap: 4,
   },
-  factorNombre: {
-    ...theme.typography.bodyMd,
-    color: theme.colors.textPrimary,
-    fontSize: 14,
+  opcionSeleccionada: {
+    borderColor: theme.colors.primary,
+    backgroundColor: 'rgba(198, 247, 10, 0.05)',
   },
-  factorOrigen: {
-    ...theme.typography.caption,
-    color: theme.colors.textMuted,
-    fontSize: 11,
+  opcionIcono: {
+    fontSize: 24,
+    marginBottom: 2,
   },
-  factorValor: {
+  opcionNombre: {
     ...theme.typography.bodyMd,
     color: theme.colors.textPrimary,
     fontFamily: 'Inter-Bold',
-    fontSize: 14,
-    textAlign: 'right',
   },
-  factorValorAlto: {
-    color: theme.colors.error,
+  opcionCapacidad: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    fontSize: 11,
   },
 });

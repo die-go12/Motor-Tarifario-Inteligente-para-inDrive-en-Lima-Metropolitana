@@ -39,6 +39,7 @@ export class TripsController {
     const estimate = await this.tripsService.estimate(
       dto.origin,
       dto.destination,
+      dto.capacity,
     );
     return presentQuote(estimate, user.role);
   }

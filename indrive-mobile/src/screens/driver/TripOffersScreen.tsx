@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../../theme/theme';
@@ -58,6 +59,7 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
   const [solicitudes, setSolicitudes] = useState<ViajeActivo[]>([]);
   const [cargando, setCargando] = useState(true);
   const [ofertas, setOfertas] = useState<Record<string, string>>({});
+  const [ofrecidos, setOfrecidos] = useState<Record<string, boolean>>({});
   const descartadosRef = React.useRef<string[]>([]);
 
   const { setViajeActivo } = useTripStore();
@@ -83,11 +85,17 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
         setViajeActivo(viaje);
         navigation.navigate('ActiveTrip', { tripId: viaje.id });
       });
+
+      // Escuchar errores del servidor
+      socket.on('error', (err: { message: string }) => {
+        Alert.alert('Error de Oferta', err.message);
+      });
     }
 
     return () => {
       socket?.off(SERVER_EVENTS.TRIP_CREATED);
       socket?.off(SERVER_EVENTS.TRIP_ASSIGNED);
+      socket?.off('error');
     };
   }, []);
 
@@ -111,13 +119,20 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
 
   const enviarOferta = (tripId: string) => {
     const socket = getSocket();
-    const monto = parseFloat(ofertas[tripId] || '0');
+    const solicitud = solicitudes.find((s) => s.id === tripId);
+    if (!solicitud) return;
+
+    const valorIngresado = ofertas[tripId];
+    const monto = valorIngresado ? parseFloat(valorIngresado) : solicitud.tarifa.minimo;
+
     if (!socket || !monto) return;
 
     socket.emit(DRIVER_EVENTS.SEND_OFFER, {
       tripId: Number(tripId),
       amount: monto,
     });
+
+    setOfrecidos((prev) => ({ ...prev, [tripId]: true }));
   };
 
   return (
@@ -172,6 +187,7 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
                   setOfertas((prev) => ({ ...prev, [item.id]: val }))
                 }
                 keyboardType="numeric"
+                editable={!ofrecidos[item.id]}
               />
 
               <View style={estilos.filaBotones}>
@@ -179,11 +195,13 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
                   titulo="Descartar"
                   onPress={() => descartarSolicitud(item.id)}
                   estilo={estilos.botonDescartar}
+                  deshabilitado={ofrecidos[item.id]}
                 />
                 <BotonNeon
-                  titulo="Enviar oferta"
+                  titulo={ofrecidos[item.id] ? 'Oferta enviada' : 'Enviar oferta'}
                   onPress={() => enviarOferta(item.id)}
-                  estilo={estilos.botonEnviar}
+                  estilo={ofrecidos[item.id] ? estilos.botonEnviado : estilos.botonEnviar}
+                  deshabilitado={ofrecidos[item.id]}
                 />
               </View>
             </TarjetaBase>
@@ -255,5 +273,9 @@ const estilos = StyleSheet.create({
   },
   botonEnviar: {
     flex: 1.5,
+  },
+  botonEnviado: {
+    flex: 1.5,
+    backgroundColor: theme.colors.surfaceTertiary,
   },
 });

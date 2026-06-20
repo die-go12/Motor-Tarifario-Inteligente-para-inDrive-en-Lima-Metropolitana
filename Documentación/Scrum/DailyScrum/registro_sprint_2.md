@@ -17,7 +17,7 @@
 | Luis Valenzuela | Data Base|
 | Enrique Orozco| DevOps |
 | Matias Dario | Aplicación móvil |
-| Nardy Condory| Integración y pruebas |
+| Nardy Condori| Integración y pruebas |
 ---
 
 ## Avances del equipo

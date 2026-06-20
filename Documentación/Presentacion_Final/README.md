@@ -27,7 +27,7 @@
 - [gestion_de_cambio.md](gestion_de_cambio.md) — cambios gestionados (proceso de 5 pasos).
 
 ## Reporte de Vulnerabilidades
-- [vulnerabilidades_sistema_sprint2.md](vulnerabilidades_sistema_sprint2.md)
+- [vulnerabilidades_sistema_sprint2.md](https://github.com/die-go12/Motor-Tarifario-Inteligente-para-inDrive-en-Lima-Metropolitana/blob/main/Documentaci%C3%B3n/Scrum/Seguridad/vulnerabilidades_sistema_sprint2.md)
 
 ---
 

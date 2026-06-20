@@ -38,6 +38,7 @@ interface AuthState {
     backendUser: BackendUser,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  switchRole: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -71,6 +72,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       refreshToken: null,
       user: null,
       isAuthenticated: false,
+    });
+  },
+
+  switchRole: () => {
+    const { user } = get();
+    if (!user) return;
+    const newRole = user.activeRole === 'PASSENGER' ? 'DRIVER' : 'PASSENGER';
+    set({
+      user: {
+        ...user,
+        activeRole: newRole,
+      },
     });
   },
 }));

@@ -35,6 +35,9 @@ export interface ViajeActivo {
   tarifaFinal?: number;
   conductorId?: string;
   conductorUbicacion?: Coords;
+  conductorNombre?: string;
+  vehiculoPlaca?: string;
+  vehiculoModelo?: string;
 }
 
 interface TripState {

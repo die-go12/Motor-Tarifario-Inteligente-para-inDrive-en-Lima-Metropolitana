@@ -15,6 +15,7 @@ import { BotonNeon } from '../../components/BotonNeon';
 import { CampoEntrada } from '../../components/CampoEntrada';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/useAuthStore';
+import { API_BASE_URL } from '../../services/config';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 
 type Props = {
@@ -56,10 +57,17 @@ export const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       await setSession(data.accessToken, data.refreshToken, data.user);
     } catch (error: unknown) {
       console.warn('[RegisterScreen Error]:', error);
-      const mensaje =
-        (error as { response?: { data?: { message?: string | string[] } } })?.response?.data?.message;
-      const mensajeMostrar = Array.isArray(mensaje) ? mensaje.join(', ') : mensaje || 'Error al crear la cuenta. Intenta de nuevo.';
-      Alert.alert('Error en el registro', mensajeMostrar);
+      const axiosError = error as { response?: { data?: { message?: string | string[] }; status?: number }; message?: string; code?: string };
+      const mensaje = axiosError?.response?.data?.message;
+      const mensajeMostrar = Array.isArray(mensaje) ? mensaje.join(', ') : mensaje || null;
+      
+      let errorMsg = 'Error al crear la cuenta. Intenta de nuevo.';
+      if (mensajeMostrar) {
+        errorMsg = mensajeMostrar;
+      } else if (axiosError?.code === 'ERR_NETWORK' || !axiosError?.response) {
+        errorMsg = 'Error de conexión. Verifica que el servidor esté encendido e intenta de nuevo.';
+      }
+      Alert.alert('Error en el registro', errorMsg);
     } finally {
       setCargando(false);
     }

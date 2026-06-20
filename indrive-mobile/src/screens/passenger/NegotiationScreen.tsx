@@ -17,6 +17,7 @@ import { useTripStore, Oferta } from '../../store/useTripStore';
 import { PassengerStackParamList } from '../../navigation/PassengerNavigator';
 import { getSocket, SERVER_EVENTS, PASSENGER_EVENTS } from '../../services/socket';
 import { formatSoles } from '../../utils/format';
+import { api } from '../../services/api';
 
 type Props = {
   navigation: NativeStackNavigationProp<PassengerStackParamList, 'Negotiation'>;
@@ -31,7 +32,7 @@ interface BackendOffer {
 }
 
 export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
-  const { viajeActivo, ofertas, agregarOferta, actualizarEstado, setTarifaFinal, reset } =
+  const { viajeActivo, ofertas, agregarOferta, actualizarEstado, setTarifaFinal, reset, setViajeActivo } =
     useTripStore();
 
   useEffect(() => {
@@ -39,13 +40,32 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
     if (!socket) return;
 
     // Escuchar ofertas de conductores (mapea la oferta del backend al modelo de la app)
-    socket.on(SERVER_EVENTS.OFFER_RECEIVED, (offer: BackendOffer) => {
+    socket.on(SERVER_EVENTS.OFFER_RECEIVED, async (offer: BackendOffer) => {
+      let driverName = `Conductor ${offer.driverId ?? ''}`;
+      let vehiclePlate = '—';
+      let vehicleModel = '—';
+
+      if (offer.driverId) {
+        try {
+          const { data } = await api.get(`/users/${offer.driverId}`);
+          if (data && data.name) {
+            driverName = data.name;
+          }
+          if (data && data.vehicle) {
+            vehiclePlate = data.vehicle.plate || '—';
+            vehicleModel = `${data.vehicle.brand || ''} ${data.vehicle.model || ''}`.trim() || '—';
+          }
+        } catch (err) {
+          console.warn('Error fetching driver details:', err);
+        }
+      }
+
       const oferta: Oferta = {
         offerId: offer.id,
         conductorId: String(offer.driverId ?? ''),
-        conductorNombre: `Conductor ${offer.driverId ?? ''}`,
-        vehiculoPlaca: '—',
-        vehiculoModelo: '—',
+        conductorNombre: driverName,
+        vehiculoPlaca: vehiclePlate,
+        vehiculoModelo: vehicleModel,
         montoPropuesto: offer.amount,
       };
       agregarOferta(oferta);
@@ -75,7 +95,14 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
       tripId: Number(viajeActivo.id),
       offerId: oferta.offerId,
     });
-    actualizarEstado('ASSIGNED');
+    setViajeActivo({
+      ...viajeActivo,
+      status: 'ASSIGNED',
+      conductorId: oferta.conductorId,
+      conductorNombre: oferta.conductorNombre,
+      vehiculoPlaca: oferta.vehiculoPlaca,
+      vehiculoModelo: oferta.vehiculoModelo,
+    });
     navigation.navigate('PassengerMap');
   };
 

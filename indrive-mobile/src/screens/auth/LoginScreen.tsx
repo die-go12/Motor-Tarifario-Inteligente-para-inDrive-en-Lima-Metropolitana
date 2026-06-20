@@ -44,10 +44,18 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
       const { data } = await api.post('/auth/login', { email, password });
       await setSession(data.accessToken, data.refreshToken, data.user);
     } catch (error: unknown) {
-      const mensaje =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Credenciales incorrectas. Verifica tu email y contraseña.';
-      Alert.alert('Error al ingresar', mensaje);
+      console.warn('[LoginScreen Error]:', error);
+      const axiosError = error as { response?: { data?: { message?: string | string[] }; status?: number }; message?: string; code?: string };
+      const mensaje = axiosError?.response?.data?.message;
+      const mensajeMostrar = Array.isArray(mensaje) ? mensaje.join(', ') : mensaje || null;
+      
+      let errorMsg = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+      if (mensajeMostrar) {
+        errorMsg = mensajeMostrar;
+      } else if (axiosError?.code === 'ERR_NETWORK' || !axiosError?.response) {
+        errorMsg = 'Error de conexión. Verifica que el servidor esté encendido e intenta de nuevo.';
+      }
+      Alert.alert('Error al ingresar', errorMsg);
     } finally {
       setCargando(false);
     }

@@ -33,6 +33,57 @@
 
 ---
 
+## 🛠️ Reporte del Proceso de Pulido e Integración del Sistema
+
+A continuación se detallan las principales dificultades encontradas en el desarrollo y refinamiento del sistema (tanto en la aplicación móvil como en el backend), comentando las soluciones aplicadas de manera simplificada e incorporando las imágenes de evidencia.
+
+### Desafío 1: Sincronización del Precio de Acuerdo Final (Bilateral)
+*   **Dificultad:** Al confirmarse la oferta mutua entre pasajero y conductor, el precio acordado no persistía ni se visualizaba en las pantallas de espera. La aplicación cargaba valores calculados asimétricamente por defecto (el máximo para el pasajero y el mínimo para el conductor).
+*   **Solución:** Se persistió el valor de la oferta aceptada en la base de datos PostgreSQL mediante el servicio de viajes al momento de la asignación. Esta información se expuso a través del payload de WebSockets para actualizar en tiempo real las pantallas de espera de ambos extremos. Además, se configuró la modal de cobro final del conductor para que se autocompletara automáticamente con este precio acordado.
+*   **Evidencias:**
+    *   *Detalles del viaje en la app del pasajero:*  
+        ![Pasajero Aceptado](../imgs/app_movil.jpg)
+    *   *Transición animada de viaje asignado en la app del conductor:*  
+        ![Conductor Transición](../imgs/appmapa.jpeg)
+    *   *Comprobación de sincronización y cobro:*  
+        ![Evidencia 1](../imgs/evidencia_1.png)
+        ![Evidencia 2](../imgs/evidencia_2.png)
+        ![Evidencia 3](../imgs/evidencia_3.png)
+
+---
+
+### Desafío 2: Control de Sesiones y Permisos por Roles (Auditor vs. Administrador)
+*   **Dificultad:** Evitar que los usuarios con rol de "Auditor" modificaran variables tarifarias o eliminaran registros de flota y usuarios, sin bloquearles el acceso de lectura a los dashboards financieros y métricas agregadas.
+*   **Solución:** Se implementó una validación doble. En el frontend se deshabilitan e invisibilizan los botones de edición/creación para el rol auditor y se añade un banner superior de aviso. En el backend se protegieron los métodos `POST`, `PATCH` y `DELETE` para rechazar operaciones de auditoría con código HTTP 403.
+*   **Evidencia:**  
+    ![Panel de Control](../imgs/centro_de_control.jpg)
+
+---
+
+### Desafío 3: Geolocalización en Tiempo Real y Trazado de Rutas en Lima Metropolitana
+*   **Dificultad:** La visualización del mapa y la actualización del recorrido del conductor en dispositivos físicos o simuladores generaba inestabilidad o demoras de renderizado.
+*   **Solución:** Se estandarizó la integración de Google Maps mediante un componente unificado (`MapViewCompatible`) que procesa dinámicamente las coordenadas y actualiza la polilínea del recorrido real en segundo plano sin interrumpir la UI.
+*   **Evidencias:**
+    *   *Trazado de ruta en el simulador:*  
+        ![Mapa de Ruta](../imgs/maparuta.jpeg)
+    *   *Inicio de ruta activa:*  
+        ![App Mapa](../imgs/appinicio.jpeg)
+
+---
+
+### Desafío 4: Orquestación de Microservicios Locales mediante Docker
+*   **Dificultad:** Administrar 9 contenedores concurrentes (bases de datos, pasarelas de enlace y 5 microservicios individuales de la app) requería configuraciones de red y dependencias sumamente complejas.
+*   **Solución:** Se agrupó la infraestructura con `docker-compose`, asignando nombres DNS y redes internas estables. Se crearon políticas de espera (*healthchecks*) para asegurar que PostgreSQL y Redis cargaran antes que las APIs de NestJS.
+*   **Evidencias:**
+    *   *Estado de contenedores:*  
+        ![Docker](../imgs/docker.png)
+    *   *Conexión a bases de datos:*  
+        ![Backend y Base de Datos](../imgs/backend+BD.jpg)
+    *   *Diagrama e interacción general:*  
+        ![Vista General](../imgs/vista_general_sistema.jpg)
+
+---
+
 ## Variables consideradas en el motor tarifario
 
 | Variable                     | Fuente                                       | Justificación                                                                    |

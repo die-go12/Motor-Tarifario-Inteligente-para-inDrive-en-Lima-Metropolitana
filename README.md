@@ -181,7 +181,7 @@ Desarrollar un motor tarifario inteligente capaz de calcular tarifas más justas
 | Área          |                 Tecnología | Uso                           |
 | ------------- | -------------------------: | ----------------------------- |
 | App móvil     |  React Native + TypeScript | Interfaz pasajero y conductor |
-| Panel Web     |         React + TypeScript | Configuración administrativa  |
+| Panel Web     |HTML + JavaScript (Vanilla) + Nginx | Configuración administrativa  |
 | Backend       |           Node.js + NestJS | Microservicios                |
 | Base de datos |                 PostgreSQL | Usuarios, viajes y vehículos  |
 | Base de datos |                    MongoDB | Auditoría e histórico         |

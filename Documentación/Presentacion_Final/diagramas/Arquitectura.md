@@ -60,11 +60,16 @@ Interfaz web centralizada orientada al monitoreo operativo y auditoría del ecos
 El backend implementa un desacoplamiento guiado por eventos (*Event-Driven Architecture*) utilizando canales Pub/Sub sobre Redis para sincronizar lecturas optimizadas (*CQRS / Read-Model*).
 
 ### 3.1. Flujo de Datos y Eventos
+
 * **Sincronización de Precios y Tarifas:** Cuando `ms-pricing` genera una cotización o detecta una variación dinámica, publica eventos bajo el tópico `pricing.*` hacia el Bus de Eventos de Redis.
+  
 * **Consumo Asíncrono:**
+  
     * `ms-base` consume estos eventos para actualizar las negociaciones activas vía WebSockets hacia la aplicación móvil.
     * `ms-reports` consume los eventos de manera asíncrona para actualizar la base de datos documental (MongoDB), evitando sobrecargar la base de datos relacional de operaciones.
+      
 * **Fuentes de Datos Externas (`ms-integration`):**
+  
     * **Google Maps (en vivo):** Cálculo de rutas, distancias y tiempos estimados (ETA).
     * **OSINERGMIN local:** Consulta de precios de referencia de combustibles para el cálculo de costos base.
     * **Tráfico Simulado:** Ingesta de variables de congestión vehicular en tiempo real.

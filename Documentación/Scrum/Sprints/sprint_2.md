@@ -147,8 +147,8 @@ Al cierre del Sprint 1, el panel administrativo y la aplicación móvil estaban 
 | Editor de configuración (`/pricing/config`) | ✅ |
 | Umbrales de anomalías configurables (CA-007-03) | ✅ |
 | Simulador con controles de oferta/demanda | ✅ |
-
 ### US-008 — Reportes y auditoría
+
 | Tarea | Estado |
 | --- | --- |
 | Microservicio `ms-reports` (read-model por eventos Redis Pub/Sub) | ✅ |

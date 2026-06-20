@@ -58,6 +58,7 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
   const [solicitudes, setSolicitudes] = useState<ViajeActivo[]>([]);
   const [cargando, setCargando] = useState(true);
   const [ofertas, setOfertas] = useState<Record<string, string>>({});
+  const descartadosRef = React.useRef<string[]>([]);
 
   const { setViajeActivo } = useTripStore();
 
@@ -68,7 +69,12 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
     if (socket) {
       // Nuevas solicitudes en tiempo real
       socket.on(SERVER_EVENTS.TRIP_CREATED, (t: BackendTrip) => {
-        setSolicitudes((prev) => [mapBackendTrip(t), ...prev]);
+        const viaje = mapBackendTrip(t);
+        if (descartadosRef.current.includes(viaje.id)) return;
+        setSolicitudes((prev) => {
+          if (prev.some((s) => s.id === viaje.id)) return prev;
+          return [viaje, ...prev];
+        });
       });
 
       // Si el pasajero acepta nuestra oferta
@@ -89,12 +95,18 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
     setCargando(true);
     try {
       const { data } = await api.get<BackendTrip[]>('/trips/available');
-      setSolicitudes(data.map(mapBackendTrip));
+      const mapeados = data.map(mapBackendTrip);
+      setSolicitudes(mapeados.filter((s) => !descartadosRef.current.includes(s.id)));
     } catch (e) {
       console.error('Error cargando solicitudes:', e);
     } finally {
       setCargando(false);
     }
+  };
+
+  const descartarSolicitud = (id: string) => {
+    descartadosRef.current.push(id);
+    setSolicitudes((prev) => prev.filter((s) => s.id !== id));
   };
 
   const enviarOferta = (tripId: string) => {
@@ -162,7 +174,18 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
                 keyboardType="numeric"
               />
 
-              <BotonNeon titulo="Enviar oferta" onPress={() => enviarOferta(item.id)} />
+              <View style={estilos.filaBotones}>
+                <BotonNeon
+                  titulo="Descartar"
+                  onPress={() => descartarSolicitud(item.id)}
+                  estilo={estilos.botonDescartar}
+                />
+                <BotonNeon
+                  titulo="Enviar oferta"
+                  onPress={() => enviarOferta(item.id)}
+                  estilo={estilos.botonEnviar}
+                />
+              </View>
             </TarjetaBase>
           )}
           ItemSeparatorComponent={() => <View style={{ height: theme.spacing.md }} />}
@@ -221,4 +244,16 @@ const estilos = StyleSheet.create({
   vacio: { alignItems: 'center', paddingTop: 64, gap: theme.spacing.sm },
   vacioTexto: { ...theme.typography.bodyLg, color: theme.colors.textSecondary },
   vacioPista: { ...theme.typography.caption, color: theme.colors.textMuted, textAlign: 'center' },
+  filaBotones: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.xs,
+  },
+  botonDescartar: {
+    flex: 1,
+    backgroundColor: theme.colors.surfaceSecondary,
+  },
+  botonEnviar: {
+    flex: 1.5,
+  },
 });

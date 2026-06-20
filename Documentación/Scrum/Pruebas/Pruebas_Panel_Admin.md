@@ -64,7 +64,8 @@ Se reemplazaron los antiguos sliders de porcentaje (que no representaban correct
 
 **Prueba de persistencia:** se modificó el costo por km de `1.50` a `1.80`, se guardó, y al recargar la página el valor se mantuvo correctamente (sin corromperse ni revertirse).
 
-![Variables Base - persistencia tras guardar](imgs/08-pricing-variables-base-persistencia.png)
+<img width="1300" height="871" alt="image" src="https://github.com/user-attachments/assets/c1788bfa-d467-401f-9bb4-baa3dac2f85b" />
+
 
 ---
 
@@ -74,11 +75,10 @@ Se agregó un nuevo formulario para configurar los umbrales que determinan cuán
 
 La UI muestra los valores en **porcentaje** (más intuitivo para el usuario), mientras que internamente se convierten a **decimal** antes de enviarse al backend (`anomalyMediumDeviation`, `anomalyHighDeviation`), que es el formato que espera la API.
 
-![Umbrales de anomalías](imgs/05-pricing-umbrales-anomalias.png)
+<img width="1293" height="874" alt="image" src="https://github.com/user-attachments/assets/f6be2e16-8aa3-4bfa-a132-0becff396f76" />
+
 
 **Prueba de persistencia:** se modificaron los valores y se confirmó que, tras refrescar, los datos cargados coinciden con lo guardado en el backend (conversión %↔decimal verificada).
-
-![Umbrales de anomalías - persistencia](imgs/06-pricing-umbrales-persistencia.png)
 
 ---
 
@@ -93,13 +93,13 @@ hourFactor = 1.0 + (demanda/100 - oferta/100) * 0.5
 
 ### Prueba 1: Demanda 80% / Oferta 40%
 
-Factor hora calculado automáticamente: **1.20**
+- Factor hora calculado automáticamente: **1.20**
+- Resultado del motor con ese factor — rango calculado **S/ 17.67 — S/ 24.38**:
 
-![Simulador oferta/demanda - prueba 1](imgs/09-simulador-oferta-demanda-1.png)
+|               |              |
+|------------------|----------------|
+|<img width="920" height="862" alt="image" src="https://github.com/user-attachments/assets/b5aa1e0c-e691-419f-894b-6f0d28071401" />|<img width="1293" height="879" alt="image" src="https://github.com/user-attachments/assets/82575121-25a4-43d8-96ec-25978f7b57cf" />|
 
-Resultado del motor con ese factor — rango calculado **S/ 17.67 — S/ 24.38**:
-
-![Resultado simulador - prueba 1](imgs/10-simulador-resultado-1.png)
 
 ### Prueba 2: Demanda 80% / Oferta 50%
 

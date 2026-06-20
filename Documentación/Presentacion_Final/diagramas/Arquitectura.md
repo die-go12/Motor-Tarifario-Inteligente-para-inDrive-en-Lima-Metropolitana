@@ -87,12 +87,17 @@ El backend implementa un desacoplamiento guiado por eventos (*Event-Driven Archi
 Diseñada para un rendimiento ágil, la aplicación móvil realiza conexiones directas mediante HTTP (REST) y WebSockets bidireccionales con `ms-base :3001` sin pasar por el API Gateway corporativo, optimizando la latencia crítica del negocio.
 
 ### 4.1. Flujos Diferenciados por Rol
+
 * **Gestión de Estado Global:** Implementado mediante Stores dedicados (`useAuthStore`, `useTripStore`).
+  
 * **Flujo del Pasajero (Visualiza TECHO / `maximumPrice`):**
+  
     1. *SearchTrip:* Solicita un viaje definiendo origen, destino y visualiza el precio máximo sugerido.
     2. *Negotiation:* Recibe ofertas de conductores cercanos, contraoferta y acepta la tarifa final.
     3. *PassengerMap:* Monitoreo en mapa interactivo de la ubicación en vivo del conductor asignado.
+       
 * **Flujo del Conductor (Visualiza PISO / `minimumPrice`):**
+  
     1. *DriverMap:* GPS activo enviando coordenadas constantes del vehículo en tiempo real.
     2. *TripOffers:* Visualización de solicitudes de viaje disponibles que superan el precio mínimo base.
     3. *ActiveTrip:* Gestión de estados del viaje en curso: inicio del recorrido y finalización segura.

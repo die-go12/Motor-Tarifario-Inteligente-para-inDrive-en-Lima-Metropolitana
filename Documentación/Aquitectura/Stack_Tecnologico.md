@@ -30,7 +30,7 @@
 | **App Móvil (Pasajero/Conductor)** | React Native + TypeScript | Aplicación única que compila interfaces para pasajeros y conductores. Tipado estricto para solicitudes de viaje y ofertas. |
 | **Mapas y Rutas** | react-native-maps / Mapbox SDK | Renderizado de mapa interactivo, trazado de rutas, marcador del vehículo. Mapbox permite personalizar colores para resaltar interfaz de precios. |
 | **Compilación Frontend** | Metro Bundler | Herramienta local (incluida en React Native) para compilar y servir código en tiempo real hacia emuladores móviles (Android Studio / Xcode). |
-| **Panel Administrativo** | React + TypeScript | Aplicación web independiente para configuración de pesos, topes de tráfico y umbrales (CAR-006). Único punto que visualiza rango completo `[mínimo, máximo]`. |
+| **Panel Administrativo** | HTML + JavaScript (Vanilla) + Nginx | Aplicación web independiente para configuración de pesos, topes de tráfico y umbrales (CAR-006). Único punto que visualiza rango completo `[mínimo, máximo]`. |
 | **Módulo Asimétrico** | React Native (inyectado) | Componentes visuales controlados por rol del usuario. Oculta rango completo y muestra solo techo (pasajero) o piso (conductor) - CAR-002. |
 
 ---
@@ -104,7 +104,7 @@
 | Capa | Tecnologías |
 |------|-------------|
 | **App Móvil** | React Native, TypeScript, react-native-maps / Mapbox SDK, Metro Bundler |
-| **Panel Admin** | React, TypeScript |
+| **Panel Admin** |HTML + JavaScript (Vanilla) + Nginx |
 | **Backend** | Node.js, NestJS |
 | **Bases de Datos** | PostgreSQL, MongoDB, Redis |
 | **Infraestructura Local** | Docker, Docker Compose |

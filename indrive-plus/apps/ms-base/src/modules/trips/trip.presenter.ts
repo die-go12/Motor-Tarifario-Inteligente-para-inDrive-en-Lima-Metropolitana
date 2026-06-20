@@ -1,6 +1,16 @@
 import { UserRole } from '@app/shared';
 import { Trip } from './entities/trip.entity';
 
+export interface PricingFactors {
+  distanceKm: number;
+  fuelPricePerGallon: number;
+  vehicleCapacity: number;
+  trafficMultiplier: number;
+  hourMultiplier: number;
+  durationMin: number;
+  historicAveragePrice: number;
+}
+
 export interface TripEstimate {
   distanceKm: number;
   durationMin: number;
@@ -8,6 +18,7 @@ export interface TripEstimate {
   basePrice: number;
   minimumPrice: number;
   maximumPrice: number;
+  pricingFactors: PricingFactors;
 }
 
 export function presentQuote(estimate: TripEstimate, viewerRole: UserRole) {
@@ -15,6 +26,7 @@ export function presentQuote(estimate: TripEstimate, viewerRole: UserRole) {
     distanceKm: estimate.distanceKm,
     durationMin: estimate.durationMin,
     polyline: estimate.polyline,
+    pricingFactors: estimate.pricingFactors,
   };
 
   if (viewerRole === UserRole.PASSENGER) {

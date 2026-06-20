@@ -8,6 +8,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../../theme/theme';
@@ -36,10 +37,21 @@ interface PlaceSuggestion {
   principal: string;
 }
 
+interface PricingFactors {
+  distanceKm: number;
+  fuelPricePerGallon: number;
+  vehicleCapacity: number;
+  trafficMultiplier: number;
+  hourMultiplier: number;
+  durationMin: number;
+  historicAveragePrice: number;
+}
+
 interface TripPreview {
   distanciaKm: number;
   duracionMin: number;
   tarifaMax: number;
+  pricingFactors: PricingFactors | null;
 }
 
 interface Coords {
@@ -105,24 +117,18 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
       setSugerencias([]);
       return;
     }
-
-    const mockPlaces = [
-      { placeId: 'mock-1', descripcion: 'Larcomar, Miraflores, Lima', principal: 'Larcomar' },
-      { placeId: 'mock-2', descripcion: 'Jockey Plaza, Santiago de Surco, Lima', principal: 'Jockey Plaza' },
-      { placeId: 'mock-3', descripcion: 'Plaza San Miguel, San Miguel, Lima', principal: 'Plaza San Miguel' },
-      { placeId: 'mock-4', descripcion: 'Parque de la Exposición, Cercado de Lima, Lima', principal: 'Parque de la Exposición' },
-      { placeId: 'mock-5', descripcion: 'San Isidro Financiero, San Isidro, Lima', principal: 'San Isidro' }
-    ];
-
     if (Platform.OS === 'web') {
-      const filtered = mockPlaces.filter(p =>
-        p.descripcion.toLowerCase().includes(texto.toLowerCase()) ||
-        p.principal.toLowerCase().includes(texto.toLowerCase())
+      const mockPlaces = [
+        { placeId: 'san_isidro', descripcion: 'San Isidro, Lima, Perú', principal: 'San Isidro' },
+        { placeId: 'miraflores', descripcion: 'Miraflores, Lima, Perú', principal: 'Miraflores' },
+        { placeId: 'surco', descripcion: 'Santiago de Surco, Lima, Perú', principal: 'Santiago de Surco' },
+        { placeId: 'san_miguel', descripcion: 'San Miguel, Lima, Perú', principal: 'San Miguel' },
+      ];
+      setSugerencias(
+        mockPlaces.filter((p) => p.descripcion.toLowerCase().includes(texto.toLowerCase()))
       );
-      setSugerencias(filtered);
       return;
     }
-
     setBuscando(true);
     try {
       const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(texto)}&location=${LIMA_CENTRO.latitude},${LIMA_CENTRO.longitude}&radius=${LIMA_RADIO_BUSQUEDA}&components=country:pe&key=${GOOGLE_MAPS_API_KEY}`;
@@ -137,20 +143,9 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
             principal: p.structured_formatting.main_text,
           }))
         );
-      } else {
-        const filtered = mockPlaces.filter(p =>
-          p.descripcion.toLowerCase().includes(texto.toLowerCase()) ||
-          p.principal.toLowerCase().includes(texto.toLowerCase())
-        );
-        setSugerencias(filtered);
       }
     } catch (e) {
       console.error('Error buscando lugares:', e);
-      const filtered = mockPlaces.filter(p =>
-        p.descripcion.toLowerCase().includes(texto.toLowerCase()) ||
-        p.principal.toLowerCase().includes(texto.toLowerCase())
-      );
-      setSugerencias(filtered);
     } finally {
       setBuscando(false);
     }
@@ -161,33 +156,27 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
     setSugerencias([]);
     setDestino(lugar.principal);
 
-    const mockCoords: Record<string, Coords> = {
-      'mock-1': { latitude: -12.132, longitude: -77.030 },
-      'mock-2': { latitude: -12.086, longitude: -76.976 },
-      'mock-3': { latitude: -12.077, longitude: -77.085 },
-      'mock-4': { latitude: -12.060, longitude: -77.036 },
-      'mock-5': { latitude: -12.096, longitude: -77.027 }
-    };
-
     // Obtener detalles y calcular ruta
     try {
-      let lat = -12.046374;
-      let lng = -77.042793;
+      let coords = { lat: LIMA_CENTRO.latitude, lng: LIMA_CENTRO.longitude };
 
-      if (lugar.placeId.startsWith('mock-')) {
-        const coords = mockCoords[lugar.placeId] || mockCoords['mock-1'];
-        lat = coords.latitude;
-        lng = coords.longitude;
+      if (Platform.OS === 'web') {
+        if (lugar.placeId === 'san_isidro') {
+          coords = { lat: -12.0913, lng: -77.0378 };
+        } else if (lugar.placeId === 'miraflores') {
+          coords = { lat: -12.1221, lng: -77.0298 };
+        } else if (lugar.placeId === 'surco') {
+          coords = { lat: -12.1256, lng: -76.9854 };
+        }
       } else {
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${lugar.placeId}&fields=geometry&key=${GOOGLE_MAPS_API_KEY}`;
         const detailsResp = await fetch(detailsUrl);
         const detailsJson = await detailsResp.json();
-        const coords = detailsJson.result.geometry.location;
-        lat = coords.lat;
-        lng = coords.lng;
+        const detailsCoords = detailsJson.result.geometry.location;
+        coords = { lat: detailsCoords.lat, lng: detailsCoords.lng };
       }
 
-      setDestinoCoords({ latitude: lat, longitude: lng });
+      setDestinoCoords({ latitude: coords.lat, longitude: coords.lng });
 
       // Cotización pre-viaje: el backend (Integración + Motor) devuelve
       // distancia, duración, polyline y el TECHO (visualización asimétrica).
@@ -200,6 +189,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
         distanciaKm: tripData.distanceKm,
         duracionMin: tripData.durationMin,
         tarifaMax: tripData.maximumPrice,
+        pricingFactors: tripData.pricingFactors || null,
       });
 
       if (tripData.polyline) {
@@ -278,8 +268,9 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
           ItemSeparatorComponent={() => <View style={estilos.separador} />}
         />
 
-        {/* Preview de tarifa — muestra solo el TECHO (máximo) al pasajero */}
+        {/* Preview de tarifa — muestra las 7 métricas del motor tarifario */}
         {preview && (
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           <TarjetaBase estilo={estilos.preview}>
             <Text style={estilos.previewTitulo}>Detalles del viaje</Text>
             <View style={estilos.previewFila}>
@@ -290,6 +281,115 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={estilos.previewLabel}>Tiempo estimado</Text>
               <Text style={estilos.previewValor}>{formatDuracion(preview.duracionMin)}</Text>
             </View>
+
+            {/* ⭐ DESGLOSE DEL MOTOR TARIFARIO — 7 métricas */}
+            {preview.pricingFactors && (
+              <View style={estilos.desgloseContainer}>
+                <View style={estilos.desgloseTituloFila}>
+                  <Text style={estilos.desgloseTitulo}>Motor Tarifario Inteligente</Text>
+                  <View style={estilos.badgeMotor}>
+                    <Text style={estilos.badgeMotorTexto}>7 factores</Text>
+                  </View>
+                </View>
+                <Text style={estilos.desgloseSubtitulo}>
+                  Factores que determinan tu tarifa
+                </Text>
+
+                {/* 1. Distancia */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>📏</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Distancia</Text>
+                    <Text style={estilos.factorOrigen}>Google Maps API</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>{formatDistancia(preview.pricingFactors.distanceKm)}</Text>
+                </View>
+
+                {/* 2. Precio de combustible */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>⛽</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Precio de combustible</Text>
+                    <Text style={estilos.factorOrigen}>OSINERGMIN API</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>S/ {preview.pricingFactors.fuelPricePerGallon.toFixed(2)}/gal</Text>
+                </View>
+
+                {/* 3. Capacidad del vehículo */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>🚗</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Capacidad del vehículo</Text>
+                    <Text style={estilos.factorOrigen}>Base de datos</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>{preview.pricingFactors.vehicleCapacity} pas.</Text>
+                </View>
+
+                {/* 4. Multiplicador de tráfico */}
+                <View style={estilos.factorFila}>
+                  <View style={[estilos.factorIconContainer, preview.pricingFactors.trafficMultiplier > 1.3 && estilos.factorAlto]}>
+                    <Text style={estilos.factorIcon}>🚦</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Multiplicador de tráfico</Text>
+                    <Text style={estilos.factorOrigen}>Traffic API (tiempo real)</Text>
+                  </View>
+                  <Text style={[
+                    estilos.factorValor,
+                    preview.pricingFactors.trafficMultiplier > 1.3 && estilos.factorValorAlto,
+                  ]}>×{preview.pricingFactors.trafficMultiplier.toFixed(2)}</Text>
+                </View>
+
+                {/* 5. Factor hora/demanda zonal */}
+                <View style={estilos.factorFila}>
+                  <View style={[estilos.factorIconContainer, preview.pricingFactors.hourMultiplier > 1.2 && estilos.factorAlto]}>
+                    <Text style={estilos.factorIcon}>🕐</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Factor hora/demanda</Text>
+                    <Text style={estilos.factorOrigen}>Redis caché (TTL 1h)</Text>
+                  </View>
+                  <Text style={[
+                    estilos.factorValor,
+                    preview.pricingFactors.hourMultiplier > 1.2 && estilos.factorValorAlto,
+                  ]}>×{preview.pricingFactors.hourMultiplier.toFixed(2)}</Text>
+                </View>
+
+                {/* 6. Tiempo estimado de viaje */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>⏱️</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Tiempo estimado de viaje</Text>
+                    <Text style={estilos.factorOrigen}>Google Directions API</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>{formatDuracion(preview.pricingFactors.durationMin)}</Text>
+                </View>
+
+                {/* 7. Factor histórico de precios */}
+                <View style={[estilos.factorFila, { borderBottomWidth: 0 }]}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>📊</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Factor histórico</Text>
+                    <Text style={estilos.factorOrigen}>MongoDB (franja horaria)</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>
+                    {preview.pricingFactors.historicAveragePrice > 0
+                      ? formatSoles(preview.pricingFactors.historicAveragePrice)
+                      : 'N/A'}
+                  </Text>
+                </View>
+              </View>
+            )}
 
             {/* ⭐ VISUALIZACIÓN ASIMÉTRICA: Pasajero solo ve el techo tarifario */}
             <View style={[estilos.previewFila, estilos.tarifaDestacada]}>
@@ -311,6 +411,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
               cargando={solicitando}
             />
           </TarjetaBase>
+          </ScrollView>
         )}
       </View>
     </View>
@@ -346,4 +447,85 @@ const estilos = StyleSheet.create({
   },
   tarifaLabel: { ...theme.typography.bodyMd, color: theme.colors.textSecondary },
   tarifaValor: { ...theme.typography.h2, color: theme.colors.primary },
+  // Desglose del motor tarifario
+  desgloseContainer: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.rounded.lg,
+    padding: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(198, 247, 10, 0.15)',
+    gap: theme.spacing.sm,
+  },
+  desgloseTituloFila: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  desgloseTitulo: {
+    ...theme.typography.bodyLg,
+    color: theme.colors.primary,
+    fontFamily: 'Inter-Bold',
+  },
+  badgeMotor: {
+    backgroundColor: 'rgba(198, 247, 10, 0.12)',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 2,
+    borderRadius: theme.rounded.full,
+  },
+  badgeMotorTexto: {
+    ...theme.typography.caption,
+    color: theme.colors.primary,
+    fontSize: 11,
+    fontFamily: 'Inter-Bold',
+  },
+  desgloseSubtitulo: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    marginBottom: theme.spacing.xs,
+  },
+  factorFila: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderSubtle,
+    gap: theme.spacing.md,
+  },
+  factorIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surfaceSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  factorAlto: {
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+  },
+  factorIcon: {
+    fontSize: 18,
+  },
+  factorInfo: {
+    flex: 1,
+  },
+  factorNombre: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+  },
+  factorOrigen: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    fontSize: 11,
+  },
+  factorValor: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    fontFamily: 'Inter-Bold',
+    fontSize: 14,
+    textAlign: 'right',
+  },
+  factorValorAlto: {
+    color: theme.colors.error,
+  },
 });

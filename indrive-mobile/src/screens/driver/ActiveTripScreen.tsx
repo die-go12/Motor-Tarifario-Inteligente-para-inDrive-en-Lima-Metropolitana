@@ -37,8 +37,8 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
 
     const socket = getSocket();
     if (socket) {
-      socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number }) => {
-        setTarifaFinal(data.tarifaFinal);
+      socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number; minimumPrice?: number; maximumPrice?: number }) => {
+        setTarifaFinal(data.tarifaFinal, data.minimumPrice, data.maximumPrice);
         locationSubscription.current?.remove();
       });
     }

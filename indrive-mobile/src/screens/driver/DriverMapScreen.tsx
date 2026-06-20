@@ -28,7 +28,7 @@ export const DriverMapScreen: React.FC<Props> = ({ navigation }) => {
   const [disponible, setDisponible] = useState(true);
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
 
-  const { user, logout, switchRole } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   useEffect(() => {
     iniciarRastreoGPS();
@@ -82,9 +82,7 @@ export const DriverMapScreen: React.FC<Props> = ({ navigation }) => {
     );
   };
 
-  const handleSwitchRole = () => {
-    switchRole();
-  };
+
 
   return (
     <View style={estilos.contenedor}>
@@ -111,10 +109,7 @@ export const DriverMapScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity style={estilos.botonRol} onPress={handleSwitchRole} activeOpacity={0.7}>
-            <Text style={estilos.textoRol}>🚗 Conductor</Text>
-            <Text style={estilos.switchHint}>Toca para cambiar a Pasajero →</Text>
-          </TouchableOpacity>
+
         </TarjetaBase>
       </View>
 

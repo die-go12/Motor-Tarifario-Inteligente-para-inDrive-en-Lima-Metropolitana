@@ -34,7 +34,7 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
   } | null>(null);
   const [permisoConcedido, setPermisoConcedido] = useState(false);
 
-  const { user, logout, switchRole } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const { 
     viajeActivo, 
     rutaCoords, 
@@ -69,8 +69,8 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
       actualizarEstado('IN_PROGRESS');
     });
 
-    socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number }) => {
-      setTarifaFinal(data.tarifaFinal);
+    socket.on(SERVER_EVENTS.TRIP_COMPLETED, (data: { tarifaFinal: number; minimumPrice?: number; maximumPrice?: number }) => {
+      setTarifaFinal(data.tarifaFinal, data.minimumPrice, data.maximumPrice);
     });
 
     socket.on(SERVER_EVENTS.TRIP_CANCELLED, () => {
@@ -96,9 +96,7 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
     );
   };
 
-  const handleSwitchRole = () => {
-    switchRole();
-  };
+
 
   // Pantalla de pago final cuando el viaje está completado
   if (viajeActivo?.status === 'COMPLETED' && viajeActivo.tarifaFinal) {
@@ -154,10 +152,7 @@ export const PassengerMapScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity style={estilos.botonRol} onPress={handleSwitchRole} activeOpacity={0.7}>
-            <Text style={estilos.textoRol}>🧑 Pasajero</Text>
-            <Text style={estilos.switchHint}>Toca para cambiar a Conductor →</Text>
-          </TouchableOpacity>
+
         </TarjetaBase>
       </View>
 

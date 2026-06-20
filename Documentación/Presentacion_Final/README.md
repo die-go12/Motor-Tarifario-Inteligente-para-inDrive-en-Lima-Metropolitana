@@ -1,35 +1,37 @@
-# Presentación Final — Motor Tarifario Inteligente inDrive+
+# 🎤 Presentación Final — Motor Tarifario Inteligente inDrive+
 
-> Índice y **guion de la defensa**. Reúne el material de la presentación y enlaza a la documentación existente (no la duplica).
+> Hub de navegación de la presentación. Cada enlace lleva al documento canónico (no se duplica contenido).
 
 ## 🏗️ Arquitectura
-- **[Vista de arquitectura (defensa)](arquitectura/Arquitectura.md)** — documento **oficial que se expone**: las 4 vistas del sistema (general, backend + BD, panel admin, app móvil) + decisiones de diseño y patrones (§5).
-- [Referencia técnica completa](../Aquitectura/Arquitectura_general.md) — **canon** técnico: diagramas fuente (componentes, secuencia, clases), 7 variables, manejo de errores y entidades.
+- **[Vista de arquitectura (defensa)](arquitectura/Arquitectura.md)** — las 4 vistas del sistema + decisiones y patrones (§5). *Documento que se expone.*
+- [Referencia técnica completa](../Aquitectura/Arquitectura_general.md) — diagramas fuente, secuencias, clases, entidades.
+- [Decisiones arquitectónicas (ADR)](../Aquitectura/decisiones_arquitectonicas.md) · [Stack tecnológico](../Aquitectura/Stack_Tecnologico.md)
+
+## 💵 Negocio (el diferencial)
+- [Flujo de cálculo de tarifa](../Negocio/flujo_calculo_tarifa.md) — 7 variables + regla de pago.
+- [Reglas tarifarias](../Negocio/reglas_tarifarias.md)
+
+## 📋 Requerimientos
+- [Historias de Usuario](../Requerimientos/Historias_usuario.md) — fuente de CAR + HU.
+
+## 🏃 Sprint / Incremento
+- [Sprint 2](../Scrum/Sprints/sprint_2.md) — incremento entregado *(tiene su índice interno: alcance, métricas §10)*.
+- [Retrospectiva Sprint 2](../Scrum/Retrospectivas/retrospective2.md)
 
 ## 🧪 Pruebas (evidencias de ejecución)
-> Capturas de las pantallas/flujos **funcionando**. La **estrategia** (cómo se prueba) está en [`pruebas_sistema.md`](../Scrum/Pruebas/pruebas_sistema.md); aquí van las **evidencias** por componente.
-- **[Panel Admin](pruebas/Pruebas_Panel_Admin.md)** — sesiones admin/auditor, pricing, viajes, seguridad y gestión de usuarios.
-- **[App Móvil](pruebas/Pruebas_App_Movil.md)** — *(en preparación)* flujos de pasajero y conductor.
-- Índice completo de pruebas → [`pruebas/`](pruebas/README.md)
+- [Estrategia de pruebas](../Scrum/Pruebas/pruebas_sistema.md) — cómo se prueba.
+- [Panel Admin](pruebas/Pruebas_Panel_Admin.md) — evidencias del panel web.
+- [App Móvil](pruebas/Pruebas_App_Movil.md) — *(en preparación)*.
 
 ## 🔄 Gestión de cambio
-- [`gestion_de_cambio.md`](gestion_de_cambio.md) — cambios gestionados durante el proyecto (proceso de 5 pasos).
+- [gestion_de_cambio.md](gestion_de_cambio.md) — cambios gestionados (proceso de 5 pasos).
 
-## 🎤 Guion sugerido de la defensa
-1. **Visión general del sistema** → [Vista de arquitectura](arquitectura/Arquitectura.md)
-2. **Decisiones de diseño** (por qué) → [Decisiones y patrones](arquitectura/Arquitectura.md) (§5) · [ADRs](../Aquitectura/decisiones_arquitectonicas.md) · [Stack](../Aquitectura/Stack_Tecnologico.md)
-3. **Negocio / diferencial** → [Flujo de cálculo de tarifa](../Negocio/flujo_calculo_tarifa.md)
-4. **Incremento del sprint** → [Sprint 2](../Scrum/Sprints/sprint_2.md) *(tiene su índice interno)*
-5. **Requerimientos** → [Historias de Usuario](../Requerimientos/Historias_usuario.md)
-6. **Pruebas** → [estrategia](../Scrum/Pruebas/pruebas_sistema.md) + [evidencias](pruebas/README.md)
-7. **Gestión de cambio** → [`gestion_de_cambio.md`](gestion_de_cambio.md)
-8. **Cierre** → métricas (Sprint 2 §10), [retrospectiva](../Scrum/Retrospectivas/retrospective2.md), resultados, lecciones y conclusiones
+---
 
-## Contenido de este apartado
-| Carpeta / archivo | Qué contiene |
-|---|---|
-| `arquitectura/` | Vista de arquitectura para la defensa (las 4 vistas + decisiones y patrones) |
-| `pruebas/` | Evidencias de pruebas (capturas de pantallas/flujos, por componente) |
-| `gestion_de_cambio.md` | Cambios gestionados durante el proyecto (proceso de 5 pasos) |
-
-> Nota: el **Sprint 2** mantiene su propio índice; este apartado **engloba la presentación** y lo que escapa al sprint (arquitectura para exponer, evidencias de demo, gestión de cambio).
+### 📁 Estructura de esta carpeta
+```
+Presentacion_Final/
+├── arquitectura/   → vista de arquitectura para la defensa
+├── pruebas/        → evidencias de pruebas por componente
+└── gestion_de_cambio.md
+```

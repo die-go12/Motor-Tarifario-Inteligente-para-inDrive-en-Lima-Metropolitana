@@ -1,5 +1,7 @@
 # Diagramas de arquitectura
 
+> El documento de arquitectura para la defensa es [`Arquitectura.md`](Arquitectura.md) (en esta misma carpeta). Este archivo es solo el **catálogo de diagramas exportados**.
+
 Diagramas del sistema (exportados desde Mermaid / Excalidraw) para la presentación.
 
 | # | Diagrama | Estado |

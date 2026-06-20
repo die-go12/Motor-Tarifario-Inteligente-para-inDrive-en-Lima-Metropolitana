@@ -78,27 +78,6 @@ services:
         condition: service_healthy
     networks:
       - indrive_network
-
-  ms-reports:
-    <<: *backend-build
-    container_name: indrive_ms_reports
-    restart: unless-stopped
-    command: node dist/apps/ms-reports/main
-    environment:
-      MS_REPORTS_PORT: 3004
-      MONGO_URI: mongodb://mongo:27017/indrive_audit
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    ports:
-      - "3004:3004"
-    depends_on:
-      mongo:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - indrive_network
   ms-integration:
     <<: *backend-build
     container_name: indrive_ms_integration

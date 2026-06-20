@@ -103,7 +103,7 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
       vehiculoPlaca: oferta.vehiculoPlaca,
       vehiculoModelo: oferta.vehiculoModelo,
     });
-    navigation.navigate('PassengerMap');
+    navigation.navigate('TripAccepted');
   };
 
   const cancelarViaje = () => {

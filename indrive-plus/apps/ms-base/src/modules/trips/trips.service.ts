@@ -50,6 +50,15 @@ export class TripsService {
       basePrice: quote.basePrice,
       minimumPrice: quote.minimumPrice,
       maximumPrice: quote.maximumPrice,
+      pricingFactors: {
+        distanceKm: context.distanceKm,
+        fuelPricePerGallon: context.fuelPricePerGallon,
+        vehicleCapacity: DEFAULT_VEHICLE_CAPACITY,
+        trafficMultiplier: context.trafficMultiplier,
+        hourMultiplier: context.hourMultiplier,
+        durationMin: context.durationMin,
+        historicAveragePrice: context.historicAveragePrice,
+      },
     };
   }
 

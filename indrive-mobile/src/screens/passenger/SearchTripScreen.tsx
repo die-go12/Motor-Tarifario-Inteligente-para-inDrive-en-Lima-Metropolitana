@@ -8,6 +8,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../../theme/theme';
@@ -36,10 +37,21 @@ interface PlaceSuggestion {
   principal: string;
 }
 
+interface PricingFactors {
+  distanceKm: number;
+  fuelPricePerGallon: number;
+  vehicleCapacity: number;
+  trafficMultiplier: number;
+  hourMultiplier: number;
+  durationMin: number;
+  historicAveragePrice: number;
+}
+
 interface TripPreview {
   distanciaKm: number;
   duracionMin: number;
   tarifaMax: number;
+  pricingFactors: PricingFactors | null;
 }
 
 interface Coords {
@@ -177,6 +189,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
         distanciaKm: tripData.distanceKm,
         duracionMin: tripData.durationMin,
         tarifaMax: tripData.maximumPrice,
+        pricingFactors: tripData.pricingFactors || null,
       });
 
       if (tripData.polyline) {
@@ -255,8 +268,9 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
           ItemSeparatorComponent={() => <View style={estilos.separador} />}
         />
 
-        {/* Preview de tarifa — muestra solo el TECHO (máximo) al pasajero */}
+        {/* Preview de tarifa — muestra las 7 métricas del motor tarifario */}
         {preview && (
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           <TarjetaBase estilo={estilos.preview}>
             <Text style={estilos.previewTitulo}>Detalles del viaje</Text>
             <View style={estilos.previewFila}>
@@ -267,6 +281,115 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={estilos.previewLabel}>Tiempo estimado</Text>
               <Text style={estilos.previewValor}>{formatDuracion(preview.duracionMin)}</Text>
             </View>
+
+            {/* ⭐ DESGLOSE DEL MOTOR TARIFARIO — 7 métricas */}
+            {preview.pricingFactors && (
+              <View style={estilos.desgloseContainer}>
+                <View style={estilos.desgloseTituloFila}>
+                  <Text style={estilos.desgloseTitulo}>Motor Tarifario Inteligente</Text>
+                  <View style={estilos.badgeMotor}>
+                    <Text style={estilos.badgeMotorTexto}>7 factores</Text>
+                  </View>
+                </View>
+                <Text style={estilos.desgloseSubtitulo}>
+                  Factores que determinan tu tarifa
+                </Text>
+
+                {/* 1. Distancia */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>📏</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Distancia</Text>
+                    <Text style={estilos.factorOrigen}>Google Maps API</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>{formatDistancia(preview.pricingFactors.distanceKm)}</Text>
+                </View>
+
+                {/* 2. Precio de combustible */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>⛽</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Precio de combustible</Text>
+                    <Text style={estilos.factorOrigen}>OSINERGMIN API</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>S/ {preview.pricingFactors.fuelPricePerGallon.toFixed(2)}/gal</Text>
+                </View>
+
+                {/* 3. Capacidad del vehículo */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>🚗</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Capacidad del vehículo</Text>
+                    <Text style={estilos.factorOrigen}>Base de datos</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>{preview.pricingFactors.vehicleCapacity} pas.</Text>
+                </View>
+
+                {/* 4. Multiplicador de tráfico */}
+                <View style={estilos.factorFila}>
+                  <View style={[estilos.factorIconContainer, preview.pricingFactors.trafficMultiplier > 1.3 && estilos.factorAlto]}>
+                    <Text style={estilos.factorIcon}>🚦</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Multiplicador de tráfico</Text>
+                    <Text style={estilos.factorOrigen}>Traffic API (tiempo real)</Text>
+                  </View>
+                  <Text style={[
+                    estilos.factorValor,
+                    preview.pricingFactors.trafficMultiplier > 1.3 && estilos.factorValorAlto,
+                  ]}>×{preview.pricingFactors.trafficMultiplier.toFixed(2)}</Text>
+                </View>
+
+                {/* 5. Factor hora/demanda zonal */}
+                <View style={estilos.factorFila}>
+                  <View style={[estilos.factorIconContainer, preview.pricingFactors.hourMultiplier > 1.2 && estilos.factorAlto]}>
+                    <Text style={estilos.factorIcon}>🕐</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Factor hora/demanda</Text>
+                    <Text style={estilos.factorOrigen}>Redis caché (TTL 1h)</Text>
+                  </View>
+                  <Text style={[
+                    estilos.factorValor,
+                    preview.pricingFactors.hourMultiplier > 1.2 && estilos.factorValorAlto,
+                  ]}>×{preview.pricingFactors.hourMultiplier.toFixed(2)}</Text>
+                </View>
+
+                {/* 6. Tiempo estimado de viaje */}
+                <View style={estilos.factorFila}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>⏱️</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Tiempo estimado de viaje</Text>
+                    <Text style={estilos.factorOrigen}>Google Directions API</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>{formatDuracion(preview.pricingFactors.durationMin)}</Text>
+                </View>
+
+                {/* 7. Factor histórico de precios */}
+                <View style={[estilos.factorFila, { borderBottomWidth: 0 }]}>
+                  <View style={estilos.factorIconContainer}>
+                    <Text style={estilos.factorIcon}>📊</Text>
+                  </View>
+                  <View style={estilos.factorInfo}>
+                    <Text style={estilos.factorNombre}>Factor histórico</Text>
+                    <Text style={estilos.factorOrigen}>MongoDB (franja horaria)</Text>
+                  </View>
+                  <Text style={estilos.factorValor}>
+                    {preview.pricingFactors.historicAveragePrice > 0
+                      ? formatSoles(preview.pricingFactors.historicAveragePrice)
+                      : 'N/A'}
+                  </Text>
+                </View>
+              </View>
+            )}
 
             {/* ⭐ VISUALIZACIÓN ASIMÉTRICA: Pasajero solo ve el techo tarifario */}
             <View style={[estilos.previewFila, estilos.tarifaDestacada]}>
@@ -288,6 +411,7 @@ export const SearchTripScreen: React.FC<Props> = ({ navigation }) => {
               cargando={solicitando}
             />
           </TarjetaBase>
+          </ScrollView>
         )}
       </View>
     </View>
@@ -323,4 +447,85 @@ const estilos = StyleSheet.create({
   },
   tarifaLabel: { ...theme.typography.bodyMd, color: theme.colors.textSecondary },
   tarifaValor: { ...theme.typography.h2, color: theme.colors.primary },
+  // Desglose del motor tarifario
+  desgloseContainer: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.rounded.lg,
+    padding: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(198, 247, 10, 0.15)',
+    gap: theme.spacing.sm,
+  },
+  desgloseTituloFila: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  desgloseTitulo: {
+    ...theme.typography.bodyLg,
+    color: theme.colors.primary,
+    fontFamily: 'Inter-Bold',
+  },
+  badgeMotor: {
+    backgroundColor: 'rgba(198, 247, 10, 0.12)',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 2,
+    borderRadius: theme.rounded.full,
+  },
+  badgeMotorTexto: {
+    ...theme.typography.caption,
+    color: theme.colors.primary,
+    fontSize: 11,
+    fontFamily: 'Inter-Bold',
+  },
+  desgloseSubtitulo: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    marginBottom: theme.spacing.xs,
+  },
+  factorFila: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderSubtle,
+    gap: theme.spacing.md,
+  },
+  factorIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surfaceSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  factorAlto: {
+    backgroundColor: 'rgba(255, 107, 107, 0.15)',
+  },
+  factorIcon: {
+    fontSize: 18,
+  },
+  factorInfo: {
+    flex: 1,
+  },
+  factorNombre: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+  },
+  factorOrigen: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    fontSize: 11,
+  },
+  factorValor: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    fontFamily: 'Inter-Bold',
+    fontSize: 14,
+    textAlign: 'right',
+  },
+  factorValorAlto: {
+    color: theme.colors.error,
+  },
 });

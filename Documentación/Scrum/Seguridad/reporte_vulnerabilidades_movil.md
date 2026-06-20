@@ -14,7 +14,7 @@ Este reporte detalla los hallazgos de seguridad obtenidos tras la ejecución de 
 | Herramienta | Tipo de Escaneo | Elementos Analizados | Hallazgos Críticos/Altos | Estado / Acción |
 | :--- | :--- | :--- | :---: | :--- |
 | **Semgrep** | SAST (Código) | Carpeta `/src` (50 archivos) | **0** | Green (Limpio) |
-| **npm audit** | SCA (Dependencias) | `package.json` + `node_modules` | **28** (4 High, 24 Moderate) | 🟡 Requiere Parcha Seguro |
+| **npm audit** | SCA (Dependencias) | `package.json` + `node_modules` | **4** (4 High) | 🟡 Requiere Parcha Seguro |
 
 ---
 
@@ -27,7 +27,7 @@ Este reporte detalla los hallazgos de seguridad obtenidos tras la ejecución de 
 
 ## 📦 3. Detalle de Vulnerabilidades en Dependencias (npm audit)
 
-El escaneo de composición de software detectó **28 vulnerabilidades** distribuidas en dependencias del entorno de Expo y React Native:
+El escaneo de composición de software detectó **4 vulnerabilidades** distribuidas en dependencias del entorno de Expo y React Native:
 
 ### A. Vulnerabilidades de Severidad Alta (High)
 1.  **`undici` (Varios CVEs):**

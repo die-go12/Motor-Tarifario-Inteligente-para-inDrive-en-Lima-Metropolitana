@@ -42,6 +42,9 @@ export class PricingConfig {
   maxRangeRatio: number;
 
   @Prop({ required: true })
+  minRangeRatio: number;
+
+  @Prop({ required: true })
   anomalyMediumDeviation: number;
 
   @Prop({ required: true })

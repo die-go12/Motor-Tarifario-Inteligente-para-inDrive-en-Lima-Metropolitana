@@ -16,6 +16,7 @@ const DEFAULT_CONFIG = {
   minAbsoluteFare: 3.0,
   maxAbsoluteFare: 150.0,
   maxRangeRatio: 3.5,
+  minRangeRatio: 1.2,
   anomalyMediumDeviation: 0.2,
   anomalyHighDeviation: 0.5,
 };
@@ -83,6 +84,21 @@ describe('PricingService', () => {
     it('nunca devuelve un máximo menor que el mínimo en viajes largos', async () => {
       const quote = await service.quote({ ...baseRequest, distanceKm: 120 });
       expect(quote.maximumPrice).toBeGreaterThanOrEqual(quote.minimumPrice);
+    });
+
+    it('garantiza un spread mínimo cuando no hay surge (multiplicadores 1.0)', async () => {
+      const quote = await service.quote({
+        ...baseRequest,
+        trafficMultiplier: 1,
+        hourMultiplier: 1,
+        timeMultiplier: 1,
+      });
+      expect(quote.maximumPrice).toBeGreaterThan(quote.minimumPrice);
+      expect(quote).toEqual({
+        basePrice: 22.88,
+        minimumPrice: 22.88,
+        maximumPrice: 27.45,
+      });
     });
   });
 

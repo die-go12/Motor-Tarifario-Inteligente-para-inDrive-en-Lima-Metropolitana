@@ -99,6 +99,14 @@ export class UpdatePricingConfigDto {
   maxRangeRatio?: number;
 
   @ApiPropertyOptional({
+    example: 1.2,
+    description: 'Ratio mínimo máximo/mínimo (spread mínimo garantizado)',
+  })
+  @IsOptional()
+  @Min(1)
+  minRangeRatio?: number;
+
+  @ApiPropertyOptional({
     example: 0.2,
     description: 'Umbral de desviación para anomalía de severidad media',
   })

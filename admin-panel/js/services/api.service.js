@@ -29,9 +29,37 @@ class ApiService {
       normalized.startsWith('/trips') ||
       normalized.startsWith('/vehicles')
     ) {
-      return API_CONFIG.MS_BASE;
+      return API_CONFIG.GATEWAY;
     }
     return API_CONFIG.BASE_URL;
+  }
+
+  getRemoteFallbackBase(baseUrl) {
+    try {
+      const target = new URL(baseUrl);
+      const current = window.location;
+      const isCurrentLocal =
+        current.hostname === 'localhost' || current.hostname === '127.0.0.1';
+      const isTargetLocal =
+        target.hostname === 'localhost' || target.hostname === '127.0.0.1';
+
+      if (!isTargetLocal || isCurrentLocal) {
+        return null;
+      }
+
+      const port = target.port || (target.protocol === 'https:' ? '443' : '80');
+      let host = current.hostname;
+
+      // Soporte para GitHub Codespaces: <name>-8080.app.github.dev -> <name>-3000.app.github.dev
+      if (host.includes('app.github.dev')) {
+        host = host.replace(/-\d+\./, `-${port}.`);
+        return `${current.protocol}//${host}`;
+      }
+
+      return `${current.protocol}//${host}:${port}`;
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -126,9 +154,47 @@ class ApiService {
 
       return await response.json();
     } catch (error) {
+      if (error instanceof TypeError) {
+        const fallbackBase = this.getRemoteFallbackBase(baseUrl);
+        if (fallbackBase) {
+          const fallbackUrl = fallbackBase + path;
+          const retryResponse = await fetch(fallbackUrl, config);
+
+          if (!retryResponse.ok) {
+            if (retryResponse.status === 401) {
+              this.clearToken();
+              window.dispatchEvent(new CustomEvent('auth:logout'));
+            }
+
+            let retryErrorData;
+            try {
+              retryErrorData = await retryResponse.json();
+            } catch {
+              retryErrorData = { message: `Error ${retryResponse.status}` };
+            }
+
+            const retryError = new Error(
+              retryErrorData.message || 'Error en la petición',
+            );
+            retryError.status = retryResponse.status;
+            retryError.data = retryErrorData;
+            throw retryError;
+          }
+
+          if (retryResponse.status === 204) {
+            return null;
+          }
+
+          return await retryResponse.json();
+        }
+      }
+
       // Manejar timeout
       if (error.name === 'AbortError') {
         throw new Error('Timeout - El servidor no responde');
+      }
+      if (error instanceof TypeError) {
+        throw new Error('No se pudo conectar al backend (verifica URL/puertos en Configuración)');
       }
       throw error;
     }

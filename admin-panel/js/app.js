@@ -11,6 +11,7 @@ import {
   reportsService,
   vehiclesService,
   pricingService,
+  API_CONFIG,
   API_ENDPOINTS,
   TRIP_STATUS,
   USER_ROLES
@@ -55,9 +56,14 @@ async function initApp() {
   const savedBase = localStorage.getItem('ms_base_url');
   const savedPricing = localStorage.getItem('ms_pricing_url');
 
-  if (savedGateway) $('settings-api-url').value = savedGateway;
-  if (savedBase) $('settings-ms-base-url').value = savedBase;
-  if (savedPricing) $('settings-ms-pricing-url').value = savedPricing;
+  const gatewayUrl = savedGateway || API_CONFIG.GATEWAY;
+  const baseUrl = savedBase || API_CONFIG.MS_BASE;
+  const pricingUrl = savedPricing || API_CONFIG.MS_PRICING;
+
+  if ($('settings-api-url')) $('settings-api-url').value = gatewayUrl;
+  if ($('settings-ms-base-url')) $('settings-ms-base-url').value = baseUrl;
+  if ($('settings-ms-pricing-url')) $('settings-ms-pricing-url').value = pricingUrl;
+  if ($('api-url-display')) $('api-url-display').textContent = gatewayUrl;
 
   // Cargar configuración de pricing
   try {
@@ -71,8 +77,9 @@ async function initApp() {
 
   // Verificar autenticación (solo admin)
   const currentUser = authService.getCurrentUser();
-  if (authService.isAuthenticated() && currentUser?.role === USER_ROLES.ADMIN) {
+  if (authService.isAuthenticated() && (currentUser?.role === USER_ROLES.ADMIN || currentUser?.role === USER_ROLES.AUDITOR)) {
     showMainUI();
+    applyRolePermissions(currentUser.role);
     connectRealtime();
     await loadDashboard();
   } else {
@@ -193,6 +200,10 @@ function showMainUI() {
   }
 }
 
+function applyRolePermissions(role) {
+  document.body.classList.toggle('role-readonly', role === USER_ROLES.AUDITOR);
+}
+
 /**
  * Handle login
  */
@@ -221,11 +232,12 @@ async function doLogin() {
 
   try {
     const { user } = await authService.login(email, password);
-    if (!user || user.role !== USER_ROLES.ADMIN) {
+    if (!user || (user.role !== USER_ROLES.ADMIN && user.role !== USER_ROLES.AUDITOR)) {
       await authService.logout();
-      throw new Error('Acceso exclusivo para administradores');
+      throw new Error('Acceso exclusivo para administradores y auditores');
     }
     connectRealtime();
+    applyRolePermissions(user.role);
     showMainUI();
     await loadDashboard();
     showToast('Sesión iniciada');
@@ -1649,13 +1661,15 @@ async function saveVehicleForDriver(driverId) {
  * Guardar configuración
  */
 function saveSettings() {
-  const gatewayUrl = $('settings-api-url').value;
-  const baseUrl = $('settings-ms-base-url').value;
-  const pricingUrl = $('settings-ms-pricing-url').value;
+  const gatewayUrl = $('settings-api-url').value.trim();
+  const baseUrl = $('settings-ms-base-url').value.trim();
+  const pricingUrl = $('settings-ms-pricing-url').value.trim();
 
   localStorage.setItem('api_gateway_url', gatewayUrl);
   localStorage.setItem('ms_base_url', baseUrl);
   localStorage.setItem('ms_pricing_url', pricingUrl);
+
+  if ($('api-url-display')) $('api-url-display').textContent = gatewayUrl;
 
   showToast('Configuración guardada');
 }
@@ -1664,22 +1678,22 @@ function saveSettings() {
  * Probar conexión
  */
 async function testConnection() {
-  const baseUrl = $('settings-ms-base-url').value;
+  const gatewayUrl = $('settings-api-url').value.trim();
 
   try {
-    const response = await fetch(`${baseUrl}/auth/login`, {
+    const response = await fetch(`${gatewayUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: 'test', password: 'test' })
     });
 
     if (response.status === 400 || response.status === 401) {
-      showToast(`✓ Backend alcanzable (${baseUrl})`);
+      showToast(`✓ Backend alcanzable (${gatewayUrl})`);
     } else {
       showToast('Error en la conexión', false);
     }
   } catch (error) {
-    showToast(`No se puede conectar a ${baseUrl}`, false);
+    showToast(`No se puede conectar a ${gatewayUrl}`, false);
   }
 }
 
@@ -1827,6 +1841,7 @@ window.completeTrip = completeTrip;
 window.setChart = setChart;
 window.simulate = simulate;
 window.updateSupplyDemand = updateSupplyDemand;
+window.applyRolePermissions = applyRolePermissions;
 window.registerUser = registerUser;
 window.toggleRegisterVehicleFields = toggleRegisterVehicleFields;
 window.loadTrips = loadTrips;

@@ -39,13 +39,13 @@ export class UsersController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.AUDITOR)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.AUDITOR)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);

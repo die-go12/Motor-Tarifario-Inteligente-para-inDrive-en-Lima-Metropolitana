@@ -212,6 +212,28 @@
 
     /* ── RESPONSIVE ── */
     @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.pricing-grid{grid-template-columns:1fr}.fleet-grid{grid-template-columns:repeat(2,1fr)}}
+
+    body.role-readonly button.btn-primary,
+    body.role-readonly button.btn-sm,
+    body.role-readonly .users-tab-btn ~ button {
+      opacity: 0.4;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+    body.role-readonly::after {
+      content: "👁 Modo solo lectura (Auditor)";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fb923c;
+      color: #1a1a1a;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px;
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
@@ -235,7 +257,7 @@
     </div>
     <button id="login-btn" class="btn-primary" style="width:100%" onclick="window.doLogin()">Iniciar sesión</button>
     <div class="auth-demo">
-      Demo: <span onclick="window.fillDemo()">Usar credenciales demo</span> · Backend: <span id="api-url-display">localhost:3001</span>
+      Demo: <span onclick="window.fillDemo()">Usar credenciales demo</span> · Backend: <span id="api-url-display">http://localhost:3000</span>
     </div>
   </div>
 </div>

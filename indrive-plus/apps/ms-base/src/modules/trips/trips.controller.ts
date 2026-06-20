@@ -71,7 +71,7 @@ export class TripsController {
     return trips.map((trip) => presentTrip(trip, user.role));
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.AUDITOR)
   @Get('all')
   async findAll(@Query() query: FindTripsDto) {
     const trips = await this.tripsService.findAll(query.status);

@@ -471,6 +471,22 @@
             </div>
             <input type="range" id="w-time" class="slider" value="20" min="0" max="100" onchange="window.updateWeights ? window.updateWeights() : null">
           </div>
+
+          <div class="config-card">
+            <div class="config-title">🚨 Umbrales de Anomalías</div>
+            <div style="margin-bottom:16px">
+              <label class="form-label">Desviación Media (%)</label>
+              <input type="number" id="anomaly-medium" class="config-input" value="15" step="1" min="0">
+              <small style="color:var(--t3);font-size:11px">Desviación desde la cual se marca como anomalía MEDIA</small>
+            </div>
+            <div style="margin-bottom:16px">
+              <label class="form-label">Desviación Alta (%)</label>
+              <input type="number" id="anomaly-high" class="config-input" value="30" step="1" min="0">
+              <small style="color:var(--t3);font-size:11px">Desviación desde la cual se marca como anomalía ALTA</small>
+            </div>
+            <button class="btn-primary" onclick="window.saveAnomalyThresholds()" style="width:100%">Guardar Umbrales</button>
+            <div id="anomaly-thresholds-msg" style="margin-top:10px;font-size:12px"></div>
+          </div>
         </div>
 
         <div class="panel">

@@ -44,7 +44,11 @@ class PricingService {
   async loadConfig() {
     try {
       const config = await apiService.get(API_ENDPOINTS.PRICING.GET_CONFIG);
-      this.config = config;
+      this.config = {
+        ...config,
+        anomalyMediumDeviation: config.anomalyMediumDeviation ?? 15,
+        anomalyHighDeviation: config.anomalyHighDeviation ?? 30
+      };
       this.weights = {
         base: {
           distance: config.costPerKmBase ?? 40,
@@ -78,19 +82,22 @@ class PricingService {
    */
   async updateConfig(configData) {
     try {
+      const currentConfig = this.config ?? {};
       const payload = {
-        costPerKmBase: configData.costPerKmBase ?? configData.distanceWeight,
-        fuelConsumptionPerKm: configData.fuelConsumptionPerKm ?? configData.fuelWeight,
+        costPerKmBase: configData.costPerKmBase ?? configData.distanceWeight ?? currentConfig.costPerKmBase,
+        fuelConsumptionPerKm: configData.fuelConsumptionPerKm ?? configData.fuelWeight ?? currentConfig.fuelConsumptionPerKm,
         fuelFactor: configData.fuelFactor ?? 1,
-        capacityExtraCost: configData.capacityExtraCost ?? configData.capacityWeight,
-        historicWeight: configData.historicWeight,
-        trafficWeight: configData.trafficWeight,
-        hourWeight: configData.hourWeight,
-        timeWeight: configData.timeWeight,
-        trafficMultiplierCap: configData.trafficMultiplierCap ?? configData.maxTrafficMultiplier,
-        minAbsoluteFare: configData.minAbsoluteFare ?? configData.minimumPrice,
-        maxAbsoluteFare: configData.maxAbsoluteFare ?? configData.maximumPrice,
-        maxRangeRatio: configData.maxRangeRatio ?? configData.maxRatio
+        capacityExtraCost: configData.capacityExtraCost ?? configData.capacityWeight ?? currentConfig.capacityExtraCost,
+        historicWeight: configData.historicWeight ?? currentConfig.historicWeight,
+        trafficWeight: configData.trafficWeight ?? currentConfig.trafficWeight,
+        hourWeight: configData.hourWeight ?? currentConfig.hourWeight,
+        timeWeight: configData.timeWeight ?? currentConfig.timeWeight,
+        anomalyMediumDeviation: configData.anomalyMediumDeviation ?? currentConfig.anomalyMediumDeviation,
+        anomalyHighDeviation: configData.anomalyHighDeviation ?? currentConfig.anomalyHighDeviation,
+        trafficMultiplierCap: configData.trafficMultiplierCap ?? configData.maxTrafficMultiplier ?? currentConfig.trafficMultiplierCap,
+        minAbsoluteFare: configData.minAbsoluteFare ?? configData.minimumPrice ?? currentConfig.minAbsoluteFare,
+        maxAbsoluteFare: configData.maxAbsoluteFare ?? configData.maximumPrice ?? currentConfig.maxAbsoluteFare,
+        maxRangeRatio: configData.maxRangeRatio ?? configData.maxRatio ?? currentConfig.maxRangeRatio
       };
 
       const updated = await apiService.put(

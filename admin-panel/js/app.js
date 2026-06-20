@@ -62,6 +62,7 @@ async function initApp() {
   // Cargar configuración de pricing
   try {
     await pricingService.loadConfig();
+    syncPricingConfigFields();
     console.log('Configuración de pricing cargada');
   } catch (error) {
     console.warn('Usando pesos de pricing por defecto:', error.message);
@@ -1660,6 +1661,53 @@ function updateWeights() {
   });
 }
 
+function syncPricingConfigFields() {
+  const config = pricingService.config;
+  if (!config) return;
+
+  const anomalyMediumInput = $('anomaly-medium');
+  const anomalyHighInput = $('anomaly-high');
+
+  if (anomalyMediumInput) {
+    anomalyMediumInput.value = String(Math.round((config.anomalyMediumDeviation ?? 0.15) * 100));
+  }
+
+  if (anomalyHighInput) {
+    anomalyHighInput.value = String(Math.round((config.anomalyHighDeviation ?? 0.30) * 100));
+  }
+}
+
+async function saveAnomalyThresholds() {
+  const medium = parseFloat($('anomaly-medium').value);
+  const high = parseFloat($('anomaly-high').value);
+  const msgEl = $('anomaly-thresholds-msg');
+
+  if (isNaN(medium) || isNaN(high)) {
+    msgEl.textContent = 'Valores inválidos';
+    msgEl.style.color = '#f87171';
+    return;
+  }
+  if (medium >= high) {
+    msgEl.textContent = 'La desviación media debe ser menor que la alta';
+    msgEl.style.color = '#f87171';
+    return;
+  }
+
+  try {
+    // Convertir porcentaje (UI) a decimal (backend): 15% -> 0.15
+    await pricingService.updateConfig({
+      anomalyMediumDeviation: medium / 100,
+      anomalyHighDeviation: high / 100
+    });
+    msgEl.textContent = '✓ Umbrales guardados correctamente';
+    msgEl.style.color = '#4ade80';
+    syncPricingConfigFields();
+  } catch (error) {
+    msgEl.textContent = `Error: ${error.message}`;
+    msgEl.style.color = '#f87171';
+  }
+}
+
 /**
  * Protocolo de emergencia (placeholder Sprint 1)
  */
@@ -1687,6 +1735,7 @@ window.loadSafetySummary = loadSafetySummary;
 window.openNewUserModal = openNewUserModal;
 window.createUser = createUser;
 window.updateWeights = updateWeights;
+window.saveAnomalyThresholds = saveAnomalyThresholds;
 window.triggerEmergency = triggerEmergency;
 window.handleLogout = handleLogout;
 window.openTripDetail = openTripDetail;

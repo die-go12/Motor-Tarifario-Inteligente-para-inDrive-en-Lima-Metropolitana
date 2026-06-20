@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { API_BASE_URL } from './config';
 
@@ -9,15 +10,26 @@ export const SECURE_KEYS = {
 };
 
 export const saveToken = async (key: string, value: string) => {
-  await SecureStore.setItemAsync(key, value);
+  if (Platform.OS === 'web') {
+    localStorage.setItem(key, value);
+  } else {
+    await SecureStore.setItemAsync(key, value);
+  }
 };
 
 export const getToken = async (key: string): Promise<string | null> => {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem(key);
+  }
   return await SecureStore.getItemAsync(key);
 };
 
 export const deleteToken = async (key: string) => {
-  await SecureStore.deleteItemAsync(key);
+  if (Platform.OS === 'web') {
+    localStorage.removeItem(key);
+  } else {
+    await SecureStore.deleteItemAsync(key);
+  }
 };
 
 // Cola de peticiones fallidas durante el refresh

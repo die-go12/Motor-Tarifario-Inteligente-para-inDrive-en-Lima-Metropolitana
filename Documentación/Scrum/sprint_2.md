@@ -11,7 +11,7 @@
 
 ### Eventos de Scrum
 - [Daily Scrum](daily_scrum/registro_sprint_2.md)
-- [Sprint Retrospective](retrospective.md) (resumen en la sección 12)
+- [Sprint Retrospective](retrospective2.md) (resumen en la sección 12)
 
 ### Documentos de Ingeniería de Software (complementarios)
 - [Historias de Usuario](../Requerimientos/Historias_usuario.md)

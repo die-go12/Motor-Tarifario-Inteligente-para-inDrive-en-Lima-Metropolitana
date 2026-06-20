@@ -1,0 +1,545 @@
+# Sprint 1 – Fase Pre-Viaje
+
+## Información General
+
+**Proyecto:** Motor Tarifario Inteligente para inDrive en Lima Metropolitana
+
+**Sprint:** Sprint 1
+
+**Período:** 26–30 de mayo de 2026 (presentación: sábado 30 de mayo)
+
+**Objetivo General**
+
+Implementar la fase Pre-Viaje del sistema, permitiendo que un pasajero solicite un viaje, el motor tarifario calcule un rango de precios, ambas partes negocien dentro de dicho rango y finalmente acepten la propuesta para iniciar el trayecto.
+
+---
+
+# Historias de Usuario Incluidas
+
+| ID     | Historia                                | Prioridad |
+| ------ | --------------------------------------- | --------- |
+| US-001 | Solicitud de viaje con cálculo de rango | Alta      |
+| US-002 | Visualización asimétrica del precio     | Alta      |
+| US-003 | Negociación acotada dentro del rango    | Alta      |
+| US-004 | Aceptación bilateral e inicio del viaje | Alta      |
+
+---
+
+# Objetivos del Sprint
+
+Durante este sprint se busca:
+
+* Implementar la solicitud de viajes.
+* Calcular automáticamente el rango tarifario.
+* Integrar datos externos para el cálculo.
+* Mostrar precios de forma asimétrica.
+* Implementar la negociación entre pasajero y conductor.
+* Registrar las ofertas realizadas.
+* Permitir la aceptación bilateral.
+* Iniciar el viaje formalmente.
+* Preparar el sistema para la fase Post-Viaje.
+
+---
+# Aplicación de la Metodología Híbrida
+
+## Scrum
+
+Se define la estructura de trabajo iterativa mediante Sprint 1 y Sprint 2.
+
+### Roles
+
+| Rol              | Responsable                    |
+| ---------------- | ------------------------------ |
+| Product Owner    | Equipo de Proyecto             |
+| Scrum Master     | Coordinador del Equipo         |
+| Development Team | Frontend, Backend, DevOps y QA |
+
+---
+
+## MoSCoW
+
+### Must Have
+
+* Configuración del repositorio GitHub.
+* Configuración de Docker Compose.
+* Configuración de PostgreSQL.
+* Configuración de MongoDB.
+* Configuración de Redis.
+* Definición de arquitectura del sistema.
+* Definición del Product Backlog.
+* Definición de Historias de Usuario.
+
+### Should Have
+
+* Configuración de GitHub Actions.
+* Configuración de Postman.
+
+### Could Have
+
+* Despliegue preliminar en AWS.
+* Monitoreo básico.
+
+### Won't Have
+
+* Modelo de Machine Learning productivo.
+* Integración con sistemas de pago reales.
+
+---
+
+## Domain Driven Design (DDD)
+
+Se identifican los dominios principales del negocio.
+
+### Pricing Domain
+
+Responsable del cálculo tarifario inteligente.
+
+Funciones:
+
+* Cálculo de rango mínimo y máximo.
+* Negociación asistida.
+* Regla de pago.
+
+### Trip Domain
+
+Responsable de la gestión del viaje.
+
+Funciones:
+
+* Solicitud de viaje.
+* Asignación de conductor.
+* Seguimiento GPS.
+* Finalización del trayecto.
+
+### Administration Domain
+
+Responsable de la parametrización del sistema.
+
+Funciones:
+
+* Gestión de reglas.
+* Configuración de pesos.
+* Gestión de multiplicadores.
+
+### Analytics Domain
+
+Responsable de la explotación de datos.
+
+Funciones:
+
+* Reportes.
+* Métricas.
+* Detección de anomalías.
+
+---
+
+## ADR (Architectural Decision Records)
+
+Durante el Sprint 0 se aprueban las siguientes decisiones arquitectónicas:
+
+| ADR     | Decisión                                     |
+| ------- | -------------------------------------------- |
+| ADR-001 | Uso de NestJS para Backend                   |
+| ADR-002 | Uso de React Native para App Móvil           |
+| ADR-003 | Uso de PostgreSQL para datos transaccionales |
+| ADR-004 | Uso de MongoDB para auditoría y trazabilidad |
+| ADR-005 | Uso de Redis para caché y sesiones           |
+| ADR-006 | Uso de Docker Compose para desarrollo local  |
+| ADR-007 | Uso de GitHub Actions para CI/CD             |
+
+---
+# Componentes Desarrollados
+
+## Frontend Móvil
+
+### Tecnologías
+
+* React Native
+* Expo
+* TypeScript
+* React Native Maps / Mapbox
+
+### Funcionalidades
+
+#### Pasajero
+
+* Selección de origen y destino.
+* Solicitud de viaje.
+* Visualización del precio máximo permitido.
+* Envío de ofertas.
+* Aceptación de negociación.
+
+#### Conductor
+
+* Recepción de solicitudes.
+* Visualización del precio mínimo permitido.
+* Envío de contraofertas.
+* Confirmación del viaje.
+
+---
+
+## Backend Base
+
+### Tecnología
+
+* NestJS
+
+### Funcionalidades
+
+#### Gestión de Viajes
+
+* Crear solicitud de viaje.
+* Validar información recibida.
+* Administrar estados del viaje.
+
+Estados:
+
+* Buscando
+* Negociando
+* Asignado
+* En Curso
+* Finalizado
+
+#### Gestión de Usuarios
+
+* Pasajeros
+* Conductores
+
+#### Gestión de Ofertas
+
+* Registro de propuestas.
+* Validación de límites.
+* Confirmación bilateral.
+
+---
+
+## Motor Tarifario Inteligente
+
+### Tecnología
+
+* NestJS
+
+### Funcionalidades
+
+#### CAR-001
+
+Cálculo del rango pre-viaje utilizando:
+
+1. Distancia del trayecto
+2. Precio del combustible
+3. Capacidad del vehículo
+4. Condición del tráfico
+5. Hora del día / demanda zonal
+6. Tiempo estimado del viaje
+7. Histórico de viajes
+
+Resultado:
+
+[minimo, maximo]
+
+> **Nota:** la "demanda" está representada por la variable 5 (hora/demanda zonal). El simulador del panel admin incorpora controles de "oferta" y "demanda" que ajustan ese factor dinámico para visualizar su efecto en el rango. El surge real en tiempo real (oferta/demanda en vivo) queda como trabajo futuro.
+
+---
+
+#### CAR-002
+
+Visualización asimétrica
+
+Pasajero:
+
+* Visualiza únicamente el valor máximo.
+
+Conductor:
+
+* Visualiza únicamente el valor mínimo.
+
+Administrador:
+
+* Visualiza el rango completo.
+
+---
+
+#### CAR-003
+
+Negociación asistida
+
+Características:
+
+* Negociación libre.
+* Validación automática.
+* Restricción al rango permitido.
+* Registro de todas las ofertas.
+
+---
+
+# Integraciones Externas
+
+## Google Maps
+
+Uso:
+
+* Distancia estimada.
+* Tiempo estimado.
+* Coordenadas del trayecto.
+
+Estado:
+
+✅ Mock/stub funcional
+
+---
+
+## OSINERGMIN
+
+Uso:
+
+* Precio de combustible.
+
+Estado:
+
+✅ Mock/stub funcional (dataset local)
+
+---
+
+## API de Tráfico
+
+Uso:
+
+* Congestión vehicular.
+* Condiciones de ruta.
+
+Estado:
+
+✅ Mock/stub funcional (simulado)
+
+---
+
+# Bases de Datos
+
+## PostgreSQL
+
+Almacena:
+
+* Usuarios
+* Conductores
+* Vehículos
+* Viajes
+* Ofertas
+
+Estado:
+
+✅ Disponible mediante Docker
+
+---
+
+## Redis
+
+Almacena:
+
+* Caché de APIs externas
+* Sesiones activas
+* Negociaciones temporales
+
+Estado:
+
+✅ Disponible mediante Docker
+
+---
+
+## MongoDB
+
+Almacena:
+
+* Auditorías
+* Logs
+* Historial tarifario
+
+Estado:
+
+✅ Disponible mediante Docker
+
+---
+
+# Infraestructura DevOps
+
+## Docker Compose
+
+Servicios levantados:
+
+* PostgreSQL
+* MongoDB
+* Redis
+
+Configuraciones implementadas:
+
+* Red privada Docker
+* Persistencia mediante volúmenes
+* Variables de entorno
+* Configuración reproducible
+
+Estado:
+
+✅ Operativo
+
+---
+
+## GitHub
+
+Flujo de trabajo:
+
+* main
+* feature/backend
+* feature/mobile-integration
+* Panel_Admin
+* docker-setup
+
+Pull Requests:
+
+* Revisión obligatoria antes de merge.
+
+Estado:
+
+✅ Operativo
+
+---
+
+# Avance de Tareas
+
+## US-001 – Solicitud de Viaje
+
+| ID     | Tarea                   | Estado |
+| ------ | ----------------------- | ------ |
+| S1-T01 | Endpoint de solicitud          | ✅     |
+| S1-T02 | Integración Google Maps (mock) | ✅     |
+| S1-T03 | Integración OSINERGMIN (mock)  | ✅     |
+| S1-T04 | Cálculo de variables           | ✅     |
+| S1-T05 | Circuit Breaker APIs           | ✅     |
+| S1-T06 | Pruebas                        | 🟡     |
+
+---
+
+## US-002 – Visualización Asimétrica
+
+| ID     | Tarea               | Estado |
+| ------ | ------------------- | ------ |
+| S1-T08 | Vista pasajero (techo)      | ✅     |
+| S1-T09 | Vista conductor (piso)      | ✅     |
+| S1-T10 | Vista administrador (rango) | ✅     |
+| S1-T11 | Pruebas por rol             | 🟡     |
+
+---
+
+## US-003 – Negociación
+
+| ID     | Tarea                 | Estado |
+| ------ | --------------------- | ------ |
+| S1-T12 | Validación de ofertas | ✅     |
+| S1-T13 | Endpoint de ofertas   | ✅     |
+| S1-T14 | Registro de ofertas   | ✅     |
+| S1-T15 | Interfaz negociación  | 🟡     |
+| S1-T16 | Pruebas de límites    | ✅     |
+
+---
+
+## US-004 – Inicio del Viaje
+
+| ID     | Tarea               | Estado |
+| ------ | ------------------- | ------ |
+| S1-T17 | Endpoint aceptación        | ✅     |
+| S1-T18 | Máquina de estados         | ✅     |
+| S1-T19 | Notificaciones (WebSocket) | ✅     |
+| S1-T20 | Captura GPS                | 🟡     |
+| S1-T21 | Flujo completo             | ✅     |
+
+---
+
+# Riesgos del Sprint
+
+* Dependencia de APIs externas.
+* Cuotas de Google Maps.
+* Latencia en servicios externos.
+* Complejidad del cálculo tarifario.
+* Sincronización entre negociación y estados del viaje.
+
+---
+
+# Evidencias del Sprint
+
+## Infraestructura Docker
+
+![Docker Compose](imgs/docker.png)
+
+**Descripción**
+
+Durante este sprint se implementó y validó la infraestructura local del proyecto mediante Docker Compose.
+
+Servicios desplegados:
+
+* PostgreSQL
+* MongoDB
+* Redis
+
+Características implementadas:
+
+* Red privada Docker para comunicación entre servicios.
+* Persistencia de datos mediante volúmenes.
+* Configuración mediante variables de entorno.
+* Entorno reproducible para todos los integrantes del equipo.
+
+Estado: ✅ Operativo
+
+---
+
+## Aplicación Móvil (Versión en Desarrollo)
+
+![Pantalla Principal](imgs/appsecion.jpeg)
+
+**Descripción**
+
+Versión preliminar de la aplicación móvil desarrollada en React Native.
+
+Funcionalidades implementadas parcialmente:
+
+* Navegación entre pantallas.
+* Interfaz inicial para solicitud de viajes.
+* Integración preliminar con el backend.
+
+Estado: 🟡 En desarrollo
+
+---
+
+## Flujo de Solicitud de Viaje
+
+![Solicitud de Viaje](imgs/appinicio.jpeg)
+
+**Descripción**
+
+Pantalla de prueba utilizada para validar el flujo de solicitud de viaje y la interacción con los servicios backend.
+
+Observaciones:
+
+* Existen errores visuales pendientes de corrección.
+* Algunas integraciones aún se encuentran en proceso de implementación.
+* Se utiliza únicamente con fines de validación funcional durante el Sprint 1.
+
+Estado: 🟡 En desarrollo
+
+---
+
+## Conclusiones del Sprint
+
+Durante este sprint se logró establecer la infraestructura base del proyecto y avanzar en el desarrollo de las funcionalidades principales de la fase Pre-Viaje.
+
+Logros alcanzados:
+
+* Infraestructura Docker funcional.
+* Bases de datos operativas.
+* Estructura inicial del backend.
+* Interfaces preliminares del frontend.
+* Integración inicial entre componentes.
+
+Próximo objetivo:
+
+Completar las funcionalidades pendientes contempladas para avanzar a la siguiente fase con el Sprint 2.
+
+Estado General: ✅ Completado (US-001 a US-004)
+

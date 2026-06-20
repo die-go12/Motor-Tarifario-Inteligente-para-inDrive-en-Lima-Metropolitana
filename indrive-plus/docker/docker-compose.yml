@@ -1,49 +1,165 @@
+x-backend-build: &backend-build
+  build:
+    context: ..
+    dockerfile: Dockerfile
+  image: indrive-backend:local
+
 services:
 
   postgres:
     image: postgres:16
     container_name: indrive_postgres
-
     restart: unless-stopped
-
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-
     ports:
       - "${POSTGRES_PORT}:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+      - ../database/postgresql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - indrive_network
 
   mongo:
     image: mongo:7
     container_name: indrive_mongo
-
     restart: unless-stopped
-
     ports:
       - "${MONGO_PORT}:27017"
-
     volumes:
       - mongo_data:/data/db
-
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - indrive_network
 
   redis:
     image: redis:7
     container_name: indrive_redis
-
     restart: unless-stopped
-
     ports:
       - "${REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - indrive_network
 
+  ms-pricing:
+    <<: *backend-build
+    container_name: indrive_ms_pricing
+    restart: unless-stopped
+    command: node dist/apps/ms-pricing/main
+    environment:
+      MS_PRICING_PORT: 3002
+      MONGO_URI: mongodb://mongo:27017/indrive_audit
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      FUEL_PRICE_PER_GALLON: ${FUEL_PRICE_PER_GALLON}
+    ports:
+      - "3002:3002"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - indrive_network
+
+  ms-integration:
+    <<: *backend-build
+    container_name: indrive_ms_integration
+    restart: unless-stopped
+    command: node dist/apps/ms-integration/main
+    environment:
+      MS_INTEGRATION_PORT: 3003
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      FUEL_PRICE_PER_GALLON: ${FUEL_PRICE_PER_GALLON}
+    ports:
+      - "3003:3003"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - indrive_network
+
+  ms-base:
+    <<: *backend-build
+    container_name: indrive_ms_base
+    restart: unless-stopped
+    command: node dist/apps/ms-base/main
+    environment:
+      MS_BASE_PORT: 3001
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES}
+      JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES}
+      MS_PRICING_URL: http://ms-pricing:3002
+      MS_INTEGRATION_URL: http://ms-integration:3003
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ms-pricing:
+        condition: service_started
+      ms-integration:
+        condition: service_started
+    networks:
+      - indrive_network
+
+  api-gateway:
+    <<: *backend-build
+    container_name: indrive_api_gateway
+    restart: unless-stopped
+    command: node dist/apps/api-gateway/main
+    environment:
+      API_GATEWAY_PORT: 3000
+      MS_BASE_URL: http://ms-base:3001
+      MS_PRICING_URL: http://ms-pricing:3002
+    ports:
+      - "3000:3000"
+    depends_on:
+      ms-base:
+        condition: service_started
+      ms-pricing:
+        condition: service_started
+    networks:
+      - indrive_network
+
+  admin-panel:
+    image: nginx:alpine
+    container_name: indrive_admin_panel
+    restart: unless-stopped
+    volumes:
+      - ../../admin-panel:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - api-gateway
     networks:
       - indrive_network
 
@@ -53,5 +169,4 @@ volumes:
 
 networks:
   indrive_network:
-
     driver: bridge

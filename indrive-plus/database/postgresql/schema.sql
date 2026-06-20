@@ -10,7 +10,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
 
     role VARCHAR(20) NOT NULL CHECK (
-        role IN ('passenger', 'driver', 'admin')
+        role IN ('passenger', 'driver', 'admin', 'auditor')
     ),
 
     phone VARCHAR(20) UNIQUE,
@@ -67,6 +67,14 @@ CREATE TABLE vehicles (
     year INT CHECK (
         year >= 2000
         AND year <= EXTRACT(YEAR FROM CURRENT_DATE) + 1
+    ),
+
+    capacity INT CHECK (
+        capacity >= 1
+    ),
+
+    fuel_type VARCHAR(20) CHECK (
+        fuel_type IN ('gasoline', 'diesel', 'gas', 'electric', 'hybrid')
     ),
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -148,6 +156,94 @@ CREATE TABLE trips (
 
 
 
+CREATE TABLE negotiations (
+
+    id SERIAL PRIMARY KEY,
+
+    trip_id INT NOT NULL UNIQUE,
+
+    status VARCHAR(20) NOT NULL CHECK (
+        status IN ('OPEN', 'ACCEPTED', 'REJECTED', 'CANCELLED')
+    ),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_negotiation_trip
+        FOREIGN KEY(trip_id)
+        REFERENCES trips(id)
+        ON DELETE CASCADE
+);
+
+
+
+
+CREATE TABLE offers (
+
+    id SERIAL PRIMARY KEY,
+
+    negotiation_id INT NOT NULL,
+
+    driver_id INT,
+
+    sender VARCHAR(20) NOT NULL CHECK (
+        sender IN ('passenger', 'driver')
+    ),
+
+    amount DECIMAL(10,2) NOT NULL CHECK (
+        amount >= 0
+    ),
+
+    status VARCHAR(20) NOT NULL CHECK (
+        status IN ('PENDING', 'ACCEPTED', 'REJECTED')
+    ),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_offer_negotiation
+        FOREIGN KEY(negotiation_id)
+        REFERENCES negotiations(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_offer_driver
+        FOREIGN KEY(driver_id)
+        REFERENCES users(id)
+        ON DELETE SET NULL
+);
+
+
+
+
+CREATE TABLE payments (
+
+    id SERIAL PRIMARY KEY,
+
+    trip_id INT NOT NULL UNIQUE,
+
+    amount DECIMAL(10,2) NOT NULL CHECK (
+        amount >= 0
+    ),
+
+    real_price DECIMAL(10,2) CHECK (
+        real_price >= 0
+    ),
+
+    condition VARCHAR(20) NOT NULL CHECK (
+        condition IN ('FLOOR', 'WITHIN_RANGE', 'CEILING')
+    ),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_payment_trip
+        FOREIGN KEY(trip_id)
+        REFERENCES trips(id)
+        ON DELETE CASCADE
+);
+
+
+
+
 CREATE INDEX idx_users_role
 ON users(role);
 
@@ -165,3 +261,9 @@ ON tokens(user_id);
 
 CREATE INDEX idx_tokens_type
 ON tokens(token_type);
+
+CREATE INDEX idx_offers_negotiation
+ON offers(negotiation_id);
+
+CREATE INDEX idx_negotiations_trip
+ON negotiations(trip_id);

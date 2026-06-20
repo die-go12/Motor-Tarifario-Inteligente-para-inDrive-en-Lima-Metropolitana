@@ -95,7 +95,7 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
         <Text style={estilos.labelFinal}>Ganancia de este viaje</Text>
         <Text style={estilos.montoFinal}>{formatSoles(viajeActivo.tarifaFinal)}</Text>
         <Text style={estilos.formulaFinal}>
-          Mín. {formatSoles(viajeActivo.tarifa.minimo)} · Máx. {formatSoles(viajeActivo.tarifa.maximo)}
+          Mínimo garantizado: {formatSoles(viajeActivo.tarifa.minimo)}
         </Text>
         <BotonNeon
           titulo="Volver al mapa"

@@ -123,7 +123,7 @@ export const NegotiationScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={estilos.labelFinal}>Total pagado</Text>
           <Text style={estilos.montoFinal}>{formatSoles(viajeActivo.tarifaFinal)}</Text>
           <Text style={estilos.descripcionFinal}>
-            {formatSoles(viajeActivo.tarifa.minimo)} mín. · {formatSoles(viajeActivo.tarifa.maximo)} máx.
+            Máximo garantizado: {formatSoles(viajeActivo.tarifa.maximo)}
           </Text>
           <BotonNeon titulo="Volver al inicio" onPress={() => { reset(); navigation.navigate('PassengerMap'); }} />
         </TarjetaDialogo>

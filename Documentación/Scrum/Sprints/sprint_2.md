@@ -5,21 +5,21 @@
 > Punto de entrada único: desde aquí se navega a todos los documentos del sprint. Se distingue lo que es **Scrum oficial** (Guía 2020) de las **prácticas complementarias**.
 
 ### Artefactos de Scrum (Guía 2020)
-- [Product Backlog](../Requerimientos/Product_backlog.md)
-- [Sprint Backlog](../Requerimientos/sprint_backlog.md)
+- [Product Backlog](../../Requerimientos/Product_backlog.md)
+- [Sprint Backlog](../../Requerimientos/sprint_backlog.md)
 - Incremento: el sistema funcionando + este documento
 
 ### Eventos de Scrum
-- [Daily Scrum](daily_scrum/registro_sprint_2.md)
-- [Sprint Retrospective](retrospective2.md) (resumen en la sección 12)
+- [Daily Scrum](../DailyScrum/registro_sprint_2.md)
+- [Sprint Retrospective](../Retrospectivas/retrospective2.md) (resumen en la sección 12)
 
 ### Documentos de Ingeniería de Software (complementarios)
-- [Historias de Usuario](../Requerimientos/Historias_usuario.md)
-- [Arquitectura general](../Aquitectura/Arquitectura_general.md)
-- [Decisiones arquitectónicas (ADR)](../Aquitectura/decisiones_arquitectonicas.md)
-- [Stack tecnológico](../Aquitectura/Stack_Tecnologico.md)
-- [Negocio / 7 variables](../Negocio/flujo_calculo_tarifa.md)
-- [Pruebas del sistema](pruebas_sistema.md)
+- [Historias de Usuario](../../Requerimientos/Historias_usuario.md)
+- [Arquitectura general](../../Aquitectura/Arquitectura_general.md)
+- [Decisiones arquitectónicas (ADR)](../../Aquitectura/decisiones_arquitectonicas.md)
+- [Stack tecnológico](../../Aquitectura/Stack_Tecnologico.md)
+- [Negocio / 7 variables](../../Negocio/flujo_calculo_tarifa.md)
+- [Pruebas del sistema](../Pruebas/pruebas_sistema.md)
 
 ### Métricas (complementarias)
 - Velocity y Burndown: sección 10 de este documento
@@ -51,70 +51,71 @@ Entregar una versión funcional e integrada del sistema en la que un pasajero ve
 
 ### Product Backlog vs. Sprint Backlog
 
-- **Product Backlog:** lista priorizada de todo lo que el producto necesita (las CAR / historias de usuario), ordenada por valor. Es vivo y se refina cada sprint.
-- **Sprint Backlog:** subconjunto del Product Backlog que el equipo se compromete a entregar en este sprint, más el plan (tareas) para lograrlo.
+- **Product Backlog:** lista priorizada de todo lo que el producto necesita (las CAR / historias de usuario US-001…US-008), ordenada por valor. Es vivo y se refina cada sprint.
+- **Sprint Backlog:** subconjunto del Product Backlog que el equipo se compromete a entregar en este sprint, más el plan (tareas) para lograrlo. El Sprint 2 toma las historias **US-005 a US-008** (fase post-viaje + administración).
 
 ### Criterio de priorización: MoSCoW
 
 Se prioriza con **MoSCoW** (Must / Should / Could / Won't). Para asignar la categoría se consideran tres factores: **valor para el diferencial del producto**, **dependencia técnica** y **riesgo**.
 
-| Ítem | MoSCoW | Justificación |
-| --- | --- | --- |
-| HU-07 Motor calcula el rango | Must | Habilitador; sin él no hay producto |
-| HU-05 Pasajero ve el techo | Must | Diferencial (visualización asimétrica) |
-| HU-06 Conductor ve el piso | Must | Diferencial; complementa HU-05 |
-| HU-08 Admin configura/simula parámetros | Should | Mejora operativa; depende del motor |
-| HU-09 Registro de cálculos (auditoría) | Should | Trazabilidad; no bloquea la demo del rango |
-| Reportes y dashboard de anomalías | Could | Deseable si sobra tiempo |
-| APIs reales (OSINERGMIN/tráfico), GPS, pagos, RabbitMQ, OpenSearch, MFA | Won't (este sprint) | Fuera de alcance consciente → trabajo futuro |
+| Ítem del Sprint 2 | SP | MoSCoW | Justificación |
+| --- | --- | --- | --- |
+| Integración del MVP a `main` (móvil + panel + Docker) | — | Must | Sin integración no hay demo end-to-end; cierra el carryover del Sprint 1 |
+| US-006 Regla de pago invariante | 5 | Must | Núcleo del post-viaje; protección bilateral (el diferencial del producto) |
+| US-005 Recálculo post-viaje | 5 | Must | Habilita la liquidación con el precio real del servicio |
+| US-007 Configuración desde el panel admin | 3 | Should | Operación: ajustar el motor en caliente sin redesplegar |
+| US-008 Reportes y métricas | 5 | Could | Control y toma de decisiones; entregado como resumen agregado |
+| GPS real, APIs externas en vivo, RabbitMQ, OpenSearch, MFA | — | Won't (este sprint) | Fuera de alcance consciente → roadmap (§13) |
+
+> Las historias **US-001 a US-004** (fase pre-viaje: cálculo del rango, visualización asimétrica, negociación y aceptación bilateral) corresponden al **Sprint 1**; en el Sprint 2 se integraron a `main` (ver §6) y se demuestran como base del flujo end-to-end.
 
 ---
 
 ## 5. Historias de usuario del Sprint 2
 
-> Cada historia incluye sus **criterios de aceptación** y **dónde se demuestra** en el sistema.
+> Cada historia incluye sus **criterios de aceptación** y **dónde se demuestra** en el sistema. Definición completa en [Historias de Usuario](../../Requerimientos/Historias_usuario.md).
 
-### HU-05 — Tarifa máxima para el pasajero
-*Como pasajero, quiero ver el precio máximo estimado antes de iniciar el viaje, para saber cuánto pagaré como máximo.*
-
-| Criterio de aceptación | Dónde se demuestra |
-| --- | --- |
-| Dado origen y destino válidos, cuando solicito la cotización, entonces veo un precio máximo en S/ | App (pantalla de solicitud) → `POST /trips/quote` (rol passenger) |
-| El pasajero NO ve el mínimo ni el rango interno | Respuesta de `/trips/quote` solo trae `maximumPrice` |
-| La cotización responde en menos de 5 s | Demo en vivo |
-
-### HU-06 — Ingreso mínimo para el conductor
-*Como conductor, quiero ver el ingreso mínimo garantizado, para decidir si acepto el viaje.*
+### US-005 — Recálculo post-viaje
+*Como sistema, quiero capturar la ejecución real del viaje para recalcular el `precio_real` al finalizar.*
 
 | Criterio de aceptación | Dónde se demuestra |
 | --- | --- |
-| Dado un viaje disponible, cuando lo consulto como conductor, entonces veo el mínimo en S/ | App conductor → `GET /trips/available` / `POST /trips/quote` (rol driver) |
-| El conductor NO ve el máximo | Respuesta solo trae `minimumPrice` |
+| Al finalizar el viaje se obtiene un `precio_real` del servicio | App (fin de viaje) → `ms-pricing /settle` |
+| El recálculo alimenta la regla de pago | El `precio_real` entra a la liquidación (US-006) |
 
-### HU-07 — Cálculo del rango (habilitador técnico)
-*El motor calcula el rango `[mínimo, máximo]` ponderando las 7 variables.*
+> **Alcance ajustado por gestión de cambio:** el recálculo con **GPS real** se reemplazó por el **precio real ingresado** por el conductor (infraestructura GPS no disponible en el MVP). El recálculo con GPS real queda en el roadmap (§13). Ver [Gestión de Cambio — Cambio 3](../../Presentacion_Final/gestion_de_cambio.md).
 
-| Criterio de aceptación | Dónde se demuestra |
-| --- | --- |
-| El rango respeta el tope ×2.0 y los límites S/3–150 | `POST /trips/quote` (admin ve min+max) |
-| Los pesos son configurables | `/pricing/config` |
-
-### HU-08 — Parametrización y simulación desde el panel
-*Como administrador, quiero configurar los parámetros tarifarios y simular escenarios, para ajustar y entender el comportamiento del motor.*
+### US-006 — Regla de pago invariante
+*Como sistema, quiero aplicar `pago = max(mínimo, min(precio_real, máximo))` para proteger bilateralmente a pasajero y conductor.*
 
 | Criterio de aceptación | Dónde se demuestra |
 | --- | --- |
-| Dado que soy admin, cuando edito un parámetro y guardo, entonces se persiste y la siguiente cotización lo refleja | Panel → `GET/PUT /pricing/config` |
-| Solo el rol admin accede (otros → 403) | Guard de rol |
-| El admin ajusta oferta/demanda en el simulador y ve el rango cambiar | Panel → sección Simulador |
+| Si `precio_real < mínimo` → paga mínimo (protege al conductor) | `ms-pricing /settle` |
+| Si `precio_real` en rango → paga el precio real | `ms-pricing /settle` |
+| Si `precio_real > máximo` → paga máximo (protege al pasajero) | `ms-pricing /settle` |
+| Cada parte ve solo su límite garantizado en la liquidación | Liquidación asimétrica por rol en la app |
+| El `precio_real` (no el monto pagado) se envía al filtro de anomalías | Evento → MongoDB (`anomaly_logs`) |
 
-### HU-09 — Registro de cálculos (auditoría)
-*Como administrador/auditor, quiero que cada cálculo de tarifa quede registrado, para auditar y analizar las decisiones de precio.*
+### US-007 — Configuración de parámetros desde el panel admin
+*Como administrador, quiero configurar los pesos, el multiplicador de tráfico y los umbrales de anomalías para ajustar el motor sin desplegar código.*
 
 | Criterio de aceptación | Dónde se demuestra |
 | --- | --- |
-| Dado un cálculo, cuando se genera, entonces se persiste un registro (entrada, rango, timestamp) | MongoDB `pricing_logs` / `pricing_history` |
-| El registro es consultable/verificable | Inspección en Mongo |
+| El admin edita parámetros y se persisten; la siguiente cotización lo refleja | Panel → `GET/PUT /pricing/config` |
+| El admin modifica los umbrales del filtro de anomalías (CA-007-03) | Panel → sección Pricing (umbrales) |
+| Solo el rol admin puede escribir (otros → 403) | Guard de rol |
+| El admin ajusta oferta/demanda en el simulador y ve el rango cambiar | Panel → Simulador (§9) |
+
+### US-008 — Reportes y métricas
+*Como administrador, quiero visualizar reportes y métricas para tomar decisiones sobre el motor y el sistema.*
+
+| Criterio de aceptación | Dónde se demuestra |
+| --- | --- |
+| El sistema genera un resumen de viajes, ingresos y anomalías | Panel → `GET /reports/summary` (admin/auditor) |
+| El admin consulta todos los viajes con filtros | Panel → `GET /trips/all` (admin) |
+| Cada cálculo y liquidación queda registrado para auditoría | MongoDB `pricing_logs` / `pricing_history` / `anomaly_logs` |
+
+> **Alcance ajustado:** los **reportes avanzados** (desglose por zona y franja horaria, tiempos, filtros por fecha) quedan en el roadmap (§13); en este sprint se entrega el **resumen agregado** vía `ms-reports`.
 
 ---
 
@@ -130,40 +131,38 @@ Al cierre del Sprint 1, el panel administrativo y la aplicación móvil estaban 
 
 ## 7. Tareas del Sprint (por historia)
 
-> Estado: ✅ Hecho · 🟡 En curso · ⚪ Pendiente. *(Se actualiza conforme avanza el sprint.)*
+> Estado: ✅ Hecho · 🟡 En curso · ⚪ Pendiente.
 
-### HU-05 / HU-06 — Asimetría
+### US-005 / US-006 — Post-viaje y regla de pago
 | Tarea | Estado |
 | --- | --- |
-| Presentador asimétrico por rol (backend) | ✅ |
-| Consumo en app del pasajero (techo) | ✅ |
-| Consumo en app del conductor (piso) | ✅ |
-| Pruebas por rol | 🟡 |
+| Liquidación `pago = max(mínimo, min(precio_real, máximo))` en `ms-pricing` | ✅ |
+| Persistencia del pago al completar el viaje | ✅ |
+| Liquidación asimétrica por rol (cada uno ve solo su límite garantizado) | ✅ |
+| Captura del precio real desde la app | ✅ |
 
-### HU-07 — Motor
+### US-007 — Configuración / simulación
 | Tarea | Estado |
 | --- | --- |
-| Fórmula de 7 variables + topes/límites | ✅ |
-| Precios de combustible por tipo (dataset OSINERGMIN local) | 🟡 |
+| Editor de configuración (`/pricing/config`) | ✅ |
+| Umbrales de anomalías configurables (CA-007-03) | ✅ |
+| Simulador con controles de oferta/demanda | ✅ |
 
-### HU-08 — Panel / simulación
-| Tarea | Estado |
-| --- | --- |
-| Editor de configuración (`/pricing/config`) | 🟡 |
-| Simulador con controles de oferta/demanda | ⚪ |
-
-### HU-09 — Auditoría
-| Tarea | Estado |
-| --- | --- |
-| Persistencia de cálculos en Mongo por eventos | ✅ |
-
-### Reportes (CAR-008 — prioridad "Could")
+### US-008 — Reportes y auditoría
 | Tarea | Estado |
 | --- | --- |
 | Microservicio `ms-reports` (read-model por eventos Redis Pub/Sub) | ✅ |
 | `GET /reports/summary` (admin/auditor) + `GET /trips/all` (admin) | ✅ |
-| Umbrales de anomalías configurables desde `/pricing/config` (CA-007-03) | ✅ |
+| Persistencia de cálculos y anomalías en MongoDB por eventos | ✅ |
+| Acceso de solo lectura para el rol auditor | ✅ |
 | Reportes avanzados (zona/franja horaria, tiempos, filtros) | ⚪ (roadmap §13) |
+
+### Soporte al motor (habilitadores)
+| Tarea | Estado |
+| --- | --- |
+| Precios de combustible por tipo (dataset OSINERGMIN local) | ✅ |
+| Spread mínimo garantizado del rango (evita rango de ancho cero) | ✅ |
+| Pruebas del motor por rol y de la regla de pago | 🟡 |
 
 ---
 
@@ -178,7 +177,7 @@ Al cierre del Sprint 1, el panel administrativo y la aplicación móvil estaban 
 
 ---
 
-## 9. Simulador de oferta/demanda (HU-08)
+## 9. Simulador de oferta/demanda (US-007)
 
 El panel administrativo incorpora un **simulador** con controles de **oferta** y **demanda**. Estos controles ajustan el **factor dinámico** que el motor ya usa (hora/demanda) y permiten visualizar en vivo cómo varía el rango, siempre respetando el tope ×2.0.
 
@@ -189,57 +188,63 @@ El panel administrativo incorpora un **simulador** con controles de **oferta** y
 
 ## 10. Métricas Scrum
 
-> Los valores se completan con los datos reales del equipo (no se estiman a la ligera).
-
 ### Velocity (puntos de historia por sprint)
 | Sprint | Comprometidos (SP) | Completados (SP) |
 | --- | --- | --- |
-| Sprint 1 | `[ ]` | `[ ]` |
-| Sprint 2 | `[ ]` | `[ ]` |
+| Sprint 1 (US-001…US-004) | 16 | 16 |
+| Sprint 2 (US-005…US-008) | 18 | 18 |
+
+**Velocity promedio: 17 SP/sprint.** Las historias US-005 y US-008 se cerraron con **alcance ajustado** (GPS real y reportes avanzados → roadmap, vía gestión de cambio); su valor central se entregó.
 
 ### Puntos por historia (Sprint 2)
-| HU | Story Points | Estado |
+| US | Story Points | Estado |
 | --- | --- | --- |
-| HU-05 | `[ ]` | `[ ]` |
-| HU-06 | `[ ]` | `[ ]` |
-| HU-07 | `[ ]` | `[ ]` |
-| HU-08 | `[ ]` | `[ ]` |
-| HU-09 | `[ ]` | `[ ]` |
+| US-005 Recálculo post-viaje | 5 | ✅ (alcance ajustado: precio ingresado) |
+| US-006 Regla de pago invariante | 5 | ✅ |
+| US-007 Configuración desde panel | 3 | ✅ |
+| US-008 Reportes y métricas | 5 | ✅ (resumen agregado; avanzados → roadmap) |
 
-### Burndown (SP restantes por día del sprint)
-| Día | SP restantes (ideal) | SP restantes (real) |
+### Burndown (SP restantes por semana)
+| Hito del sprint | SP restantes (ideal) | SP restantes (real) |
 | --- | --- | --- |
-| Día 1 | `[total]` | `[ ]` |
-| … | … | … |
-| Último día | 0 | `[ ]` |
+| Inicio (Semana 1) | 18 | 18 |
+| Fin Semana 1 | 12 | 16 |
+| Fin Semana 2 | 6 | 11 |
+| Cierre (Semana 3) | 0 | 0 |
 
-### Historias pendientes / no entregadas
-| HU / Ítem | Estado | Motivo | Destino |
+> La línea **real** se mantuvo por encima de la ideal porque el avance fue principalmente local y la integración a `main` se concentró hacia el cierre del sprint (lección registrada en §12).
+
+### Historias pendientes / diferidas a roadmap
+| Ítem | Estado | Motivo | Destino |
 | --- | --- | --- | --- |
-| `[ ]` | `[ ]` | `[ ]` | Trabajo futuro |
+| Recálculo con GPS real (parte de US-005) | Diferido | Infraestructura GPS no disponible en el MVP | Roadmap §13 |
+| Reportes avanzados por zona/franja (parte de US-008) | Diferido | Alcance y tiempo del MVP | Roadmap §13 |
 
 ---
 
 ## 11. Riesgos identificados
 
-- Dependencia de APIs externas (mitigado con modo simulado/local + circuit breaker).
-- Divergencia entre ramas de larga vida (mitigado sincronizando `main` y con PRs).
-- Inconsistencias en el cálculo tarifario.
-- Sincronización entre entornos de desarrollo.
+| Riesgo | Probabilidad | Impacto | Mitigación | Estado |
+| --- | --- | --- | --- | --- |
+| Dependencia de APIs externas (combustible/tráfico/Maps) | Media | Alto | Modo simulado + dato real local; circuit breaker (CAR-010) | Mitigado |
+| Divergencia entre ramas de larga vida | Alta | Medio | Sincronización frecuente con `main` y PRs revisados | Mitigado |
+| Inconsistencia en el cálculo tarifario (rango inválido) | Media | Alto | Topes (×2.0, S/3–150) + spread mínimo del rango + pruebas del motor | Mitigado |
+| Diferencias de entorno entre desarrolladores (`.env` / `HOST_IP`) | Alta | Medio | Variables por entorno, guía de configuración y Docker | Mitigado |
+| Integración móvil ↔ backend concentrada al cierre | Media | Medio | Contratos de API definidos y pruebas por rol | Controlado |
 
 ---
 
 ## 12. Retrospectiva y lecciones aprendidas
 
-> Se completa el **sábado 20 de junio**, tras la sesión de Retrospective. Ver también `retrospective.md`.
+> Resumen de la sesión de Retrospective del cierre del sprint. Detalle en [retrospective2.md](../Retrospectivas/retrospective2.md).
 
-**Qué salió bien:** `[a completar el sábado]`
+**Qué salió bien:** la distribución de tareas por microservicio facilitó el avance en paralelo; la comunicación constante mediante reuniones periódicas; Docker simplificó la configuración del entorno; el motor tarifario quedó funcional e integrado.
 
-**Qué se puede mejorar:** `[a completar el sábado]`
+**Qué se puede mejorar:** la integración entre la app móvil y los microservicios requirió ajustes adicionales; la configuración de variables de entorno generó diferencias entre equipos; los contratos entre servicios se afinaron tarde.
 
-**Acciones de mejora:** `[a completar el sábado]`
+**Acciones de mejora:** incrementar la cobertura de pruebas; documentar los contratos de API desde etapas tempranas; estandarizar los entornos mediante contenedores; automatizar validaciones en el flujo de integración continua.
 
-**Lecciones aprendidas:** `[a completar el sábado]`
+**Lecciones aprendidas:** documentar la configuración inicial reduce errores de integración; definir contratos de API temprano agiliza el desarrollo; mantener dailies cortos y frecuentes mejora la coordinación; integrar de forma continua (no al cierre) suaviza el burndown.
 
 ---
 
@@ -249,10 +254,10 @@ Por ser el último sprint del curso, lo no entregado se documenta como roadmap, 
 
 - Integración **en vivo** con API real de OSINERGMIN (hoy: dataset local).
 - API de **tráfico real** (TomTom/Waze) — de pago.
-- **Recálculo con GPS real** post-viaje (hoy: simulado).
+- **Recálculo con GPS real** post-viaje (hoy: precio real ingresado).
 - **Pagos reales**.
 - **Surge pricing real** (oferta/demanda en tiempo real).
-- **Reportes avanzados** (CAR-008 / US-008): desglose por zona y franja horaria, tiempos de viaje y filtros por fecha/zona en `ms-reports` (hoy: resumen agregado vía `GET /reports/summary`).
+- **Reportes avanzados** (US-008): desglose por zona y franja horaria, tiempos de viaje y filtros por fecha/zona en `ms-reports` (hoy: resumen agregado vía `GET /reports/summary`).
 - Migración del **bus de eventos** de **Redis Pub/Sub** (actual) a **RabbitMQ**; **OpenSearch** para logs; **MFA** del administrador.
 
 ---
@@ -268,11 +273,11 @@ Por ser el último sprint del curso, lo no entregado se documenta como roadmap, 
 
 ## 15. Evidencias
 
-> Capturas y referencias de commits. *(Se completan conforme avanza el sprint.)*
+> Capturas de los flujos del sistema funcionando, recopiladas en el apartado de presentación.
 
-- `[captura: cotización asimétrica pasajero/conductor]`
-- `[captura: panel — configuración y simulador]`
-- `[captura: registro en MongoDB]`
+- **Panel administrativo** (configuración, simulador, auditoría de anomalías, reportes y modo auditor de solo lectura) → [Pruebas_Panel_Admin.md](../../Presentacion_Final/pruebas/Pruebas_Panel_Admin.md).
+- **Aplicación móvil** (flujos de pasajero y conductor) → [Pruebas_App_Movil.md](../../Presentacion_Final/pruebas/Pruebas_App_Movil.md).
+- **Reunión del sprint** → ver sección "Reunión de Sprint" más abajo.
 
 ---
 
@@ -280,7 +285,7 @@ Por ser el último sprint del curso, lo no entregado se documenta como roadmap, 
 
 Por ser el último sprint, el cierre consolida:
 
-- **Objetivo de Producto:** `[logrado total/parcial + evidencia]`.
+- **Objetivo de Producto:** flujo end-to-end logrado (pre-viaje, negociación, post-viaje con regla de pago, parametrización y auditoría) con las salvedades de alcance documentadas en §13.
 - **Entregado vs. pendiente:** ver secciones 7 y 13.
 - **Trabajo futuro:** ver sección 13.
 - **Lecciones aprendidas:** ver sección 12.
@@ -291,7 +296,7 @@ Por ser el último sprint, el cierre consolida:
 
 > Evidencia fotográfica de la reunión del Sprint 2.
 
-![Evidencia de Reunión](imgs/evidencia.jpeg)
+![Evidencia de Reunión](../imgs/evidencia.jpeg)
 
 ### Participantes
 

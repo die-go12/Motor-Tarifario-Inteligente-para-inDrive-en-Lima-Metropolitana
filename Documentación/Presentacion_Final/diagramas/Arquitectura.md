@@ -127,16 +127,16 @@ A continuación se consolidan las actividades del último ciclo de desarrollo t�
 | **RS-25**| CAR-009 | Integración nativa con SDK de Google Maps | `LISTO` |
 | **RS-30**| CAR-010 | Configuración de orquestación local con Stack Docker Compose completo | `LISTO` |
 | **RS-38**| - | Consolidación y cierre de métricas Scrum del ciclo | `LISTO` |
-| **RS-17**| US-007 | Formulario dinámico para parametrización de umbrales | `EN CURSO` |
+| **RS-17**| US-007 | Formulario dinámico para parametrización de umbrales | `LISTO` |
 | **RS-31**| - | Integración de cambios de Docker Compose a la rama principal `main` | `EN CURSO` |
 | **RS-37**| - | Levantamiento de evidencias, matriz de riesgos y apoyo en base de datos | `EN CURSO` |
 | **RS-9** | US-007 | Configuración de Umbrales de anomalía dinámicos en backend | `EN REVISIÓN` |
 | **RS-10**| - | Elaboración de documentación técnica de arquitectura y endpoints | `EN REVISIÓN` |
 | **RS-18**| HU-08 | Implementación del simulador avanzado de oferta y demanda | `EN REVISIÓN` |
-| **RS-19**| - | Integración y merge final de la rama `Panel_Admin` con `main` | `EN REVISIÓN` |
+| **RS-19**| - | Integración y merge final de la rama `Panel_Admin` con `main` | `LISTO` |
 | **RS-26**| - | Fase de pruebas para la integración bidireccional mediante WebSockets | `EN REVISIÓN` |
 | **RS-27**| - | Sincronización y resolución de conflictos de la rama móvil con `main` | `EN REVISIÓN` |
-| **RS-32**| CAR-008 | Incorporación del servicio `ms-reports` al entorno local de compose | `EN REVISIÓN` |
+| **RS-32**| CAR-008 | Incorporación del servicio `ms-reports` al entorno local de compose | `LISTO` |
 | **RS-33**| Docker-002| Configuración de Healthchecks de servicios e integración continua | `EN REVISIÓN` |
 | **RS-34**| HU-05/06 | Ejecución de pruebas integrales segmentadas por rol de usuario | `EN REVISIÓN` |
 | **RS-35**| CAR-004 | Validación exhaustiva del motor de reglas de pago | `EN REVISIÓN` |

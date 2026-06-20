@@ -163,14 +163,36 @@ El viaje inicia solo cuando ambas partes aceptan el precio final.
 
 ---
 
+## Backlog Pendiente (Roadmap post-MVP)
+
+> En Scrum, el Product Backlog conserva el **trabajo que aún falta**, ordenado por valor. Las historias entregadas (US-001…US-008) se liberaron al **Incremento**; los siguientes ítems quedan como backlog pendiente para después del MVP (no hay Sprint 3 en el curso).
+
+| Orden | Ítem (PBI) | Tipo | CAR / Origen | Valor |
+|----|------|------|------|------|
+| 1 | Recálculo post-viaje con **GPS real** (hoy: precio ingresado) | Funcional | CAR-004 / US-005 | Alto |
+| 2 | **Reportes avanzados**: desglose por zona y franja horaria, tiempos, filtros | Funcional | CAR-008 / US-008 | Alto |
+| 3 | **Surge pricing real** (oferta/demanda en tiempo real) | Funcional | CAR-001 | Medio |
+| 4 | Integración **en vivo** con API real de OSINERGMIN | Técnico | CAR-009 | Medio |
+| 5 | API de **tráfico real** (TomTom/Waze) | Técnico | CAR-009 | Medio |
+| 6 | **Pagos reales** | Funcional | CAR-004 | Medio |
+| 7 | Migración del bus de eventos **Redis Pub/Sub → RabbitMQ** | Técnico | ADR-005 | Medio |
+| 8 | **OpenSearch** para logs y trazabilidad | Técnico | CAR-007 | Bajo |
+| 9 | **MFA** del administrador | Técnico (seguridad) | CAR-006 | Bajo |
+
+> Justificación de estos diferimientos en [Sprint 2 §13](../Scrum/Sprints/sprint_2.md) y en la [Gestión de Cambio](../Presentacion_Final/gestion_de_cambio.md).
+
+---
+
 ## Resumen del Product Backlog
 
 | Métrica | Valor |
 |--------|------|
-| Total historias | 8 |
-| Sprint 1 | 4 historias |
-| Sprint 2 | 4 historias |
-| Total Story Points | 34 |
+| Historias liberadas al Incremento (US-001…US-008) | 8 (34 SP) |
+| — entregadas en Sprint 1 (pre-viaje) | 4 (16 SP) |
+| — entregadas en Sprint 2 (post-viaje + admin) | 4 (18 SP) |
+| Ítems pendientes en el backlog (roadmap post-MVP) | 9 |
+
+> **Estado del backlog al cierre:** las 8 historias del MVP están **liberadas al Incremento** (cumplen la Definition of Done); el Product Backlog conserva los **9 ítems de roadmap** como trabajo pendiente, ordenado por valor.
 
 ---
 

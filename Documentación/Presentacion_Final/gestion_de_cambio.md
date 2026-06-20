@@ -3,7 +3,19 @@
 > Registro **formal** de los cambios gestionados durante el desarrollo del MVP, siguiendo el proceso:
 > **Identificación → Análisis de impacto → Evaluación y aprobación → Implementación → Seguimiento y validación.**
 >
-> Este documento cubre el **proceso de cambio** (cómo se gestionó cada cambio). La lista de funcionalidades futuras (roadmap) está en [Sprint 2 §13](../Scrum/sprint_2.md).
+> Este documento cubre el **proceso de cambio** (cómo se gestionó cada cambio). La lista de funcionalidades futuras (roadmap) está en [Sprint 2 §13](../Scrum/Sprints/sprint_2.md).
+
+---
+
+## Resumen de cambios gestionados
+
+| # | Cambio | De → A | Estado |
+| --- | --- | --- | --- |
+| 1 | Fuentes externas | APIs en vivo → dato real local + tráfico simulado | Implementado |
+| 2 | Bus de eventos | RabbitMQ → Redis Pub/Sub | Implementado |
+| 3 | Recálculo post-viaje | GPS real → precio real ingresado | Implementado |
+| 4 | Alcance de servicios | ~7 servicios + OpenSearch/MFA → 4 + API Gateway | Implementado |
+| 5 | Rango de negociación | Rango de ancho cero → spread mínimo garantizado | Implementado |
 
 ---
 
@@ -34,3 +46,10 @@
 3. **Evaluación y aprobación:** se aprueba consolidar en **4 microservicios de negocio + API Gateway**: anomalías y logs viven dentro de `ms-pricing` (auditoría) y los reportes en `ms-reports`. OpenSearch, MFA y el split adicional quedan diferidos.
 4. **Implementación:** `api-gateway`, `ms-base`, `ms-pricing`, `ms-integration`, `ms-reports` operativos y orquestados con Docker.
 5. **Seguimiento y validación:** sistema funcional end-to-end. Servicios e infraestructura restantes = roadmap.
+
+## Cambio 5 — Negociación: rango de ancho cero → spread mínimo garantizado
+1. **Identificación:** cuando los multiplicadores dinámicos (tráfico/hora/tiempo) eran 1.0, el motor producía un rango con **máximo igual al mínimo** (ancho cero); la negociación se rompía porque ninguna oferta podía caer dentro de `[X, X]`.
+2. **Análisis de impacto:** afecta CAR-003 (negociación acotada). Sin una banda de precio no hay margen de negociación válido entre pasajero y conductor.
+3. **Evaluación y aprobación:** se aprueba garantizar un **spread mínimo del rango** mediante un parámetro configurable (`minRangeRatio`, 20 % por defecto), respetando los topes existentes (×2.0, límites S/3–150 y ratio máximo ×3.5).
+4. **Implementación:** `ms-pricing` calcula el máximo con un piso `máximo ≥ mínimo × minRangeRatio`; el parámetro vive en la configuración dinámica del motor.
+5. **Seguimiento y validación:** las pruebas del motor cubren el caso sin *surge*; el rango siempre conserva una banda de negociación.

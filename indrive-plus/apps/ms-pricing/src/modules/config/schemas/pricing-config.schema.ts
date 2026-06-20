@@ -40,6 +40,12 @@ export class PricingConfig {
 
   @Prop({ required: true })
   maxRangeRatio: number;
+
+  @Prop({ required: true })
+  anomalyMediumDeviation: number;
+
+  @Prop({ required: true })
+  anomalyHighDeviation: number;
 }
 
 export const PricingConfigSchema = SchemaFactory.createForClass(PricingConfig);

@@ -17,6 +17,8 @@ const DEFAULT_CONFIG: PricingConfig = {
   minAbsoluteFare: 3.0,
   maxAbsoluteFare: 150.0,
   maxRangeRatio: 3.5,
+  anomalyMediumDeviation: 0.2,
+  anomalyHighDeviation: 0.5,
 };
 
 @Injectable()
@@ -29,7 +31,7 @@ export class PricingConfigService {
   async getActive(): Promise<PricingConfig> {
     const existing = await this.configModel.findOne().lean();
     if (existing) {
-      return existing;
+      return { ...DEFAULT_CONFIG, ...existing };
     }
     return this.configModel.create(DEFAULT_CONFIG);
   }

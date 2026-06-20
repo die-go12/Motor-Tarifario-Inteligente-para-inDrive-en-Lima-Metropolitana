@@ -11,9 +11,6 @@ import { EventsPublisher } from '../audit/events.publisher';
 import { PricingConfig } from '../config/schemas/pricing-config.schema';
 import { PricingConfigService } from '../config/pricing-config.service';
 
-const ANOMALY_HIGH_DEVIATION = 0.5;
-const ANOMALY_MEDIUM_DEVIATION = 0.2;
-
 @Injectable()
 export class PricingService {
   private readonly logger = new Logger(PricingService.name);
@@ -81,7 +78,7 @@ export class PricingService {
     return Math.max(minimumPrice, cappedMaximum);
   }
 
-  settle(request: SettleRequest): PriceSettlement {
+  async settle(request: SettleRequest): Promise<PriceSettlement> {
     const { minimumPrice, maximumPrice, realPrice } = request;
     const finalPrice = this.round(
       Math.max(minimumPrice, Math.min(realPrice, maximumPrice)),
@@ -95,11 +92,12 @@ export class PricingService {
       finalPrice,
       settledAt: new Date().toISOString(),
     });
-    this.detectAnomaly(request);
+    const config = await this.pricingConfigService.getActive();
+    this.detectAnomaly(request, config);
     return { finalPrice };
   }
 
-  private detectAnomaly(request: SettleRequest): void {
+  private detectAnomaly(request: SettleRequest, config: PricingConfig): void {
     const { minimumPrice, maximumPrice, realPrice, tripId } = request;
     const deviation = this.outOfRangeDeviation(
       minimumPrice,
@@ -112,7 +110,7 @@ export class PricingService {
     this.emit(PricingChannel.ANOMALY, {
       tripId,
       anomalyType: 'PRICE_OUTLIER',
-      severity: this.severityFor(deviation),
+      severity: this.severityFor(deviation, config),
       realPrice,
       minimumPrice,
       maximumPrice,
@@ -135,11 +133,14 @@ export class PricingService {
     return 0;
   }
 
-  private severityFor(deviation: number): AnomalySeverity {
-    if (deviation >= ANOMALY_HIGH_DEVIATION) {
+  private severityFor(
+    deviation: number,
+    config: PricingConfig,
+  ): AnomalySeverity {
+    if (deviation >= config.anomalyHighDeviation) {
       return AnomalySeverity.HIGH;
     }
-    if (deviation >= ANOMALY_MEDIUM_DEVIATION) {
+    if (deviation >= config.anomalyMediumDeviation) {
       return AnomalySeverity.MEDIUM;
     }
     return AnomalySeverity.LOW;

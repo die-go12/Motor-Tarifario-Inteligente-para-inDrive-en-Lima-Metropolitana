@@ -16,6 +16,8 @@ const DEFAULT_CONFIG = {
   minAbsoluteFare: 3.0,
   maxAbsoluteFare: 150.0,
   maxRangeRatio: 3.5,
+  anomalyMediumDeviation: 0.2,
+  anomalyHighDeviation: 0.5,
 };
 
 const baseRequest = {
@@ -87,24 +89,23 @@ describe('PricingService', () => {
   describe('settle', () => {
     const range = { minimumPrice: 11.65, maximumPrice: 17.81 };
 
-    it('respeta el precio real cuando está dentro del rango', () => {
-      expect(service.settle({ ...range, realPrice: 16.5 }).finalPrice).toBe(
-        16.5,
-      );
+    it('respeta el precio real cuando está dentro del rango', async () => {
+      const settlement = await service.settle({ ...range, realPrice: 16.5 });
+      expect(settlement.finalPrice).toBe(16.5);
     });
 
-    it('eleva al piso cuando el precio real está por debajo', () => {
-      expect(service.settle({ ...range, realPrice: 8 }).finalPrice).toBe(11.65);
+    it('eleva al piso cuando el precio real está por debajo', async () => {
+      const settlement = await service.settle({ ...range, realPrice: 8 });
+      expect(settlement.finalPrice).toBe(11.65);
     });
 
-    it('limita al techo cuando el precio real está por encima', () => {
-      expect(service.settle({ ...range, realPrice: 25 }).finalPrice).toBe(
-        17.81,
-      );
+    it('limita al techo cuando el precio real está por encima', async () => {
+      const settlement = await service.settle({ ...range, realPrice: 25 });
+      expect(settlement.finalPrice).toBe(17.81);
     });
 
-    it('publica una anomalía con el detalle del rango y la desviación', () => {
-      service.settle({ ...range, realPrice: 40 });
+    it('publica una anomalía con el detalle del rango y la desviación', async () => {
+      await service.settle({ ...range, realPrice: 40 });
       expect(publisher.publish).toHaveBeenCalledWith(
         'anomaly.detected',
         expect.objectContaining({
@@ -117,18 +118,18 @@ describe('PricingService', () => {
       );
     });
 
-    it('clasifica la severidad según la desviación fuera del rango', () => {
-      service.settle({ ...range, realPrice: 19 });
-      service.settle({ ...range, realPrice: 23 });
-      service.settle({ ...range, realPrice: 40 });
+    it('clasifica la severidad según la desviación fuera del rango', async () => {
+      await service.settle({ ...range, realPrice: 19 });
+      await service.settle({ ...range, realPrice: 23 });
+      await service.settle({ ...range, realPrice: 40 });
       const severities = publisher.publish.mock.calls
         .filter(([channel]) => channel === 'anomaly.detected')
         .map(([, payload]) => (payload as { severity: string }).severity);
       expect(severities).toEqual(['LOW', 'MEDIUM', 'HIGH']);
     });
 
-    it('no publica anomalía cuando el precio real está dentro del rango', () => {
-      service.settle({ ...range, realPrice: 16.5 });
+    it('no publica anomalía cuando el precio real está dentro del rango', async () => {
+      await service.settle({ ...range, realPrice: 16.5 });
       expect(publisher.publish).not.toHaveBeenCalledWith(
         'anomaly.detected',
         expect.anything(),

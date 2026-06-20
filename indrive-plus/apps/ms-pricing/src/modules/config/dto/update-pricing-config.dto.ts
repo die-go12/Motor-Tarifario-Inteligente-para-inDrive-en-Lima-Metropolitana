@@ -97,4 +97,20 @@ export class UpdatePricingConfigDto {
   @IsOptional()
   @Min(1)
   maxRangeRatio?: number;
+
+  @ApiPropertyOptional({
+    example: 0.2,
+    description: 'Umbral de desviación para anomalía de severidad media',
+  })
+  @IsOptional()
+  @IsPositive()
+  anomalyMediumDeviation?: number;
+
+  @ApiPropertyOptional({
+    example: 0.5,
+    description: 'Umbral de desviación para anomalía de severidad alta',
+  })
+  @IsOptional()
+  @IsPositive()
+  anomalyHighDeviation?: number;
 }

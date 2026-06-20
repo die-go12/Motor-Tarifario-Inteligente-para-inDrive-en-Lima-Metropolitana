@@ -73,13 +73,13 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
   const [precioReal, setPrecioReal] = useState('');
 
   const finalizarViaje = () => {
-    setPrecioReal(String(viajeActivo?.tarifa?.minimo || ''));
+    setPrecioReal(String(viajeActivo?.acceptedPrice || viajeActivo?.tarifa?.minimo || ''));
     setMostrarModalFinalizar(true);
   };
 
   const confirmarFinalizarViaje = () => {
     const socket = getSocket();
-    const precio = parseFloat(precioReal) || viajeActivo?.tarifa?.minimo || 0;
+    const precio = parseFloat(precioReal) || viajeActivo?.acceptedPrice || viajeActivo?.tarifa?.minimo || 0;
     socket?.emit(DRIVER_EVENTS.COMPLETE_TRIP, {
       tripId: Number(tripId),
       realPrice: precio,
@@ -165,7 +165,7 @@ export const ActiveTripScreen: React.FC<Props> = ({ navigation, route }) => {
             </Text>
             <CampoEntrada
               etiqueta="Precio real del viaje (S/)"
-              placeholder={String(viajeActivo?.tarifa?.minimo || '0.00')}
+              placeholder={String(viajeActivo?.acceptedPrice || viajeActivo?.tarifa?.minimo || '0.00')}
               value={precioReal}
               onChangeText={setPrecioReal}
               keyboardType="numeric"

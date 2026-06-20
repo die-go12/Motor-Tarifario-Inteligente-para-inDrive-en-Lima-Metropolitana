@@ -118,6 +118,10 @@ CREATE TABLE trips (
         maximum_price >= minimum_price
     ),
 
+    accepted_price DECIMAL(10,2) CHECK (
+        accepted_price >= 0
+    ),
+
     final_price DECIMAL(10,2) CHECK (
         final_price >= 0
     ),

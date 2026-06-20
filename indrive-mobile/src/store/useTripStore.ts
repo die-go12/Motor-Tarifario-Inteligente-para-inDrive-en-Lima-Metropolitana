@@ -33,6 +33,7 @@ export interface ViajeActivo {
   duracionMin: number;
   tarifa: TarifaRango;
   tarifaFinal?: number;
+  acceptedPrice?: number;
   conductorId?: string;
   conductorUbicacion?: Coords;
   conductorNombre?: string;

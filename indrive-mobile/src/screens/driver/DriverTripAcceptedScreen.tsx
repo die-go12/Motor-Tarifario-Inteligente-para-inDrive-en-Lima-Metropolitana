@@ -13,17 +13,17 @@ import { theme } from '../../theme/theme';
 import { TarjetaBase } from '../../components/TarjetaBase';
 import { BotonNeon } from '../../components/BotonNeon';
 import { useTripStore } from '../../store/useTripStore';
-import { PassengerStackParamList } from '../../navigation/PassengerNavigator';
+import { DriverStackParamList } from '../../navigation/DriverNavigator';
 import { formatSoles, formatDistancia, formatDuracion } from '../../utils/format';
 
 type Props = {
-  navigation: NativeStackNavigationProp<PassengerStackParamList, 'TripAccepted'>;
-  route: RouteProp<PassengerStackParamList, 'TripAccepted'>;
+  navigation: NativeStackNavigationProp<DriverStackParamList, 'DriverTripAccepted'>;
+  route: RouteProp<DriverStackParamList, 'DriverTripAccepted'>;
 };
 
 const PROMEDIO_KMH_LLEGADA = 18; // km/h promedio en tráfico de Lima para la llegada del conductor
 
-export const TripAcceptedScreen: React.FC<Props> = ({ navigation }) => {
+export const DriverTripAcceptedScreen: React.FC<Props> = ({ navigation }) => {
   const { viajeActivo } = useTripStore();
 
   // Animations
@@ -91,20 +91,28 @@ export const TripAcceptedScreen: React.FC<Props> = ({ navigation }) => {
       useNativeDriver: false,
     }).start();
 
-    // Auto-navigate to map after 6 seconds
+    // Auto-navigate to active trip map after 6 seconds
     const timer = setTimeout(() => {
-      navigation.replace('PassengerMap');
+      if (viajeActivo) {
+        navigation.replace('ActiveTrip', { tripId: viajeActivo.id });
+      } else {
+        navigation.replace('DriverMap');
+      }
     }, 6000);
 
     return () => clearTimeout(timer);
   }, []);
 
   const irAlMapa = () => {
-    navigation.replace('PassengerMap');
+    if (viajeActivo) {
+      navigation.replace('ActiveTrip', { tripId: viajeActivo.id });
+    } else {
+      navigation.replace('DriverMap');
+    }
   };
 
   if (!viajeActivo) {
-    navigation.replace('PassengerMap');
+    navigation.replace('DriverMap');
     return null;
   }
 
@@ -139,9 +147,9 @@ export const TripAcceptedScreen: React.FC<Props> = ({ navigation }) => {
           },
         ]}
       >
-        <Text style={estilos.tituloConfirmacion}>¡Solicitud aceptada!</Text>
+        <Text style={estilos.tituloConfirmacion}>¡Viaje asignado!</Text>
         <Text style={estilos.subtituloConfirmacion}>
-          Tu conductor está en camino
+          Dirígete a recoger al pasajero
         </Text>
 
         {/* ETA Badge */}
@@ -165,7 +173,7 @@ export const TripAcceptedScreen: React.FC<Props> = ({ navigation }) => {
               <View style={estilos.lineaConector} />
             </View>
             <View style={estilos.direccionContainer}>
-              <Text style={estilos.rutaLabel}>Origen</Text>
+              <Text style={estilos.rutaLabel}>Recoger en (Origen)</Text>
               <Text style={estilos.rutaDireccion} numberOfLines={2}>
                 {viajeActivo.origenDireccion}
               </Text>
@@ -201,25 +209,21 @@ export const TripAcceptedScreen: React.FC<Props> = ({ navigation }) => {
             <View style={estilos.detalleItem}>
               <Text style={estilos.detalleIcono}>💰</Text>
               <Text style={estilos.detalleValor}>
-                {formatSoles(viajeActivo.acceptedPrice || viajeActivo.tarifa.maximo)}
+                {formatSoles(viajeActivo.acceptedPrice || viajeActivo.tarifa.minimo)}
               </Text>
             </View>
           </View>
         </TarjetaBase>
 
-        {/* Driver info card */}
+        {/* Passenger info card */}
         <TarjetaBase estilo={estilos.tarjetaConductor}>
           <View style={estilos.conductorFila}>
             <View style={estilos.avatarConductor}>
-              <Text style={estilos.avatarIcono}>🧑‍✈️</Text>
+              <Text style={estilos.avatarIcono}>🧑</Text>
             </View>
             <View style={estilos.conductorInfo}>
-              <Text style={estilos.conductorNombre}>
-                {viajeActivo.conductorNombre || 'Conductor asignado'}
-              </Text>
-              <Text style={estilos.conductorVehiculo}>
-                {viajeActivo.vehiculoModelo || 'Vehículo'} · {viajeActivo.vehiculoPlaca || '—'}
-              </Text>
+              <Text style={estilos.conductorNombre}>Pasajero inDrive+</Text>
+              <Text style={estilos.conductorVehiculo}>Esperando tu llegada</Text>
             </View>
           </View>
         </TarjetaBase>

@@ -32,6 +32,7 @@ interface BackendTrip {
   destination: string;
   distanceKm: number;
   minimumPrice: number;
+  acceptedPrice?: number;
 }
 
 const PROMEDIO_KMH = 20;
@@ -52,6 +53,7 @@ const mapBackendTrip = (t: BackendTrip): ViajeActivo => {
     distanciaKm: t.distanceKm,
     duracionMin: Math.round((t.distanceKm / PROMEDIO_KMH) * 60),
     tarifa: { minimo: t.minimumPrice, maximo: 0 },
+    acceptedPrice: t.acceptedPrice,
   };
 };
 
@@ -83,7 +85,7 @@ export const TripOffersScreen: React.FC<Props> = ({ navigation }) => {
       socket.on(SERVER_EVENTS.TRIP_ASSIGNED, (t: BackendTrip) => {
         const viaje = mapBackendTrip(t);
         setViajeActivo(viaje);
-        navigation.navigate('ActiveTrip', { tripId: viaje.id });
+        navigation.navigate('DriverTripAccepted');
       });
 
       // Escuchar errores del servidor

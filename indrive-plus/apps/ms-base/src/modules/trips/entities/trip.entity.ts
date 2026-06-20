@@ -40,6 +40,9 @@ export class Trip {
   @Column({ name: 'maximum_price', ...decimal, transformer })
   maximumPrice: number;
 
+  @Column({ name: 'accepted_price', ...decimal, nullable: true, transformer })
+  acceptedPrice: number | null;
+
   @Column({ name: 'final_price', ...decimal, nullable: true, transformer })
   finalPrice: number | null;
 

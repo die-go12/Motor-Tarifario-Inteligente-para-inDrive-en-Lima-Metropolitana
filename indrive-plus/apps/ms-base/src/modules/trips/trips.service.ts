@@ -110,7 +110,7 @@ export class TripsService {
     };
   }
 
-  async assign(tripId: number, driverId: number): Promise<Trip> {
+  async assign(tripId: number, driverId: number, acceptedPrice?: number): Promise<Trip> {
     const hasVehicle = await this.vehiclesService.existsForDriver(driverId);
     if (!hasVehicle) {
       throw new BadRequestException(
@@ -120,7 +120,7 @@ export class TripsService {
     await this.findById(tripId);
     const result = await this.tripsRepository.update(
       { id: tripId, status: TripStatus.SEARCHING },
-      { driverId, status: TripStatus.ASSIGNED },
+      { driverId, status: TripStatus.ASSIGNED, acceptedPrice },
     );
     if (!result.affected) {
       throw new BadRequestException('El viaje ya no está disponible');

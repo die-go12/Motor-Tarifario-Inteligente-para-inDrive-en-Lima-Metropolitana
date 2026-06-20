@@ -55,6 +55,7 @@ export function presentTrip(trip: Trip, viewerRole: UserRole) {
     distanceKm: trip.distanceKm,
     status: trip.status,
     finalPrice: trip.finalPrice,
+    acceptedPrice: trip.acceptedPrice,
     requestedAt: trip.requestedAt,
     startedAt: trip.startedAt,
     completedAt: trip.completedAt,

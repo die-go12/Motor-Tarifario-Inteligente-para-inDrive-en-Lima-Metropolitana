@@ -90,6 +90,9 @@ async function initApp() {
 
   // Sincroniza formulario de registro para mostrar datos de vehículo solo en rol conductor
   toggleRegisterVehicleFields();
+
+  // Inicializar factor hora basado en oferta/demanda del simulador
+  updateSupplyDemand();
 }
 
 /**
@@ -1426,6 +1429,33 @@ function setChart(range, btn) {
 
 // ==================== PRICING ====================
 
+function updateSupplyDemand() {
+  const demandInput = $('sim-demand');
+  const supplyInput = $('sim-supply');
+  if (!demandInput || !supplyInput) return;
+
+  const demand = parseFloat(demandInput.value);
+  const supply = parseFloat(supplyInput.value);
+  const demandLabel = $('sim-demand-v');
+  const supplyLabel = $('sim-supply-v');
+  if (demandLabel) demandLabel.textContent = `${demand}%`;
+  if (supplyLabel) supplyLabel.textContent = `${supply}%`;
+
+  // Factor hora/demanda: sube con mas demanda, baja con mas oferta
+  // Rango resultante: 1.0 a 1.5, respetando el tope del motor
+  let hourFactor = 1.0 + ((demand / 100) - (supply / 100)) * 0.5;
+  hourFactor = Math.max(1.0, Math.min(1.5, hourFactor));
+
+  const hourInput = $('sim-hour');
+  if (hourInput) hourInput.value = hourFactor.toFixed(2);
+
+  // Recalcular en vivo si ya hay un resultado visible
+  const simResult = $('sim-result');
+  if (simResult && simResult.style.display !== 'none') {
+    simulate();
+  }
+}
+
 /**
  * Simular tarifa
  */
@@ -1796,6 +1826,7 @@ window.assignTrip = assignTrip;
 window.completeTrip = completeTrip;
 window.setChart = setChart;
 window.simulate = simulate;
+window.updateSupplyDemand = updateSupplyDemand;
 window.registerUser = registerUser;
 window.toggleRegisterVehicleFields = toggleRegisterVehicleFields;
 window.loadTrips = loadTrips;

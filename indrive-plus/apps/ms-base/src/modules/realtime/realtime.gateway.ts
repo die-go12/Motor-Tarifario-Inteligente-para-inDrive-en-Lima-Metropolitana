@@ -184,14 +184,12 @@ export class RealtimeGateway implements OnGatewayConnection {
       );
       this.emitToUser(trip.passengerId, ServerEvent.TRIP_COMPLETED, {
         tarifaFinal: trip.finalPrice,
-        minimumPrice: trip.minimumPrice,
         maximumPrice: trip.maximumPrice,
       });
       if (trip.driverId !== null) {
         this.emitToUser(trip.driverId, ServerEvent.TRIP_COMPLETED, {
           tarifaFinal: trip.finalPrice,
           minimumPrice: trip.minimumPrice,
-          maximumPrice: trip.maximumPrice,
         });
       }
     });

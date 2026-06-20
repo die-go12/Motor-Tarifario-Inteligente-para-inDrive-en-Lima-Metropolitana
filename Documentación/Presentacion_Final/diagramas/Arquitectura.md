@@ -4,7 +4,7 @@
 
 <div align="center">
 
-![Vista General del Sistema](https://github.com/die-go12/Motor-Tarifario-Inteligente-para-inDrive-en-Lima-Metropolitana/blob/main/Documentaci%C3%B3n/Scrum/imgs/vista_general_sistema.jpg)
+![Vista General del Sistema](../../Scrum/imgs/vista_general_sistema.jpg)
 
 </div>
 
@@ -12,7 +12,7 @@ El sistema está basado en una arquitectura de microservicios diseñada para sop
 
 ### 1.1. Arquitectura de Alto Nivel
 * **Capa de Presentación:**
-  
+
     * **App Móvil (React Native + Expo):** Utilizada por Pasajeros y Conductores para interactuar con los flujos de viaje en tiempo real de forma directa con el servicio base (`ms-base`).
     * **Panel Web Admin (Lima Ops):** Utilizado por Administradores y Auditores para la gestión de métricas, configuraciones y auditoría mediante un `API Gateway`.
 * **Capa de Orquestación y Ruteo:**
@@ -33,7 +33,7 @@ El sistema está basado en una arquitectura de microservicios diseñada para sop
 
 <div align="center">
 
-![Vista General del Sistema](https://github.com/die-go12/Motor-Tarifario-Inteligente-para-inDrive-en-Lima-Metropolitana/blob/main/Documentaci%C3%B3n/Scrum/imgs/centro_de_control.jpg)
+![Centro de Control - Panel Admin](../../Scrum/imgs/centro_de_control.jpg)
 
 </div>
 
@@ -53,7 +53,7 @@ Interfaz web centralizada orientada al monitoreo operativo y auditoría del ecos
 
 <div align="center">
 
-![Vista General del Sistema](https://github.com/die-go12/Motor-Tarifario-Inteligente-para-inDrive-en-Lima-Metropolitana/blob/main/Documentaci%C3%B3n/Scrum/imgs/backend%2BBD.jpg)
+![Backend, Persistencia y Mensajería](../../Scrum/imgs/backend%2BBD.jpg)
 
 </div>
 
@@ -62,17 +62,18 @@ El backend implementa un desacoplamiento guiado por eventos (*Event-Driven Archi
 ### 3.1. Flujo de Datos y Eventos
 
 * **Sincronización de Precios y Tarifas:** Cuando `ms-pricing` genera una cotización o detecta una variación dinámica, publica eventos bajo el tópico `pricing.*` hacia el Bus de Eventos de Redis.
-  
+
 * **Consumo Asíncrono:**
-  
-    * `ms-base` consume estos eventos para actualizar las negociaciones activas vía WebSockets hacia la aplicación móvil.
-    * `ms-reports` consume los eventos de manera asíncrona para actualizar la base de datos documental (MongoDB), evitando sobrecargar la base de datos relacional de operaciones.
-      
+
+    * `ms-pricing` (AuditListener) consume los eventos `pricing.*` para persistir la auditoría (`pricing_logs`, `anomaly_logs`, `pricing_history`) en MongoDB.
+    * `ms-reports` consume los mismos eventos de manera asíncrona para alimentar su *read-model* de reportes en MongoDB, evitando sobrecargar la base de datos relacional de operaciones.
+    * La actualización en vivo de la negociación hacia el móvil es un mecanismo *in-process* de `ms-base` (EventEmitter2 + `@OnEvent` → WebSocket), independiente del Bus de Eventos de Redis.
+
 * **Fuentes de Datos Externas (`ms-integration`):**
-  
+
     * **Google Maps (en vivo):** Cálculo de rutas, distancias y tiempos estimados (ETA).
     * **OSINERGMIN local:** Consulta de precios de referencia de combustibles para el cálculo de costos base.
-    * **Tráfico Simulado:** Ingesta de variables de congestión vehicular en tiempo real.
+    * **Tráfico Simulado:** Ingesta de variables simuladas de congestión vehicular (stub local, no fuente en vivo).
 
 ---
 
@@ -80,7 +81,7 @@ El backend implementa un desacoplamiento guiado por eventos (*Event-Driven Archi
 
 <div align="center">
 
-![Vista General del Sistema](https://github.com/die-go12/Motor-Tarifario-Inteligente-para-inDrive-en-Lima-Metropolitana/blob/main/Documentaci%C3%B3n/Scrum/imgs/app_movil.jpg)
+![Aplicación Móvil](../../Scrum/imgs/app_movil.jpg)
 
 </div>
 
@@ -89,55 +90,57 @@ Diseñada para un rendimiento ágil, la aplicación móvil realiza conexiones di
 ### 4.1. Flujos Diferenciados por Rol
 
 * **Gestión de Estado Global:** Implementado mediante Stores dedicados (`useAuthStore`, `useTripStore`).
-  
+
 * **Flujo del Pasajero (Visualiza TECHO / `maximumPrice`):**
-  
+
     1. *SearchTrip:* Solicita un viaje definiendo origen, destino y visualiza el precio máximo sugerido.
     2. *Negotiation:* Recibe ofertas de conductores cercanos, contraoferta y acepta la tarifa final.
     3. *PassengerMap:* Monitoreo en mapa interactivo de la ubicación en vivo del conductor asignado.
-       
+
 * **Flujo del Conductor (Visualiza PISO / `minimumPrice`):**
-  
+
     1. *DriverMap:* GPS activo enviando coordenadas constantes del vehículo en tiempo real.
     2. *TripOffers:* Visualización de solicitudes de viaje disponibles que superan el precio mínimo base.
     3. *ActiveTrip:* Gestión de estados del viaje en curso: inicio del recorrido y finalización segura.
 
 ---
 
-## 5. Control de Tareas del Sprint (Matriz de Actividades)
+## 5. Decisiones de Arquitectura y Patrones de Diseño
 
-A continuación se consolidan las actividades del último ciclo de desarrollo técnico junto con sus respectivos identificadores de requerimiento y estados actuales:
+Esta sección distingue tres niveles de diseño y justifica las decisiones clave del sistema. Una precisión importante: **los microservicios son un *estilo* arquitectónico, no un patrón de diseño**.
 
-| Código | Requerimiento / Componente | Descripción Técnica | Estado |
-| :--- | :--- | :--- | :--- |
-| **RS-3** | HU-07 | Motor de 7 variables + topes y límites | `LISTO` |
-| **RS-4** | HU-05/06 | Presentador asimétrico por rol (Pasajero/Conductor) | `LISTO` |
-| **RS-5** | CAR-003 | Negociación acotada + aceptación bilateral de tarifa | `LISTO` |
-| **RS-6** | CAR-004 | Persistir la información del Payment post-viaje | `LISTO` |
-| **RS-7** | CAR-005 | Módulo de Anomalías enriquecidas + endpoints GET | `LISTO` |
-| **RS-8** | CAR-008 | Implementación de `ms-reports` + endpoints `/reports/summary` y `/trips/all` | `LISTO` |
-| **RS-12**| HU-08 | Flujo de Login seguro + Dashboard operacional de administración | `LISTO` |
-| **RS-13**| CAR-006 | Editor visual del endpoint `/pricing/config` en Panel Admin | `LISTO` |
-| **RS-14**| CAR-005 | Consumo del módulo de anomalías desde el front web | `LISTO` |
-| **RS-15**| CAR-008 | Consumo e integración visual del módulo de reportes | `LISTO` |
-| **RS-16**| CAR-008 | Tabla maestra con filtros para visualización de todos los viajes | `LISTO` |
-| **RS-21**| HU-05 | Despliegue y estabilización de la App Pasajero | `LISTO` |
-| **RS-22**| HU-06 | Despliegue y estabilización de la App Conductor | `LISTO` |
-| **RS-23**| CAR-004 | Pulido visual de la vista post-viaje e impresión de precio final | `LISTO` |
-| **RS-25**| CAR-009 | Integración nativa con SDK de Google Maps | `LISTO` |
-| **RS-30**| CAR-010 | Configuración de orquestación local con Stack Docker Compose completo | `LISTO` |
-| **RS-38**| - | Consolidación y cierre de métricas Scrum del ciclo | `LISTO` |
-| **RS-17**| US-007 | Formulario dinámico para parametrización de umbrales | `LISTO` |
-| **RS-31**| - | Integración de cambios de Docker Compose a la rama principal `main` | `EN CURSO` |
-| **RS-37**| - | Levantamiento de evidencias, matriz de riesgos y apoyo en base de datos | `EN CURSO` |
-| **RS-9** | US-007 | Configuración de Umbrales de anomalía dinámicos en backend | `EN REVISIÓN` |
-| **RS-10**| - | Elaboración de documentación técnica de arquitectura y endpoints | `EN REVISIÓN` |
-| **RS-18**| HU-08 | Implementación del simulador avanzado de oferta y demanda | `EN REVISIÓN` |
-| **RS-19**| - | Integración y merge final de la rama `Panel_Admin` con `main` | `LISTO` |
-| **RS-26**| - | Fase de pruebas para la integración bidireccional mediante WebSockets | `EN REVISIÓN` |
-| **RS-27**| - | Sincronización y resolución de conflictos de la rama móvil con `main` | `EN REVISIÓN` |
-| **RS-32**| CAR-008 | Incorporación del servicio `ms-reports` al entorno local de compose | `LISTO` |
-| **RS-33**| Docker-002| Configuración de Healthchecks de servicios e integración continua | `EN REVISIÓN` |
-| **RS-34**| HU-05/06 | Ejecución de pruebas integrales segmentadas por rol de usuario | `EN REVISIÓN` |
-| **RS-35**| CAR-004 | Validación exhaustiva del motor de reglas de pago | `EN REVISIÓN` |
-| **RS-36**| - | Ejecución del Smoke Test integral End-to-End en entorno *Staging* | `EN REVISIÓN` |
+### 5.1. Estilos Arquitectónicos
+
+* **Microservicios:** el sistema se divide en servicios desplegables de forma independiente (`api-gateway`, `ms-base`, `ms-pricing`, `ms-integration`, `ms-reports`), cada uno con una responsabilidad acotada.
+* **Arquitectura Orientada a Eventos (EDA):** la comunicación asíncrona se realiza mediante un bus de eventos (Redis Pub/Sub), desacoplando a los productores de los consumidores.
+* **Arquitectura por Capas:** dentro de cada microservicio NestJS el flujo es `Controller → Service → Repository/Entity`, con responsabilidad única por capa.
+
+### 5.2. Patrones Arquitectónicos
+
+* **API Gateway:** `api-gateway :3000` es la entrada única del Panel Web Admin (JWT, CORS, ruteo REST).
+* **CQRS / Read-Model:** `ms-reports` mantiene un modelo de lectura en MongoDB, alimentado por eventos, separado del modelo transaccional (PostgreSQL en `ms-base`).
+* **Publish/Subscribe:** los canales `pricing.*` (`CALCULATED`, `SETTLED`, `ANOMALY`) sobre Redis permiten que productores y consumidores no se conozcan entre sí.
+* **Circuit Breaker:** protege las llamadas de `ms-base` hacia `ms-integration` (Google Maps / OSINERGMIN / tráfico), evitando fallos en cascada (resiliencia, CAR-010).
+* **Base de Datos por Servicio / Persistencia Poliglota:** cada motor de datos se usa según su fortaleza (ver §5.5).
+
+### 5.3. Patrones de Diseño (GoF, a nivel de código)
+
+* **Singleton:** los *providers* de NestJS viven como instancia única dentro de su módulo; en el móvil, `getSocket()` reutiliza una sola conexión WebSocket.
+* **Observer:** `ms-base` usa `EventEmitter2` con `@OnEvent`: el *gateway* de tiempo real escucha eventos de dominio internos (p. ej. la creación de un viaje) y los emite por WebSocket a los clientes suscritos.
+* **State:** la máquina de estados del viaje (`assertTransition`) controla las transiciones `SEARCHING → ASSIGNED → IN_PROGRESS → COMPLETED | CANCELLED`; una transición inválida lanza una excepción.
+
+### 5.4. Nota de Honestidad Técnica
+
+* Los **`@decoradores`** de NestJS (`@Injectable`, `@Controller`, `@OnEvent`, etc.) son una característica del lenguaje (TypeScript + *metadata reflection*), **no** una implementación del patrón GoF *Decorator*.
+* **Repository** y **DTO** son patrones empresariales (Fowler, *PoEAA*), no patrones GoF; se documentan aparte por precisión.
+
+### 5.5. Justificación de Decisiones Clave
+
+| Decisión | Por qué | Alternativa descartada |
+| :--- | :--- | :--- |
+| Microservicios | Despliegue y escalado independientes, aislamiento de fallos | Monolito (un fallo afecta a todo el sistema) |
+| Persistencia poliglota | PostgreSQL (ACID transaccional), MongoDB (*schemaless* para logs/reportes), Redis (latencia + bus) | Una sola base de datos para todos los casos |
+| Redis Pub/Sub como bus | Simplicidad y baja latencia para el alcance actual | RabbitMQ (mayor garantía de entrega; en el *roadmap*, ADR-005) |
+| Visualización asimétrica (techo/piso) | Diferencial de negocio del motor tarifario | Mostrar el mismo precio a ambos roles |
+| Móvil directo a `ms-base` | El *gateway* no hace proxy de WebSocket; reduce latencia crítica | Enrutar el móvil por el `API Gateway` |
+| Circuit Breaker en integraciones | Resiliencia ante fallos de servicios externos (CAR-010) | Llamadas directas sin protección |

@@ -4,7 +4,6 @@
 
 ## 🏗️ Arquitectura
 - **[Vista de arquitectura (defensa)](arquitectura/Arquitectura.md)** — documento **oficial que se expone**: las 4 vistas del sistema (general, backend + BD, panel admin, app móvil) + decisiones de diseño y patrones (§5).
-- **[Catálogo de diagramas](arquitectura/diagramas.md)** — diagramas exportados (`.png` / `.svg`) para los slides.
 - [Referencia técnica completa](../Aquitectura/Arquitectura_general.md) — **canon** técnico: diagramas fuente (componentes, secuencia, clases), 7 variables, manejo de errores y entidades.
 
 ## 🧪 Pruebas (evidencias de ejecución)
@@ -29,7 +28,7 @@
 ## Contenido de este apartado
 | Carpeta / archivo | Qué contiene |
 |---|---|
-| `arquitectura/` | Vista de arquitectura para la defensa + catálogo de diagramas |
+| `arquitectura/` | Vista de arquitectura para la defensa (las 4 vistas + decisiones y patrones) |
 | `pruebas/` | Evidencias de pruebas (capturas de pantallas/flujos, por componente) |
 | `gestion_de_cambio.md` | Cambios gestionados durante el proyecto (proceso de 5 pasos) |
 

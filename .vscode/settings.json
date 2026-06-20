@@ -1,0 +1,4 @@
+{
+  "typescript.tsdk": "indrive-plus/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

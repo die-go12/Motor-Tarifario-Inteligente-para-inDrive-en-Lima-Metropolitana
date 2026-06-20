@@ -123,6 +123,10 @@ class AuthService {
         payload.phone = userData.phone;
       }
 
+      if (userData.vehicleProfile) {
+        payload.vehicleProfile = userData.vehicleProfile;
+      }
+
       const response = await apiService.post(API_ENDPOINTS.AUTH.REGISTER, payload);
       return {
         success: true,
@@ -130,6 +134,29 @@ class AuthService {
       };
     } catch (error) {
       console.error('Register error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Crear usuario como admin vía /users (dispara auditoría backend)
+   */
+  async adminCreateUser(userData) {
+    try {
+      const payload = {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        role: String(userData.role || '').toLowerCase()
+      };
+
+      if (userData.phone) {
+        payload.phone = userData.phone;
+      }
+
+      return await apiService.post(API_ENDPOINTS.USERS.LIST_ALL, payload);
+    } catch (error) {
+      console.error('Admin create user error:', error);
       throw error;
     }
   }
@@ -232,6 +259,30 @@ class AuthService {
       return await apiService.get(API_ENDPOINTS.USERS.GET_ONE(userId));
     } catch (error) {
       console.error('Get user error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualizar un usuario (solo ADMIN) - patch parcial
+   */
+  async adminUpdateUser(userId, data) {
+    try {
+      return await apiService.patch(API_ENDPOINTS.USERS.GET_ONE(userId), data);
+    } catch (error) {
+      console.error('Admin update user error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Eliminar un usuario (solo ADMIN)
+   */
+  async deleteUser(userId) {
+    try {
+      return await apiService.delete(API_ENDPOINTS.USERS.GET_ONE(userId));
+    } catch (error) {
+      console.error('Delete user error:', error);
       throw error;
     }
   }

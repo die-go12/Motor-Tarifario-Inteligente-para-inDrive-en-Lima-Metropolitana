@@ -7,6 +7,7 @@ export { apiService } from './api.service.js';
 export { authService } from './auth.service.js';
 export { socketService } from './socket.service.js';
 export { tripsService } from './trips.service.js';
+export { reportsService } from './reports.service.js';
 export { vehiclesService } from './vehicles.service.js';
 export { pricingService } from './pricing.service.js';
 

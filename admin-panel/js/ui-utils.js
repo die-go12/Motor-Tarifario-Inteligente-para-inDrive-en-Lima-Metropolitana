@@ -76,6 +76,11 @@ export function closeModal() {
  * @param {string} viewName - Nombre de la vista (dashboard, fleet, trips, etc.)
  */
 export function navigateTo(viewName, navBtn = null) {
+  try {
+    console.debug('navigateTo -> view:', viewName);
+  } catch (err) {
+    // ignore
+  }
   // Ocultar todas las vistas
   document.querySelectorAll('.view').forEach(v => {
     v.classList.remove('active');

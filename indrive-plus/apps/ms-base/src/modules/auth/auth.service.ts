@@ -1,11 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { JwtPayload } from '@app/shared';
+import { JwtPayload, UserRole } from '@app/shared';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { VehiclesService } from '../vehicles/vehicles.service';
 import { TokensService } from './tokens.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -16,14 +21,41 @@ const PASSWORD_SALT_ROUNDS = 10;
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
+    private readonly vehiclesService: VehiclesService,
     private readonly tokensService: TokensService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
   async register(dto: RegisterDto) {
+    if (dto.role === UserRole.DRIVER) {
+      if (!dto.vehicleProfile) {
+        throw new BadRequestException(
+          'El perfil del vehículo es obligatorio para conductores',
+        );
+      }
+      if (
+        dto.vehicleProfile.capacity === undefined ||
+        dto.vehicleProfile.capacity === null
+      ) {
+        throw new BadRequestException(
+          'La capacidad del vehículo es obligatoria para conductores',
+        );
+      }
+    }
+
     const password = await bcrypt.hash(dto.password, PASSWORD_SALT_ROUNDS);
     const user = await this.usersService.create({ ...dto, password });
+
+    if (dto.role === UserRole.DRIVER && dto.vehicleProfile) {
+      try {
+        await this.vehiclesService.register(user.id, dto.vehicleProfile);
+      } catch (error) {
+        await this.usersService.remove(user.id).catch(() => undefined);
+        throw error;
+      }
+    }
+
     return this.buildSession(user);
   }
 

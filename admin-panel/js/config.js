@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
   },
   TRIPS: {
     LIST: '/trips',
+    LIST_ADMIN: '/trips/all',
     CREATE: '/trips',
     QUOTE: '/trips/quote',
     GET_ONE: (id) => `/trips/${id}`,
@@ -54,11 +55,17 @@ export const API_ENDPOINTS = {
   PRICING: {
     QUOTE: '/pricing/quote',
     GET_CONFIG: '/pricing/config',
-    UPDATE_CONFIG: '/pricing/config'
+    UPDATE_CONFIG: '/pricing/config',
+    ANOMALIES: '/pricing/anomalies'
+  },
+  REPORTS: {
+    SUMMARY: '/reports/summary'
   },
   VEHICLES: {
     LIST: '/vehicles',
-    ME: '/vehicles/me'
+    ME: '/vehicles/me',
+    BY_DRIVER: (driverId) => `/vehicles/driver/${driverId}`,
+    UPSERT_BY_DRIVER: (driverId) => `/vehicles/driver/${driverId}`
   }
 };
 

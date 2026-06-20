@@ -118,7 +118,7 @@ await pricingService.updateConfig({
 
 ```javascript
 // Get
-const data = await apiService.get('/trips');
+const data = await apiService.get('/trips/all');
 
 // Post
 const result = await apiService.post('/trips', { origin, destination });
@@ -128,6 +128,12 @@ await apiService.patch('/trips/1/cancel', {});
 
 // Put
 await apiService.put('/pricing/config', configData);
+
+// Reports summary
+const summary = await apiService.get('/reports/summary');
+
+// Pricing anomalies
+const anomalies = await apiService.get('/pricing/anomalies?limit=50');
 
 // Delete
 await apiService.delete('/path', {});
@@ -206,6 +212,7 @@ USER_ROLES.PASSENGER   // 'PASSENGER'
 | POST | /auth/register | Registrar |
 | GET | /trips | Mis viajes |
 | POST | /trips | Crear viaje |
+| GET | /trips/all | Viajes admin |
 | GET | /trips/:id | Detalle viaje |
 | PATCH | /trips/:id/cancel | Cancelar |
 | PATCH | /trips/:id/assign | Asignar (DRIVER) |
@@ -214,6 +221,8 @@ USER_ROLES.PASSENGER   // 'PASSENGER'
 | POST | /pricing/quote | Cotizar |
 | GET | /pricing/config | Obtener config (ADMIN) |
 | PUT | /pricing/config | Actualizar config (ADMIN) |
+| GET | /pricing/anomalies | Anomalías auditadas |
+| GET | /reports/summary | Resumen agregado |
 
 ## Configuración
 

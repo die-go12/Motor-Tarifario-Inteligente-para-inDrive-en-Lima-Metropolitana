@@ -63,13 +63,15 @@ export class TripsController {
   @Get()
   async myTrips(@CurrentUser() user: AuthenticatedUser) {
     const trips =
-      user.role === UserRole.DRIVER
-        ? await this.tripsService.findByDriver(user.id)
-        : await this.tripsService.findByPassenger(user.id);
+      user.role === UserRole.ADMIN
+        ? await this.tripsService.findAll()
+        : user.role === UserRole.DRIVER
+          ? await this.tripsService.findByDriver(user.id)
+          : await this.tripsService.findByPassenger(user.id);
     return trips.map((trip) => presentTrip(trip, user.role));
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.AUDITOR)
   @Get('all')
   async findAll(@Query() query: FindTripsDto) {
     const trips = await this.tripsService.findAll(query.status);

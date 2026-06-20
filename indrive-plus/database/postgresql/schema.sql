@@ -262,6 +262,30 @@ ON tokens(user_id);
 CREATE INDEX idx_tokens_type
 ON tokens(token_type);
 
+CREATE TABLE audit_logs (
+    id SERIAL PRIMARY KEY,
+    admin_id INT NOT NULL,
+    action VARCHAR(50) NOT NULL CHECK (
+        action IN ('CREATE_USER', 'UPDATE_USER', 'DELETE_USER', 'UPDATE_CONFIG', 'UPDATE_WEIGHTS')
+    ),
+    entity_type VARCHAR(50) NOT NULL CHECK (
+        entity_type IN ('USER', 'CONFIGURATION', 'WEIGHTS')
+    ),
+    entity_id INT,
+    entity_name VARCHAR(255),
+    old_values JSONB,
+    new_values JSONB,
+    details TEXT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_audit_admin
+        FOREIGN KEY(admin_id)
+        REFERENCES users(id)
+        ON DELETE SET NULL
+);
+
+
 CREATE INDEX idx_offers_negotiation
 ON offers(negotiation_id);
 

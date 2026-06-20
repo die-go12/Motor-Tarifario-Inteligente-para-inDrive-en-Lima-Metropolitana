@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@app/shared';
+import { AuthenticatedUser, UserRole } from '@app/shared';
 import { PricingConfigService } from './pricing-config.service';
 import { UpdatePricingConfigDto } from './dto/update-pricing-config.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -21,7 +21,10 @@ export class PricingConfigController {
   }
 
   @Put()
-  update(@Body() dto: UpdatePricingConfigDto) {
-    return this.pricingConfigService.update(dto);
+  update(
+    @Req() req: { user: AuthenticatedUser },
+    @Body() dto: UpdatePricingConfigDto,
+  ) {
+    return this.pricingConfigService.update(dto, req.user);
   }
 }

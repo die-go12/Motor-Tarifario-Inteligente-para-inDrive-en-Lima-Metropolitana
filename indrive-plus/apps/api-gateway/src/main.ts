@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { ApiGatewayModule } from './api-gateway.module';
 
-const BASE_ROUTES = ['/auth', '/users', '/vehicles', '/trips'];
+const BASE_ROUTES = ['/auth', '/users', '/vehicles', '/trips', '/audit'];
 const PRICING_ROUTES = ['/pricing/config', '/pricing/anomalies'];
 const REPORTS_ROUTES = ['/reports'];
 

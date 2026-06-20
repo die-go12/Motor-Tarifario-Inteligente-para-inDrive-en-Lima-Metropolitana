@@ -186,7 +186,7 @@ export class TripsService {
     viewer: AuthenticatedUser,
   ): Promise<Trip> {
     const trip = await this.findById(tripId);
-    if (viewer.role !== UserRole.ADMIN) {
+    if (viewer.role !== UserRole.ADMIN && viewer.role !== UserRole.AUDITOR) {
       this.assertParticipant(trip, viewer.id);
     }
     return trip;
@@ -197,6 +197,7 @@ export class TripsService {
       where: { status: TripStatus.SEARCHING },
     });
   }
+
 
   findByPassenger(passengerId: number): Promise<Trip[]> {
     return this.tripsRepository.find({ where: { passengerId } });

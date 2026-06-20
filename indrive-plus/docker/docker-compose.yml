@@ -78,7 +78,6 @@ services:
         condition: service_healthy
     networks:
       - indrive_network
-
   ms-integration:
     <<: *backend-build
     container_name: indrive_ms_integration

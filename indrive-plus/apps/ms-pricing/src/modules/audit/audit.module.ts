@@ -6,11 +6,14 @@ import {
   PricingHistory,
   PricingHistorySchema,
 } from './schemas/pricing-history.schema';
+import {
+  ConfigChangeLog,
+  ConfigChangeLogSchema,
+} from './schemas/config-change-log.schema';
 import { EventsPublisher } from './events.publisher';
 import { AuditListener } from './audit.listener';
-import { AnomaliesService } from './anomalies.service';
-import { AnomaliesController } from './anomalies.controller';
-import { AuthModule } from '../auth/auth.module';
+import { AuditService } from './audit.service';
+import { AuditController } from './audit.controller';
 
 @Module({
   imports: [
@@ -18,11 +21,11 @@ import { AuthModule } from '../auth/auth.module';
       { name: PricingLog.name, schema: PricingLogSchema },
       { name: AnomalyLog.name, schema: AnomalyLogSchema },
       { name: PricingHistory.name, schema: PricingHistorySchema },
+      { name: ConfigChangeLog.name, schema: ConfigChangeLogSchema },
     ]),
-    AuthModule,
   ],
-  controllers: [AnomaliesController],
-  providers: [EventsPublisher, AuditListener, AnomaliesService],
-  exports: [EventsPublisher],
+  providers: [EventsPublisher, AuditListener, AuditService],
+  controllers: [AuditController],
+  exports: [EventsPublisher, AuditService],
 })
 export class AuditModule {}

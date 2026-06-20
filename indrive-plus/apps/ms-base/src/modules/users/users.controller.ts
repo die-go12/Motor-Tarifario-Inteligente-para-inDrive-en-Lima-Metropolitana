@@ -1,15 +1,18 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedUser, UserRole } from '@app/shared';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -36,15 +39,43 @@ export class UsersController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.AUDITOR)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.AUDITOR)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Post()
+  create(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Body() dto: CreateUserDto,
+  ) {
+    return this.usersService.create(dto, admin.id);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Patch(':id')
+  updateOne(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.usersService.updateProfile(id, dto, admin.id);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Delete(':id')
+  removeOne(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.usersService.remove(id, admin.id);
   }
 }

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="720" height="400" fill="#ffffff"/>
+  <text x="360" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a1a">Burndown Sprint 2 — 18 SP (por semana)</text>
+
+  <!-- ejes -->
+  <line x1="70" y1="60" x2="70" y2="340" stroke="#333" stroke-width="1.5"/>
+  <line x1="70" y1="340" x2="680" y2="340" stroke="#333" stroke-width="1.5"/>
+  <text x="24" y="205" text-anchor="middle" font-size="13" fill="#333" transform="rotate(-90 24 205)">Story Points restantes</text>
+
+  <!-- gridlines + labels Y (0,6,12,18) -->
+  <line x1="70" y1="340" x2="680" y2="340" stroke="#eee"/>
+  <text x="60" y="344" text-anchor="end" font-size="12" fill="#666">0</text>
+  <line x1="70" y1="246.7" x2="680" y2="246.7" stroke="#eee"/>
+  <text x="60" y="250.7" text-anchor="end" font-size="12" fill="#666">6</text>
+  <line x1="70" y1="153.3" x2="680" y2="153.3" stroke="#eee"/>
+  <text x="60" y="157.3" text-anchor="end" font-size="12" fill="#666">12</text>
+  <line x1="70" y1="60" x2="680" y2="60" stroke="#eee"/>
+  <text x="60" y="64" text-anchor="end" font-size="12" fill="#666">18</text>
+
+  <!-- labels X -->
+  <text x="70" y="360" text-anchor="middle" font-size="12" fill="#333">Inicio</text>
+  <text x="273" y="360" text-anchor="middle" font-size="12" fill="#333">Fin Sem. 1</text>
+  <text x="477" y="360" text-anchor="middle" font-size="12" fill="#333">Fin Sem. 2</text>
+  <text x="680" y="360" text-anchor="middle" font-size="12" fill="#333">Cierre</text>
+
+  <!-- linea ideal -->
+  <polyline points="70,60 273,153.3 477,246.7 680,340" fill="none" stroke="#9aa0a6" stroke-width="2" stroke-dasharray="6 5"/>
+  <!-- linea real -->
+  <polyline points="70,60 273,91.1 477,168.9 680,340" fill="none" stroke="#0b8457" stroke-width="3"/>
+
+  <!-- puntos reales -->
+  <circle cx="70" cy="60" r="5" fill="#0b8457"/><text x="80" y="55" font-size="12" fill="#0b8457">18</text>
+  <circle cx="273" cy="91.1" r="5" fill="#0b8457"/><text x="283" y="86" font-size="12" fill="#0b8457">16</text>
+  <circle cx="477" cy="168.9" r="5" fill="#0b8457"/><text x="487" y="164" font-size="12" fill="#0b8457">11</text>
+  <circle cx="680" cy="340" r="5" fill="#0b8457"/><text x="655" y="332" font-size="12" fill="#0b8457">0</text>
+
+  <!-- puntos ideales -->
+  <circle cx="273" cy="153.3" r="4" fill="#9aa0a6"/>
+  <circle cx="477" cy="246.7" r="4" fill="#9aa0a6"/>
+
+  <!-- leyenda -->
+  <line x1="430" y1="80" x2="470" y2="80" stroke="#9aa0a6" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="476" y="84" font-size="12" fill="#666">Ideal</text>
+  <line x1="530" y1="80" x2="570" y2="80" stroke="#0b8457" stroke-width="3"/>
+  <text x="576" y="84" font-size="12" fill="#666">Real</text>
+</svg>

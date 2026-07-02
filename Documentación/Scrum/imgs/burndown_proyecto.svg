@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="720" height="400" fill="#ffffff"/>
+  <text x="360" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a1a">Burndown del Proyecto — 34 SP (Sprint 1 + Sprint 2)</text>
+
+  <!-- ejes -->
+  <line x1="70" y1="60" x2="70" y2="340" stroke="#333" stroke-width="1.5"/>
+  <line x1="70" y1="340" x2="680" y2="340" stroke="#333" stroke-width="1.5"/>
+  <text x="24" y="205" text-anchor="middle" font-size="13" fill="#333" transform="rotate(-90 24 205)">Story Points restantes</text>
+
+  <!-- gridlines + labels Y (0,10,20,30,34) -->
+  <line x1="70" y1="340" x2="680" y2="340" stroke="#eee"/>
+  <text x="60" y="344" text-anchor="end" font-size="12" fill="#666">0</text>
+  <line x1="70" y1="257.6" x2="680" y2="257.6" stroke="#eee"/>
+  <text x="60" y="261.6" text-anchor="end" font-size="12" fill="#666">10</text>
+  <line x1="70" y1="175.3" x2="680" y2="175.3" stroke="#eee"/>
+  <text x="60" y="179.3" text-anchor="end" font-size="12" fill="#666">20</text>
+  <line x1="70" y1="92.9" x2="680" y2="92.9" stroke="#eee"/>
+  <text x="60" y="96.9" text-anchor="end" font-size="12" fill="#666">30</text>
+  <line x1="70" y1="60" x2="680" y2="60" stroke="#f3f3f3"/>
+  <text x="60" y="64" text-anchor="end" font-size="12" fill="#666">34</text>
+
+  <!-- labels X -->
+  <text x="70" y="360" text-anchor="middle" font-size="12" fill="#333">Inicio</text>
+  <text x="375" y="360" text-anchor="middle" font-size="12" fill="#333">Fin Sprint 1</text>
+  <text x="680" y="360" text-anchor="middle" font-size="12" fill="#333">Fin Sprint 2</text>
+
+  <!-- linea ideal (34 -> 0) -->
+  <polyline points="70,60 680,340" fill="none" stroke="#9aa0a6" stroke-width="2" stroke-dasharray="6 5"/>
+  <!-- linea real (34 -> 18 -> 0) -->
+  <polyline points="70,60 375,191.8 680,340" fill="none" stroke="#0b8457" stroke-width="3"/>
+
+  <!-- puntos reales -->
+  <circle cx="70" cy="60" r="5" fill="#0b8457"/>
+  <text x="82" y="55" font-size="12" fill="#0b8457">34</text>
+  <circle cx="375" cy="191.8" r="5" fill="#0b8457"/>
+  <text x="387" y="187" font-size="12" fill="#0b8457">18</text>
+  <circle cx="680" cy="340" r="5" fill="#0b8457"/>
+  <text x="655" y="332" font-size="12" fill="#0b8457">0</text>
+
+  <!-- leyenda -->
+  <line x1="430" y1="80" x2="470" y2="80" stroke="#9aa0a6" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="476" y="84" font-size="12" fill="#666">Ideal</text>
+  <line x1="530" y1="80" x2="570" y2="80" stroke="#0b8457" stroke-width="3"/>
+  <text x="576" y="84" font-size="12" fill="#666">Real</text>
+</svg>

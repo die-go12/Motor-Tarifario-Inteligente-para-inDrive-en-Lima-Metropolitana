@@ -7,6 +7,7 @@
 - **[Presentación Final](Presentacion_Final/README.md)** — índice/guion de la defensa: arquitectura, sprints, pruebas, evidencias, gestión de cambio y conclusiones.
 
 ## 🏃 Scrum (por fase)
+- ⭐ **[Cierre del Proyecto — Gestión Scrum (Sprint Final)](Scrum/cierre_sprint_final.md)** — vista única: **burndown**, velocity, historias completadas, pendientes con justificación, retrospectiva y riesgos.
 - [Sprint 0](Scrum/Sprints/sprint_0.md)
 - [Sprint 1](Scrum/Sprints/sprint_1.md)
 - [Sprint 2](Scrum/Sprints/sprint_2.md) — tiene su **propio índice interno**
@@ -20,6 +21,7 @@
 - [Sprint Backlog](Requerimientos/sprint_backlog.md)
 
 ## 🏗️ Arquitectura
+- ⭐ **[Decisiones y Patrones (explicación en claro)](Aquitectura/decisiones_y_patrones.md)** — decisiones y patrones de diseño en lenguaje simple + analogías (para audiencia).
 - [Arquitectura general](Aquitectura/Arquitectura_general.md) — **canónico** de arquitectura técnica + diagramas
 - [Decisiones arquitectónicas (ADR)](Aquitectura/decisiones_arquitectonicas.md)
 - [Stack tecnológico](Aquitectura/Stack_Tecnologico.md)

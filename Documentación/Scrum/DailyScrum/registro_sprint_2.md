@@ -3,7 +3,7 @@
 
 **Proyecto:** Motor Tarifario Inteligente para inDrive en Lima Metropolitana
 
-**Fecha:** 16/07/2026
+**Fecha:** 16/06/2026
 
 **Hora:** 10:00 PM
 

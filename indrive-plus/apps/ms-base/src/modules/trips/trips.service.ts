@@ -41,8 +41,16 @@ export class TripsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async estimate(origin: string, destination: string, capacity?: number): Promise<TripEstimate> {
-    const { context, quote } = await this.resolveQuote(origin, destination, capacity);
+  async estimate(
+    origin: string,
+    destination: string,
+    capacity?: number,
+  ): Promise<TripEstimate> {
+    const { context, quote } = await this.resolveQuote(
+      origin,
+      destination,
+      capacity,
+    );
     return {
       distanceKm: context.distanceKm,
       durationMin: context.durationMin,
@@ -98,7 +106,10 @@ export class TripsService {
     return { context, quote };
   }
 
-  private buildQuoteRequest(context: TripContext, capacity?: number): QuoteRequest {
+  private buildQuoteRequest(
+    context: TripContext,
+    capacity?: number,
+  ): QuoteRequest {
     return {
       distanceKm: context.distanceKm,
       fuelPricePerGallon: context.fuelPricePerGallon,
@@ -110,7 +121,11 @@ export class TripsService {
     };
   }
 
-  async assign(tripId: number, driverId: number, acceptedPrice?: number): Promise<Trip> {
+  async assign(
+    tripId: number,
+    driverId: number,
+    acceptedPrice?: number,
+  ): Promise<Trip> {
     const hasVehicle = await this.vehiclesService.existsForDriver(driverId);
     if (!hasVehicle) {
       throw new BadRequestException(
@@ -215,7 +230,6 @@ export class TripsService {
       where: { status: TripStatus.SEARCHING },
     });
   }
-
 
   findByPassenger(passengerId: number): Promise<Trip[]> {
     return this.tripsRepository.find({ where: { passengerId } });

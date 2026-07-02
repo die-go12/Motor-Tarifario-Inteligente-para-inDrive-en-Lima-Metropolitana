@@ -24,29 +24,28 @@ const parseCorsOrigins = (raw?: string): string[] => {
   return origins.length > 0 ? origins : DEFAULT_CORS_ORIGINS;
 };
 
-const proxyTo = (target: string, prefixes: string[]): Options =>
-  ({
-    target,
-    changeOrigin: true,
-    pathFilter: matches(prefixes),
-    proxyTimeout: PROXY_TIMEOUT_MS,
-    timeout: PROXY_TIMEOUT_MS,
-    on: {
-      error: (error: Error, _req: unknown, res: unknown) => {
-        logger.error(`Proxy error hacia ${target}: ${error.message}`);
-        const response = res as ServerResponse;
-        if (typeof response.writeHead === 'function' && !response.headersSent) {
-          response.writeHead(502, { 'Content-Type': 'application/json' });
-          response.end(
-            JSON.stringify({
-              statusCode: 502,
-              message: 'Servicio no disponible',
-            }),
-          );
-        }
-      },
+const proxyTo = (target: string, prefixes: string[]): Options => ({
+  target,
+  changeOrigin: true,
+  pathFilter: matches(prefixes),
+  proxyTimeout: PROXY_TIMEOUT_MS,
+  timeout: PROXY_TIMEOUT_MS,
+  on: {
+    error: (error: Error, _req: unknown, res: unknown) => {
+      logger.error(`Proxy error hacia ${target}: ${error.message}`);
+      const response = res as ServerResponse;
+      if (typeof response.writeHead === 'function' && !response.headersSent) {
+        response.writeHead(502, { 'Content-Type': 'application/json' });
+        response.end(
+          JSON.stringify({
+            statusCode: 502,
+            message: 'Servicio no disponible',
+          }),
+        );
+      }
     },
-  }) as Options;
+  },
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule, { bodyParser: false });

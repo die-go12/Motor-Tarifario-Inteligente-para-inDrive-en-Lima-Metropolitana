@@ -54,10 +54,7 @@ export class UsersController {
 
   @Roles(UserRole.ADMIN)
   @Post()
-  create(
-    @CurrentUser() admin: AuthenticatedUser,
-    @Body() dto: CreateUserDto,
-  ) {
+  create(@CurrentUser() admin: AuthenticatedUser, @Body() dto: CreateUserDto) {
     return this.usersService.create(dto, admin.id);
   }
 

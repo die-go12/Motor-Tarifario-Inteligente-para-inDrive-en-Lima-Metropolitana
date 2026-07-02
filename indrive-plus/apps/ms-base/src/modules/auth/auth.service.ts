@@ -109,8 +109,7 @@ export class AuthService {
   }
 
   private async revokeFamilyOnReuse(refreshToken: string): Promise<void> {
-    const known =
-      await this.tokensService.findRefreshTokenRecord(refreshToken);
+    const known = await this.tokensService.findRefreshTokenRecord(refreshToken);
     if (known) {
       await this.tokensService.revokeAllForUser(known.userId);
     }

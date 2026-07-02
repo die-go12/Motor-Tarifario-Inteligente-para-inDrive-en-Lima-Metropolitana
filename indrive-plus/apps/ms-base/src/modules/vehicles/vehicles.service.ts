@@ -10,7 +10,10 @@ import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
-import { AuditAction, AuditEntityType } from '../audit/entities/audit-log.entity';
+import {
+  AuditAction,
+  AuditEntityType,
+} from '../audit/entities/audit-log.entity';
 
 @Injectable()
 export class VehiclesService {
@@ -68,7 +71,9 @@ export class VehiclesService {
       where: { driverId },
     });
 
-    const driver = await this.usersRepository.findOne({ where: { id: driverId } });
+    const driver = await this.usersRepository.findOne({
+      where: { id: driverId },
+    });
     const entityName = driver
       ? `${driver.name} (${driver.email})`
       : `Conductor #${driverId}`;

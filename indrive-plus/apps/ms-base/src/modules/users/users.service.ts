@@ -10,7 +10,10 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuditService } from '../audit/audit.service';
-import { AuditAction, AuditEntityType } from '../audit/entities/audit-log.entity';
+import {
+  AuditAction,
+  AuditEntityType,
+} from '../audit/entities/audit-log.entity';
 
 const PASSWORD_SALT_ROUNDS = 10;
 
@@ -69,7 +72,11 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async updateProfile(id: number, dto: UpdateUserDto, adminId?: number): Promise<User> {
+  async updateProfile(
+    id: number,
+    dto: UpdateUserDto,
+    adminId?: number,
+  ): Promise<User> {
     const user = await this.findById(id);
     const oldValues = this.toAuditSnapshot(user);
     Object.assign(user, dto);
@@ -141,4 +148,3 @@ export class UsersService {
     };
   }
 }
-

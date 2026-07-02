@@ -1,6 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsPositive, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  Max,
+  Min,
+} from 'class-validator';
 import { AnomalySeverity } from '@app/shared';
 
 export const DEFAULT_ANOMALY_LIMIT = 50;
@@ -19,7 +26,10 @@ export class FindAnomaliesDto {
   @IsPositive()
   tripId?: number;
 
-  @ApiPropertyOptional({ default: DEFAULT_ANOMALY_LIMIT, maximum: MAX_ANOMALY_LIMIT })
+  @ApiPropertyOptional({
+    default: DEFAULT_ANOMALY_LIMIT,
+    maximum: MAX_ANOMALY_LIMIT,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

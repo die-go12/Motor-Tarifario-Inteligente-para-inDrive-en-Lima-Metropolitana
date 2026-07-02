@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuditLog, AuditAction, AuditEntityType } from './entities/audit-log.entity';
+import {
+  AuditLog,
+  AuditAction,
+  AuditEntityType,
+} from './entities/audit-log.entity';
 
 export interface CreateAuditLogDto {
   adminId?: number | null;

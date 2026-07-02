@@ -56,7 +56,7 @@ export class PricingConfigService {
       }
     });
 
-    const effective = { ...current, ...newValues } as PricingConfig;
+    const effective = { ...current, ...newValues };
     this.assertCoherentConfig(effective);
 
     await this.configModel.findOneAndUpdate({}, { $set: dto }, { new: true });

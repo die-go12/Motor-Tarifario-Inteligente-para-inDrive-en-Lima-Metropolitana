@@ -88,7 +88,11 @@ export class NegotiationService {
       throw new BadRequestException('La oferta ya no está disponible');
     }
 
-    const assignedTrip = await this.tripsService.assign(tripId, offer.driverId, offer.amount);
+    const assignedTrip = await this.tripsService.assign(
+      tripId,
+      offer.driverId,
+      offer.amount,
+    );
     offer.status = OfferStatus.ACCEPTED;
     await this.offersRepository.save(offer);
     await this.rejectOtherPendingOffers(offer);

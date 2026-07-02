@@ -13,6 +13,7 @@
     "start:gateway": "nest start api-gateway --watch",
     "start:pricing": "nest start ms-pricing --watch",
     "start:integration": "nest start ms-integration --watch",
+    "start:reports": "nest start ms-reports --watch",
     "start:prod:base": "node dist/apps/ms-base/main",
     "lint": "eslint \"{apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",

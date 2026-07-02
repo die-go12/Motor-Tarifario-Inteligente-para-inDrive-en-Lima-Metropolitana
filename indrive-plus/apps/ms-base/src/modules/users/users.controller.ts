@@ -14,6 +14,7 @@ import { AuthenticatedUser, UserRole } from '@app/shared';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -34,7 +35,7 @@ export class UsersController {
   @Patch('me')
   updateProfile(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: UpdateUserDto,
+    @Body() dto: UpdateProfileDto,
   ) {
     return this.usersService.updateProfile(user.id, dto);
   }

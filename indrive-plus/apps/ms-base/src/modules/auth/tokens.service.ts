@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { createHash } from 'crypto';
 import { MoreThan, Repository } from 'typeorm';
 import { TokenType } from '@app/shared';
 import { Token } from './entities/token.entity';
@@ -18,7 +19,7 @@ export class TokensService {
   ): Promise<Token> {
     const refreshToken = this.tokensRepository.create({
       userId,
-      token,
+      token: this.hashToken(token),
       tokenType: TokenType.REFRESH,
       expiresAt,
     });
@@ -28,7 +29,7 @@ export class TokensService {
   findActiveRefreshToken(token: string): Promise<Token | null> {
     return this.tokensRepository.findOne({
       where: {
-        token,
+        token: this.hashToken(token),
         tokenType: TokenType.REFRESH,
         isRevoked: false,
         expiresAt: MoreThan(new Date()),
@@ -36,11 +37,25 @@ export class TokensService {
     });
   }
 
-  async revokeRefreshToken(token: string): Promise<void> {
-    await this.tokensRepository.update(
-      { token, tokenType: TokenType.REFRESH },
+  findRefreshTokenRecord(token: string): Promise<Token | null> {
+    return this.tokensRepository.findOne({
+      where: {
+        token: this.hashToken(token),
+        tokenType: TokenType.REFRESH,
+      },
+    });
+  }
+
+  async revokeRefreshToken(token: string): Promise<boolean> {
+    const result = await this.tokensRepository.update(
+      {
+        token: this.hashToken(token),
+        tokenType: TokenType.REFRESH,
+        isRevoked: false,
+      },
       { isRevoked: true },
     );
+    return (result.affected ?? 0) > 0;
   }
 
   async revokeAllForUser(userId: number): Promise<void> {
@@ -48,5 +63,9 @@ export class TokensService {
       { userId, tokenType: TokenType.REFRESH, isRevoked: false },
       { isRevoked: true },
     );
+  }
+
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
   }
 }

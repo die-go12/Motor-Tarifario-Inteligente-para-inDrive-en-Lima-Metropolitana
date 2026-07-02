@@ -69,6 +69,7 @@ services:
       REDIS_PORT: 6379
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       FUEL_PRICE_PER_GALLON: ${FUEL_PRICE_PER_GALLON}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     ports:
       - "3002:3002"
     depends_on:
@@ -137,6 +138,7 @@ services:
       JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES}
       MS_PRICING_URL: http://ms-pricing:3002
       MS_INTEGRATION_URL: http://ms-integration:3003
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     ports:
       - "3001:3001"
     depends_on:
@@ -161,6 +163,7 @@ services:
       MS_BASE_URL: http://ms-base:3001
       MS_PRICING_URL: http://ms-pricing:3002
       MS_REPORTS_URL: http://ms-reports:3004
+      GATEWAY_CORS_ORIGINS: ${GATEWAY_CORS_ORIGINS}
     ports:
       - "3000:3000"
     depends_on:

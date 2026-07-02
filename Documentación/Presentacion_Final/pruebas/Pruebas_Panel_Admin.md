@@ -246,7 +246,7 @@ En la sección de Configuración del Sistema, los botones "Guardar configuració
 <img src="https://github.com/user-attachments/assets/fcdf52ba-ebb0-4024-9097-cbe08afa29d2" width="700">
 </p>
 
-- En la sección de Fleet se puede realizar el registr del conductor y al igual que los otros roles se le piden que ingrese su nombre completo, correo y contrase, y como datos adicionales los datos del perfil de auto, tales como la marca, el modelo, número de placa, capacidad, color, año y el tipo de combustible que utiliza.
+- En la sección de Fleet se puede realizar el registro de los datos del conductor y al igual que los otros roles se le piden que ingrese su nombre completo, correo y contraseña, pero para el caso del condcutor le pide que añada como datos adicionales los datos del perfil de auto, tales como la marca, el modelo, número de placa, capacidad, color, año y el tipo de combustible que utiliza.
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/bc91b8eb-e65b-4f5d-afa4-eb3f5de67a19" width="700">

@@ -7,7 +7,7 @@ export function assertOfferWithinRange(
 ): void {
   if (amount < minimumPrice || amount > maximumPrice) {
     throw new BadRequestException(
-      `La oferta debe estar dentro del rango [${minimumPrice}, ${maximumPrice}]`,
+      'La oferta está fuera del rango permitido para este viaje',
     );
   }
 }

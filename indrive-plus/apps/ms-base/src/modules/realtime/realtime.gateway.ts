@@ -118,10 +118,7 @@ export class RealtimeGateway implements OnGatewayConnection {
         payload.offerId,
         user,
       );
-      this.emitToUser(trip.passengerId, ServerEvent.TRIP_ASSIGNED, trip);
-      if (trip.driverId !== null) {
-        this.emitToUser(trip.driverId, ServerEvent.TRIP_ASSIGNED, trip);
-      }
+      this.emitTripToParticipants(trip, ServerEvent.TRIP_ASSIGNED);
     });
   }
 
@@ -148,10 +145,7 @@ export class RealtimeGateway implements OnGatewayConnection {
     const user = this.userOf(client);
     await this.guard(client, async () => {
       const trip = await this.tripsService.start(payload.tripId, user.id);
-      this.emitToUser(trip.passengerId, ServerEvent.TRIP_STARTED, trip);
-      if (trip.driverId !== null) {
-        this.emitToUser(trip.driverId, ServerEvent.TRIP_STARTED, trip);
-      }
+      this.emitTripToParticipants(trip, ServerEvent.TRIP_STARTED);
     });
   }
 
@@ -163,10 +157,7 @@ export class RealtimeGateway implements OnGatewayConnection {
     const user = this.userOf(client);
     await this.guard(client, async () => {
       const trip = await this.tripsService.cancel(payload.tripId, user.id);
-      this.emitToUser(trip.passengerId, ServerEvent.TRIP_CANCELLED, trip);
-      if (trip.driverId !== null) {
-        this.emitToUser(trip.driverId, ServerEvent.TRIP_CANCELLED, trip);
-      }
+      this.emitTripToParticipants(trip, ServerEvent.TRIP_CANCELLED);
     });
   }
 
@@ -229,6 +220,17 @@ export class RealtimeGateway implements OnGatewayConnection {
     payload: unknown,
   ): void {
     this.server.to(this.userRoom(userId)).emit(event, payload);
+  }
+
+  private emitTripToParticipants(trip: Trip, event: ServerEvent): void {
+    this.emitToUser(
+      trip.passengerId,
+      event,
+      presentTrip(trip, UserRole.PASSENGER),
+    );
+    if (trip.driverId !== null) {
+      this.emitToUser(trip.driverId, event, presentTrip(trip, UserRole.DRIVER));
+    }
   }
 
   private userRoom(userId: number): string {

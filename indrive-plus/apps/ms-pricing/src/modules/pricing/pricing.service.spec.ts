@@ -86,6 +86,16 @@ describe('PricingService', () => {
       expect(quote.maximumPrice).toBeGreaterThanOrEqual(quote.minimumPrice);
     });
 
+    it('respeta el tope absoluto S/150 en viajes largos', async () => {
+      const quote = await service.quote({ ...baseRequest, distanceKm: 120 });
+      expect(quote.minimumPrice).toBeLessThanOrEqual(
+        DEFAULT_CONFIG.maxAbsoluteFare,
+      );
+      expect(quote.maximumPrice).toBeLessThanOrEqual(
+        DEFAULT_CONFIG.maxAbsoluteFare,
+      );
+    });
+
     it('garantiza un spread mínimo cuando no hay surge (multiplicadores 1.0)', async () => {
       const quote = await service.quote({
         ...baseRequest,

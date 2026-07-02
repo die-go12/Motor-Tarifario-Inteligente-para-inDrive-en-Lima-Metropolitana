@@ -143,9 +143,10 @@ export class TripsService {
   ): Promise<Trip> {
     const trip = await this.findAssignedDriverTrip(tripId, driverId);
     assertTransition(trip.status, TripStatus.COMPLETED);
+    const settlementCeiling = this.settlementCeiling(trip);
     const settlement = await this.pricingClient.settle({
       minimumPrice: trip.minimumPrice,
-      maximumPrice: trip.maximumPrice,
+      maximumPrice: settlementCeiling,
       realPrice,
       tripId: trip.id,
       route: `${trip.origin} - ${trip.destination}`,
@@ -154,24 +155,30 @@ export class TripsService {
     trip.status = TripStatus.COMPLETED;
     trip.completedAt = new Date();
     const completed = await this.tripsRepository.save(trip);
-    await this.persistPayment(completed, settlement.finalPrice, realPrice);
+    await this.persistPayment(
+      completed,
+      settlement.finalPrice,
+      realPrice,
+      settlementCeiling,
+    );
     return completed;
+  }
+
+  private settlementCeiling(trip: Trip): number {
+    return trip.acceptedPrice ?? trip.maximumPrice;
   }
 
   private async persistPayment(
     trip: Trip,
     amount: number,
     realPrice: number,
+    ceiling: number,
   ): Promise<void> {
     const payment = this.paymentsRepository.create({
       tripId: trip.id,
       amount,
       realPrice,
-      condition: derivePaymentCondition(
-        realPrice,
-        trip.minimumPrice,
-        trip.maximumPrice,
-      ),
+      condition: derivePaymentCondition(realPrice, trip.minimumPrice, ceiling),
     });
     await this.paymentsRepository.save(payment);
   }

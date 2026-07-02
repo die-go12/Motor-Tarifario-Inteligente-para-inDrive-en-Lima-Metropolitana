@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthenticatedUser } from '@app/shared';
@@ -35,7 +35,7 @@ export class PricingConfigService {
   async getActive(): Promise<PricingConfig> {
     const existing = await this.configModel.findOne().lean();
     if (existing) {
-      return { ...DEFAULT_CONFIG, ...existing };
+      return this.mergeWithDefaults(existing);
     }
     return this.configModel.create(DEFAULT_CONFIG);
   }
@@ -56,14 +56,44 @@ export class PricingConfigService {
       }
     });
 
-    const updated = (await this.configModel
-      .findOneAndUpdate({}, { $set: dto }, { new: true })
-      .lean()) as PricingConfig;
+    const effective = { ...current, ...newValues };
+    this.assertCoherentConfig(effective);
+
+    await this.configModel.findOneAndUpdate({}, { $set: dto }, { new: true });
 
     if (admin) {
       await this.auditService.logConfigChange(admin, oldValues, newValues);
     }
 
-    return updated;
+    return effective;
+  }
+
+  private mergeWithDefaults(existing: Partial<PricingConfig>): PricingConfig {
+    const merged = { ...DEFAULT_CONFIG };
+    (Object.keys(DEFAULT_CONFIG) as (keyof PricingConfig)[]).forEach((key) => {
+      const value = existing[key];
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        merged[key] = value;
+      }
+    });
+    return merged;
+  }
+
+  private assertCoherentConfig(config: PricingConfig): void {
+    if (config.minAbsoluteFare > config.maxAbsoluteFare) {
+      throw new BadRequestException(
+        'La tarifa mínima absoluta no puede superar a la máxima',
+      );
+    }
+    if (config.minRangeRatio > config.maxRangeRatio) {
+      throw new BadRequestException(
+        'El ratio mínimo no puede superar al ratio máximo',
+      );
+    }
+    if (config.anomalyMediumDeviation > config.anomalyHighDeviation) {
+      throw new BadRequestException(
+        'El umbral de anomalía media no puede superar al umbral alto',
+      );
+    }
   }
 }

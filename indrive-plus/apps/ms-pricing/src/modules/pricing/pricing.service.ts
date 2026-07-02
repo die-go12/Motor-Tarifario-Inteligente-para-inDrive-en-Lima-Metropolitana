@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   AnomalySeverity,
   PriceQuote,
@@ -23,7 +23,11 @@ export class PricingService {
   async quote(request: QuoteRequest): Promise<PriceQuote> {
     const config = await this.pricingConfigService.getActive();
     const basePrice = this.calculateBasePrice(request, config);
-    const minimumPrice = Math.max(basePrice, config.minAbsoluteFare);
+    const minimumPrice = this.clamp(
+      basePrice,
+      config.minAbsoluteFare,
+      config.maxAbsoluteFare,
+    );
     const maximumPrice = this.calculateMaximumPrice(
       minimumPrice,
       request,
@@ -82,10 +86,12 @@ export class PricingService {
   }
 
   async settle(request: SettleRequest): Promise<PriceSettlement> {
+    this.assertSettlementRange(request);
     const { minimumPrice, maximumPrice, realPrice } = request;
     const finalPrice = this.round(
       Math.max(minimumPrice, Math.min(realPrice, maximumPrice)),
     );
+    const config = await this.pricingConfigService.getActive();
     this.emit(PricingChannel.SETTLED, {
       tripId: request.tripId,
       route: request.route,
@@ -95,9 +101,16 @@ export class PricingService {
       finalPrice,
       settledAt: new Date().toISOString(),
     });
-    const config = await this.pricingConfigService.getActive();
     this.detectAnomaly(request, config);
     return { finalPrice };
+  }
+
+  private assertSettlementRange(request: SettleRequest): void {
+    if (request.minimumPrice > request.maximumPrice) {
+      throw new BadRequestException(
+        'El rango de liquidación es inválido: el mínimo supera al máximo',
+      );
+    }
   }
 
   private detectAnomaly(request: SettleRequest, config: PricingConfig): void {
@@ -128,10 +141,10 @@ export class PricingService {
     realPrice: number,
   ): number {
     if (realPrice > maximumPrice) {
-      return (realPrice - maximumPrice) / maximumPrice;
+      return maximumPrice > 0 ? (realPrice - maximumPrice) / maximumPrice : 0;
     }
     if (realPrice < minimumPrice) {
-      return (minimumPrice - realPrice) / minimumPrice;
+      return minimumPrice > 0 ? (minimumPrice - realPrice) / minimumPrice : 0;
     }
     return 0;
   }
@@ -157,5 +170,9 @@ export class PricingService {
 
   private round(value: number): number {
     return Math.round(value * 100) / 100;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
   }
 }

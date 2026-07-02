@@ -10,7 +10,12 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuditService } from '../audit/audit.service';
-import { AuditAction, AuditEntityType } from '../audit/entities/audit-log.entity';
+import {
+  AuditAction,
+  AuditEntityType,
+} from '../audit/entities/audit-log.entity';
+
+const PASSWORD_SALT_ROUNDS = 10;
 
 @Injectable()
 export class UsersService {
@@ -22,13 +27,11 @@ export class UsersService {
 
   async create(dto: CreateUserDto, adminId?: number): Promise<User> {
     await this.ensureEmailIsAvailable(dto.email);
-    const maybeHashedPassword = dto.password.startsWith('$2')
-      ? dto.password
-      : await bcrypt.hash(dto.password, 10);
+    const password = await bcrypt.hash(dto.password, PASSWORD_SALT_ROUNDS);
 
     const user = this.usersRepository.create({
       ...dto,
-      password: maybeHashedPassword,
+      password,
     });
     const saved = await this.usersRepository.save(user);
 
@@ -69,9 +72,13 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async updateProfile(id: number, dto: UpdateUserDto, adminId?: number): Promise<User> {
+  async updateProfile(
+    id: number,
+    dto: UpdateUserDto,
+    adminId?: number,
+  ): Promise<User> {
     const user = await this.findById(id);
-    const oldValues = { ...user } as Record<string, unknown>;
+    const oldValues = this.toAuditSnapshot(user);
     Object.assign(user, dto);
     const updated = await this.usersRepository.save(user);
 
@@ -130,5 +137,14 @@ export class UsersService {
       throw new ConflictException('El correo ya está registrado');
     }
   }
-}
 
+  private toAuditSnapshot(user: User): Record<string, unknown> {
+    return {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone,
+      isActive: user.isActive,
+    };
+  }
+}

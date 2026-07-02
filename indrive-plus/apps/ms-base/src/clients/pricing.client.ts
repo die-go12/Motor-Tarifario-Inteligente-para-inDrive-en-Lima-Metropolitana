@@ -27,10 +27,15 @@ export class PricingClient {
 
   private async post<T>(path: string, payload: unknown): Promise<T> {
     const baseUrl = this.configService.getOrThrow<string>('MS_PRICING_URL');
+    const internalApiKey =
+      this.configService.getOrThrow<string>('INTERNAL_API_KEY');
     try {
       const response = await fetch(`${baseUrl}/${path}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-api-key': internalApiKey,
+        },
         body: JSON.stringify(payload),
       });
       if (!response.ok) {

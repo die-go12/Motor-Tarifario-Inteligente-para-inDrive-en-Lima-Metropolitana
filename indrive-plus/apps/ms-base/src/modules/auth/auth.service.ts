@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -15,7 +16,10 @@ import { TokensService } from './tokens.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
-const PASSWORD_SALT_ROUNDS = 10;
+const SELF_REGISTRATION_ROLES: readonly UserRole[] = [
+  UserRole.PASSENGER,
+  UserRole.DRIVER,
+];
 
 @Injectable()
 export class AuthService {
@@ -28,6 +32,8 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    this.assertSelfRegistrationRole(dto.role);
+
     if (dto.role === UserRole.DRIVER) {
       if (!dto.vehicleProfile) {
         throw new BadRequestException(
@@ -44,8 +50,7 @@ export class AuthService {
       }
     }
 
-    const password = await bcrypt.hash(dto.password, PASSWORD_SALT_ROUNDS);
-    const user = await this.usersService.create({ ...dto, password });
+    const user = await this.usersService.create(dto);
 
     if (dto.role === UserRole.DRIVER && dto.vehicleProfile) {
       try {
@@ -74,16 +79,40 @@ export class AuthService {
     const stored =
       await this.tokensService.findActiveRefreshToken(refreshToken);
     if (!stored) {
+      await this.revokeFamilyOnReuse(refreshToken);
       throw new UnauthorizedException('Refresh token inválido o expirado');
     }
     await this.verifyRefreshToken(refreshToken);
-    await this.tokensService.revokeRefreshToken(refreshToken);
     const user = await this.usersService.findById(stored.userId);
+    if (!user.isActive) {
+      await this.tokensService.revokeAllForUser(user.id);
+      throw new UnauthorizedException('La cuenta está inactiva');
+    }
+    const rotated = await this.tokensService.revokeRefreshToken(refreshToken);
+    if (!rotated) {
+      await this.tokensService.revokeAllForUser(user.id);
+      throw new UnauthorizedException('Refresh token inválido o expirado');
+    }
     return this.buildSession(user);
   }
 
   async logout(refreshToken: string): Promise<void> {
     await this.tokensService.revokeRefreshToken(refreshToken);
+  }
+
+  private assertSelfRegistrationRole(role: UserRole): void {
+    if (!SELF_REGISTRATION_ROLES.includes(role)) {
+      throw new ForbiddenException(
+        'El registro público solo permite los roles pasajero o conductor',
+      );
+    }
+  }
+
+  private async revokeFamilyOnReuse(refreshToken: string): Promise<void> {
+    const known = await this.tokensService.findRefreshTokenRecord(refreshToken);
+    if (known) {
+      await this.tokensService.revokeAllForUser(known.userId);
+    }
   }
 
   private async buildSession(user: User) {

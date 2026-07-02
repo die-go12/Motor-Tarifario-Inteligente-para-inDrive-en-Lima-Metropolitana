@@ -11,8 +11,9 @@ export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || `http://${DEFAULT
 // WebSocket (socket.io) servido por ms-base en el mismo puerto.
 export const WS_BASE_URL = process.env.EXPO_PUBLIC_WS_URL || `http://${DEFAULT_IP}:3001`;
 
-// Google Maps API Key
-export const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyD8P5S5XkSVt3epOPC8_dTGmPvFvRm6nx4';
+// Google Maps API Key (se lee de EXPO_PUBLIC_GOOGLE_MAPS_API_KEY en .env)
+export const GOOGLE_MAPS_API_KEY =
+  process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
 // Coordenadas del centro de Lima Metropolitana para filtrar búsquedas
 export const LIMA_CENTRO = {

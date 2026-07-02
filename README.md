@@ -224,57 +224,44 @@ El sistema se divide en dos componentes principales: una plataforma base encarga
 motor-tarifario-inteligente/
 │
 ├── Documentación/
-│   │
-│   ├── Arquitectura/
+│   ├── Aquitectura/
 │   │   ├── Arquitectura_general.md
 │   │   ├── Stack_Tecnologico.md
 │   │   └── decisiones_arquitectonicas.md
-│   │
 │   ├── Negocio/
 │   │   ├── flujo_calculo_tarifa.md
 │   │   └── reglas_tarifarias.md
-│   │    
-│   │
 │   ├── Requerimientos/
 │   │   ├── Historias_usuario.md
 │   │   ├── Product_backlog.md
 │   │   └── sprint_backlog.md
-│   │   
-│   │
-│   └── Scrum/
-│       ├── daily_scrum/
-│       │   ├── registro_sprint_1.md
-│       │   └── registro_sprint_2.md
-│       │
-│       ├── retrospective.md
-│       ├── sprint_0.md
-│       ├── sprint_1.md
-│       ├── sprint_2.md
-│       ├── sprint_review.md
-│       └── README.md
-│
-├── indrive-plus/
-│   │
-│   ├── database/
-│   │   ├── mongodb/
-│   │   │   └── collections.md
-│   │   ├── postgresql/
-│   │   │   ├── listado_funciones.txt
-│   │   │   └── schema.sql
-│   │   ├── redis/
-│   │   │   └── redis_structure.md
-│   │   └── README.md
-│   │
-│   ├── mobile-app/
-│   ├── admin-panel/
-│   ├── services/
-│   │   ├── platform-base/
-│   │   └── pricing-engine/
-│   │
-│   ├── tests/
-│   ├── docker-compose.yml
+│   ├── Scrum/
+│   │   ├── DailyScrum/
+│   │   ├── Planeamiento/
+│   │   ├── Pruebas/
+│   │   ├── Retrospectivas/
+│   │   ├── Seguridad/
+│   │   └── Sprints/            # sprint_0.md, sprint_1.md, sprint_2.md
+│   ├── Presentacion_Final/
 │   └── README.md
 │
+├── indrive-plus/               # backend (monorepo NestJS)
+│   ├── apps/
+│   │   ├── api-gateway/         # :3000
+│   │   ├── ms-base/            # :3001 (auth, users, vehicles, trips, ws)
+│   │   ├── ms-pricing/         # :3002 (motor tarifario)
+│   │   ├── ms-integration/     # :3003 (stubs + circuit breaker)
+│   │   └── ms-reports/         # :3004 (reportes)
+│   ├── libs/shared/            # enums, interfaces, tipos JWT
+│   ├── database/
+│   │   ├── mongodb/collections.md
+│   │   ├── postgresql/schema.sql
+│   │   └── redis/redis_structure.md
+│   ├── docker/                 # docker-compose.yml, .env.example
+│   └── package.json
+│
+├── admin-panel/               # panel web admin (HTML/JS)
+├── indrive-mobile/            # app móvil (Expo / React Native)
 └── README.md
 ```
 
@@ -282,9 +269,9 @@ motor-tarifario-inteligente/
 
 ## Documentación Scrum
 
-* [Sprint 0](Documentación/Scrum/sprint_0.md)
-* [Sprint 1](Documentación/Scrum/sprint_1.md)
-* [Sprint 2](Documentación/Scrum/sprint_2.md)
+* [Sprint 0](Documentación/Scrum/Sprints/sprint_0.md)
+* [Sprint 1](Documentación/Scrum/Sprints/sprint_1.md)
+* [Sprint 2](Documentación/Scrum/Sprints/sprint_2.md)
 * [Historias de Usuario](Documentación/Requerimientos/Historias_usuario.md)
 * [Product Backlog](Documentación/Requerimientos/Product_backlog.md)
 * [Sprint Backlog](Documentación/Requerimientos/sprint_backlog.md)

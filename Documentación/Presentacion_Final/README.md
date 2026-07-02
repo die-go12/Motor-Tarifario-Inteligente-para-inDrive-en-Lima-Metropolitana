@@ -27,7 +27,7 @@
 - [gestion_de_cambio.md](gestion_de_cambio.md) — cambios gestionados (proceso de 5 pasos).
 
 ## Reporte de Vulnerabilidades
-- [Reporte General del Sistema](../Scrum/Seguridad/vulnerabilidades_sistema_sprint2.md)
+- [Reporte General del Sistema](../Scrum/Seguridad/reporte_vulnerabilidades.md)
 - [Reporte del Panel Administrativo](../Scrum/Seguridad/reporte_vulnerabilidades_admin_panel.md)
 - [Reporte de la Aplicación Móvil](../Scrum/Seguridad/reporte_vulnerabilidades_movil.md)
 

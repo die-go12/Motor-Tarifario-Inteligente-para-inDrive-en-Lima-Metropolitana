@@ -45,8 +45,16 @@ export class AuditService {
     const safeLimit = Math.max(1, Math.min(limit, 500));
 
     const [pricing, anomalies, history, configChanges] = await Promise.all([
-      this.pricingLogModel.find().sort({ createdAt: -1 }).limit(safeLimit).lean(),
-      this.anomalyLogModel.find().sort({ createdAt: -1 }).limit(safeLimit).lean(),
+      this.pricingLogModel
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(safeLimit)
+        .lean(),
+      this.anomalyLogModel
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(safeLimit)
+        .lean(),
       this.pricingHistoryModel
         .find()
         .sort({ createdAt: -1 })

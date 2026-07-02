@@ -31,7 +31,7 @@ La infraestructura servirá como base para la integración de:
 | Componente | Tecnología |
 |------------|------------|
 | Aplicación Móvil | React Native + Expo |
-| Panel Administrativo | React + TypeScript |
+| Panel Administrativo | HTML + JavaScript (Vanilla) + Nginx |
 | Backend Principal | NestJS |
 | Motor Tarifario | NestJS |
 | Base de Datos Relacional | PostgreSQL |

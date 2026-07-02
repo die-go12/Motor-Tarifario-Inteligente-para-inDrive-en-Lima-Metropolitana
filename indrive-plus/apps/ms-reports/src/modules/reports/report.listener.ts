@@ -1,4 +1,9 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,6 +21,7 @@ import { ReportAnomaly } from './schemas/report-anomaly.schema';
 @Injectable()
 export class ReportListener implements OnModuleInit, OnModuleDestroy {
   private readonly subscriber: Redis;
+  private readonly logger = new Logger(ReportListener.name);
 
   constructor(
     configService: ConfigService,
@@ -39,7 +45,12 @@ export class ReportListener implements OnModuleInit, OnModuleDestroy {
       PricingChannel.ANOMALY,
     );
     this.subscriber.on('message', (channel, message) => {
-      void this.persist(channel as PricingChannel, message);
+      this.persist(channel as PricingChannel, message).catch((error) => {
+        const reason = error instanceof Error ? error.message : String(error);
+        this.logger.error(
+          `No se pudo registrar el reporte del evento ${channel}: ${reason}`,
+        );
+      });
     });
   }
 
@@ -51,13 +62,25 @@ export class ReportListener implements OnModuleInit, OnModuleDestroy {
     channel: PricingChannel,
     message: string,
   ): Promise<void> {
-    const payload: unknown = JSON.parse(message);
+    const payload = this.parseMessage(channel, message);
+    if (payload === null) {
+      return;
+    }
     if (channel === PricingChannel.CALCULATED) {
       await this.persistQuote(payload as PricingCalculatedEvent);
     } else if (channel === PricingChannel.SETTLED) {
       await this.persistSettlement(payload as PricingSettledEvent);
     } else if (channel === PricingChannel.ANOMALY) {
       await this.persistAnomaly(payload as AnomalyDetectedEvent);
+    }
+  }
+
+  private parseMessage(channel: PricingChannel, message: string): unknown {
+    try {
+      return JSON.parse(message);
+    } catch {
+      this.logger.warn(`Mensaje no-JSON descartado en el canal ${channel}`);
+      return null;
     }
   }
 

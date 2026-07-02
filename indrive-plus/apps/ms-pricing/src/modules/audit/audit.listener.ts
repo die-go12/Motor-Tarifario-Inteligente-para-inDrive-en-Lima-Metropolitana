@@ -1,4 +1,9 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,6 +21,7 @@ import { PricingHistory } from './schemas/pricing-history.schema';
 @Injectable()
 export class AuditListener implements OnModuleInit, OnModuleDestroy {
   private readonly subscriber: Redis;
+  private readonly logger = new Logger(AuditListener.name);
 
   constructor(
     configService: ConfigService,
@@ -39,7 +45,10 @@ export class AuditListener implements OnModuleInit, OnModuleDestroy {
       PricingChannel.ANOMALY,
     );
     this.subscriber.on('message', (channel, message) => {
-      void this.persist(channel as PricingChannel, message);
+      this.persist(channel as PricingChannel, message).catch((error) => {
+        const reason = error instanceof Error ? error.message : String(error);
+        this.logger.error(`No se pudo auditar el evento ${channel}: ${reason}`);
+      });
     });
   }
 
@@ -51,13 +60,25 @@ export class AuditListener implements OnModuleInit, OnModuleDestroy {
     channel: PricingChannel,
     message: string,
   ): Promise<void> {
-    const payload: unknown = JSON.parse(message);
+    const payload = this.parseMessage(channel, message);
+    if (payload === null) {
+      return;
+    }
     if (channel === PricingChannel.CALCULATED) {
       await this.persistCalculated(payload as PricingCalculatedEvent);
     } else if (channel === PricingChannel.SETTLED) {
       await this.persistSettled(payload as PricingSettledEvent);
     } else if (channel === PricingChannel.ANOMALY) {
       await this.persistAnomaly(payload as AnomalyDetectedEvent);
+    }
+  }
+
+  private parseMessage(channel: PricingChannel, message: string): unknown {
+    try {
+      return JSON.parse(message);
+    } catch {
+      this.logger.warn(`Mensaje no-JSON descartado en el canal ${channel}`);
+      return null;
     }
   }
 

@@ -91,6 +91,7 @@ export class NegotiationService {
     const assignedTrip = await this.tripsService.assign(tripId, offer.driverId, offer.amount);
     offer.status = OfferStatus.ACCEPTED;
     await this.offersRepository.save(offer);
+    await this.rejectOtherPendingOffers(offer);
     await this.closeNegotiation(tripId);
     this.logger.log(
       `Aceptacion bilateral: viaje=${tripId} oferta=${offerId} conductor=${offer.driverId}`,
@@ -108,6 +109,16 @@ export class NegotiationService {
     if (!negotiation || offer.negotiationId !== negotiation.id) {
       throw new BadRequestException('La oferta no pertenece a este viaje');
     }
+  }
+
+  private async rejectOtherPendingOffers(acceptedOffer: Offer): Promise<void> {
+    await this.offersRepository.update(
+      {
+        negotiationId: acceptedOffer.negotiationId,
+        status: OfferStatus.PENDING,
+      },
+      { status: OfferStatus.REJECTED },
+    );
   }
 
   private async closeNegotiation(tripId: number): Promise<void> {

@@ -27,7 +27,8 @@ import {
   formatDate,
   getStatusConfig,
   getInitials,
-  getColorByIndex
+  getColorByIndex,
+  escapeHtml
 } from './ui-utils.js';
 import { debounce } from './ui-utils.js';
 
@@ -447,30 +448,30 @@ async function loadFleet() {
         (u, i) => {
           const vehicle = vehiclesByDriver[u.id];
           const vehicleDetail = vehicle
-            ? `${vehicle.brand || '—'} ${vehicle.model || ''} • ${vehicle.plate || '—'}`
+            ? `${escapeHtml(vehicle.brand || '—')} ${escapeHtml(vehicle.model || '')} • ${escapeHtml(vehicle.plate || '—')}`
             : 'Sin vehículo registrado';
-          const vehicleCapacity = vehicle?.capacity ? `${vehicle.capacity} pasajeros` : 'No definida';
-          const vehicleFuel = vehicle?.fuelType || 'No definido';
-          const vehicleYear = vehicle?.year || '—';
+          const vehicleCapacity = vehicle?.capacity ? `${escapeHtml(vehicle.capacity)} pasajeros` : 'No definida';
+          const vehicleFuel = escapeHtml(vehicle?.fuelType || 'No definido');
+          const vehicleYear = escapeHtml(vehicle?.year || '—');
 
           return `
         <div class="driver-card">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-            <div class="driver-av" style="background:${getColorByIndex(i)};color:var(--bg)">${getInitials(u.name)}</div>
+            <div class="driver-av" style="background:${getColorByIndex(i)};color:var(--bg)">${escapeHtml(getInitials(u.name))}</div>
             <div>
-              <div class="driver-name">${u.name}</div>
-              <div class="driver-meta">${u.email}</div>
+              <div class="driver-name">${escapeHtml(u.name)}</div>
+              <div class="driver-meta">${escapeHtml(u.email)}</div>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="dstat"><div class="dstat-label">ID</div><div class="dstat-val">#${u.id}</div></div>
-            <div class="dstat"><div class="dstat-label">Rol</div><div class="dstat-val">${u.role}</div></div>
+            <div class="dstat"><div class="dstat-label">ID</div><div class="dstat-val">#${escapeHtml(u.id)}</div></div>
+            <div class="dstat"><div class="dstat-label">Rol</div><div class="dstat-val">${escapeHtml(u.role)}</div></div>
             <div class="dstat" style="grid-column:1 / span 2"><div class="dstat-label">Vehículo</div><div class="dstat-val">${vehicleDetail}</div></div>
             <div class="dstat"><div class="dstat-label">Capacidad</div><div class="dstat-val">${vehicleCapacity}</div></div>
             <div class="dstat"><div class="dstat-label">Año / Combustible</div><div class="dstat-val">${vehicleYear} • ${vehicleFuel}</div></div>
           </div>
           <div style="margin-top:12px">
-            <button class="btn-secondary" onclick="window.openVehicleModal(${u.id}, '${String(u.name || '').replace(/'/g, "\\'")}')">Editar vehículo</button>
+            <button class="btn-secondary" data-driver-id="${escapeHtml(u.id)}" data-driver-name="${escapeHtml(u.name || '')}" onclick="window.openVehicleModal(this.dataset.driverId, this.dataset.driverName)">Editar vehículo</button>
           </div>
         </div>
       `;
@@ -530,14 +531,14 @@ async function loadUsers(roleFilter = 'all') {
           const isActive = u.isActive === false ? false : true;
           return `
           <tr>
-            <td>#${u.id}</td>
-            <td>${u.name || '—'}</td>
-            <td>${u.email || '—'}</td>
-            <td><span class="role-pill role-${role}">${u.role || '—'}</span></td>
+            <td>#${escapeHtml(u.id)}</td>
+            <td>${escapeHtml(u.name || '—')}</td>
+            <td>${escapeHtml(u.email || '—')}</td>
+            <td><span class="role-pill role-${escapeHtml(role)}">${escapeHtml(u.role || '—')}</span></td>
             <td>${isActive ? '<span class="pill-active">Activo</span>' : '<span class="pill-cancelled">Inactivo</span>'}</td>
             <td style="white-space:nowrap">
-              <button class="users-action-btn btn-secondary" data-action="toggle" data-id="${u.id}" data-active="${isActive}">${isActive ? 'Desactivar' : 'Activar'}</button>
-              <button class="users-action-btn btn-secondary" data-action="delete" data-id="${u.id}" style="margin-left:8px">Eliminar</button>
+              <button class="users-action-btn btn-secondary" data-action="toggle" data-id="${escapeHtml(u.id)}" data-active="${isActive}">${isActive ? 'Desactivar' : 'Activar'}</button>
+              <button class="users-action-btn btn-secondary" data-action="delete" data-id="${escapeHtml(u.id)}" style="margin-left:8px">Eliminar</button>
             </td>
           </tr>
         `;
@@ -1043,10 +1044,10 @@ async function loadAuditLogs() {
             .map(
               (row) => `
             <tr>
-              <td><span class="badge ${row.type === 'ANOMALÍA' ? 'warn' : row.type === 'PRECIO' ? 'info' : 'action'}">${row.type}</span></td>
-              <td>${row.admin}</td>
-              <td style="max-width:400px;word-break:break-word">${row.detail}</td>
-              <td style="font-size:12px;color:var(--t3);white-space:nowrap">${row.timestamp}</td>
+              <td><span class="badge ${row.type === 'ANOMALÍA' ? 'warn' : row.type === 'PRECIO' ? 'info' : 'action'}">${escapeHtml(row.type)}</span></td>
+              <td>${escapeHtml(row.admin)}</td>
+              <td style="max-width:400px;word-break:break-word">${escapeHtml(row.detail)}</td>
+              <td style="font-size:12px;color:var(--t3);white-space:nowrap">${escapeHtml(row.timestamp)}</td>
             </tr>
           `
             )
@@ -1064,7 +1065,7 @@ async function loadAuditLogs() {
     container.innerHTML = `
       <div class="empty">
         <div style="color:var(--err);font-weight:700">Error cargando auditoría</div>
-        <div style="color:var(--t3);font-size:12px;margin-top:8px">${error.message}</div>
+        <div style="color:var(--t3);font-size:12px;margin-top:8px">${escapeHtml(error.message)}</div>
       </div>
     `;
   }
@@ -1225,8 +1226,8 @@ function renderTripsTable(container, trips, compact = false) {
     <th>Trip ID</th>
     <th>Tiempo</th>
     <th>Ruta</th>
-    <th>Pasajero</th>
-    <th>Conductor</th>
+    <th>Máx (S/)</th>
+    <th>Mín (S/)</th>
     ${compact ? '' : '<th>Distancia</th>'}
     <th>Estado</th>
   </tr></thead><tbody>`;
@@ -1236,13 +1237,13 @@ function renderTripsTable(container, trips, compact = false) {
     const time = trip.requestedAt ? formatDate(trip.requestedAt) : '—';
 
     html += `
-      <tr onclick="window.openTripDetail(${trip.id})" style="cursor: pointer;">
+      <tr onclick="window.openTripDetail(${Number(trip.id)})" style="cursor: pointer;">
         <td class="trip-id">#LIM-${String(trip.id).padStart(4, '0')}</td>
-        <td>${time}</td>
-        <td>${trip.origin} → ${trip.destination}</td>
+        <td>${escapeHtml(time)}</td>
+        <td>${escapeHtml(trip.origin)} → ${escapeHtml(trip.destination)}</td>
         <td>S/ ${trip.maximumPrice?.toFixed(2) || '—'}</td>
         <td>S/ ${trip.minimumPrice?.toFixed(2) || '—'}</td>
-        ${compact ? '' : `<td>${trip.distanceKm} km</td>`}
+        ${compact ? '' : `<td>${escapeHtml(trip.distanceKm)} km</td>`}
         <td><span class="status-pill ${status.class}">${status.label}</span></td>
       </tr>
     `;

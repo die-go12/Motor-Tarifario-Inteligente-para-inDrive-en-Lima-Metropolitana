@@ -6,6 +6,25 @@
 import { UI_CONSTANTS } from './config.js';
 
 /**
+ * Escapar texto para insertarlo de forma segura en HTML (previene XSS).
+ * @param {unknown} value
+ * @returns {string}
+ */
+export function escapeHtml(value) {
+  return String(value ?? '').replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[char],
+  );
+}
+
+/**
  * Mostrar toast notification
  * @param {string} message
  * @param {boolean} isSuccess

@@ -7,12 +7,12 @@
 - **[Presentación Final](Presentacion_Final/README.md)** — índice/guion de la defensa: arquitectura, sprints, pruebas, evidencias, gestión de cambio y conclusiones.
 
 ## 🏃 Scrum (por fase)
-- [Sprint 0](Scrum/sprint_0.md)
-- [Sprint 1](Scrum/sprint_1.md)
-- [Sprint 2](Scrum/sprint_2.md) — tiene su **propio índice interno**
+- [Sprint 0](Scrum/Sprints/sprint_0.md)
+- [Sprint 1](Scrum/Sprints/sprint_1.md)
+- [Sprint 2](Scrum/Sprints/sprint_2.md) — tiene su **propio índice interno**
 - [Gestión de Cambio](Presentacion_Final/gestion_de_cambio.md)
-- Retrospectivas: [Sprint 1](Scrum/retrospective.md) · [Sprint 2](Scrum/retrospective2.md)
-- [Pruebas del sistema (estrategia)](Scrum/pruebas_sistema.md)
+- Retrospectivas: [Sprint 1](Scrum/Retrospectivas/retrospective.md) · [Sprint 2](Scrum/Retrospectivas/retrospective2.md)
+- [Pruebas del sistema (estrategia)](Scrum/Pruebas/pruebas_sistema.md)
 
 ## 📋 Requerimientos
 - [Historias de Usuario](Requerimientos/Historias_usuario.md) — **fuente canónica** de CAR + HU

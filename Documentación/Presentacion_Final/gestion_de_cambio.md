@@ -69,25 +69,25 @@ A continuación, se detallan las hojas de cálculo transaccionales de control t�
 
 ---
 
-## CR-05 — Rango de Negociación Dinámica
+### CR-05 — Rango de Negociación Dinámica
 
 **Descripción:** Ajuste matemático en el motor de precios bajo condiciones de demanda base.
 
 | Alternativa Evaluada | VT | IC | CI | VN | Puntaje Total | Estado | Justificación del Resultado |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Opción Original:** Cálculo determinista estricto puro | 5 | 4 | 5 | 1 | **15 / 20** | **Descartada** | Fallo conceptual: en tráfico bajo producía un rango de ancho cero $[X,X]$, rompiendo el regateo del negocio. |
-| **Opción Nueva:** Spread mínimo del 20% (`minRangeRatio`) | 5 | 5 | 5 | 5 | **20 / 20** | **Ganadora** | **Aprobado:** Garantiza una banda elástica de negociación obligatoria respetando los topes máximos absolutos. |
+|----------------------|:--:|:--:|:--:|:--:|:-------------:|---------|-----------------------------|
+| Opción Original: Cálculo determinista estricto puro | 5 | 4 | 5 | 1 | **15/20** | Descartada | En escenarios de tráfico bajo generaba un rango de negociación de ancho cero (`[X, X]`), impidiendo el proceso de negociación. |
+| Opción Nueva: Banda mínima configurable (`minRangeRatio`) | 5 | 5 | 5 | 5 | **20/20** | Ganadora | Garantiza una banda mínima de negociación mediante un factor configurable (`minRangeRatio = 1.2`), preservando la flexibilidad del proceso sin superar los límites establecidos. |
 
 ---
 
-## CR-06 — Pasarela de Comunicación en Tiempo Real (CAMBIO RECHAZADO)
+### CR-06 — Pasarela de Comunicación en Tiempo Real (CAMBIO RECHAZADO)
 
-**Descripción:** Propuesta de migración de WebSockets a arquitectura distribuida sin Broker centralizado para la transmisión de ofertas.
+**Descripción:** Evaluación de una arquitectura distribuida para WebSockets sin un adaptador centralizado para la transmisión de ofertas.
 
 | Alternativa Evaluada | VT | IC | CI | VN | Puntaje Total | Estado | Justificación del Resultado |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Opción Original (Diseño Base):** HTTP/REST Centralizado | 5 | 4 | 5 | 4 | **18 / 20** | **Ganadora** | Mantiene la persistencia del estado del viaje y las contraofertas de forma segura en la base de datos común. |
-| **Opción Propuesta:** Clúster WebSockets distribuidos sin Broker | 1 | 2 | 3 | 2 | **08 / 20** | **Rechazada** | **Perdedora:** Al replicar el Gateway, si el usuario y el conductor caen en instancias distintas, las ofertas se pierden. Implementar un *Redis Adapter* a días del cierre añade deuda técnica masiva. |
+|----------------------|:--:|:--:|:--:|:--:|:-------------:|---------|-----------------------------|
+| Opción Original: **WebSocket en instancia única + estado persistente en base de datos** | 5 | 4 | 5 | 4 | **18/20** | Ganadora | Mantiene la comunicación en tiempo real mediante una única instancia del Gateway y garantiza la persistencia consistente del estado de las negociaciones en la base de datos. |
+| Opción Propuesta: Clúster distribuido de WebSockets sin adaptador centralizado | 1 | 2 | 3 | 2 | **08/20** | Rechazada | Al distribuir el Gateway sin un mecanismo de sincronización (por ejemplo, Redis Adapter), los eventos podían perderse cuando usuario y conductor se conectaban a instancias distintas. |
 
 ---
 
@@ -157,29 +157,33 @@ Esta expresión garantiza que el pago final nunca sea inferior al límite mínim
 
 - **Identificación:** Durante la ejecución de escenarios con factores multiplicadores dinámicos mínimos (tráfico bajo, hora base y demanda neutra = `1.0`), el algoritmo generaba un límite máximo idéntico al límite mínimo (`[X, X]`), produciendo una banda de negociación de ancho cero.
 
-- **Análisis de impacto:** Una banda sin dispersión invalidaba la lógica de negociación acotada (**CAR-003**). Al no existir un intervalo de precios, ninguna oferta podía ubicarse válidamente entre los límites definidos, lo que impedía el proceso de negociación.
+- **Análisis de impacto:** Una banda sin dispersión invalidaba la lógica de negociación acotada (**CAR-003**). Al no existir un intervalo de precios, ninguna oferta podía ubicarse válidamente entre los límites definidos, impidiendo el proceso de negociación.
 
-- **Análisis comparativo (¿Por qué la nueva opción es superior?):** La implementación original obtuvo la puntuación mínima en valor de negocio (**VN: 1**) porque, aunque era matemáticamente consistente con las variables de entrada, comprometía el funcionamiento del producto al eliminar la flexibilidad necesaria para la negociación. En contraste, la nueva alternativa (**VN: 20/20**) fue seleccionada de forma unánime al incorporar un coeficiente elástico configurable (`minRangeRatio`), el cual garantiza una amplitud mínima del **20 %** en la banda de negociación y preserva la experiencia de usuario.
+- **Análisis comparativo (¿Por qué la nueva opción es superior?):** La implementación original obtuvo la puntuación mínima en valor de negocio (**VN: 1**) porque, aunque era matemáticamente consistente con las variables de entrada, comprometía el funcionamiento del producto al eliminar la flexibilidad necesaria para la negociación. En contraste, la nueva alternativa (**Puntaje: 20/20**) fue seleccionada al incorporar un coeficiente configurable (`minRangeRatio = 1.2`), el cual garantiza una banda mínima equivalente al **20 %** sobre el límite inferior y preserva la experiencia de usuario.
 
-- **Implementación:** El componente de cálculo del servicio `ms-pricing` determina el límite superior del rango aplicando una validación de piso elástico, garantizando que el límite máximo nunca sea inferior al límite mínimo incrementado por el porcentaje mínimo configurado:
+- **Implementación:** El componente de cálculo del servicio `ms-pricing` determina el límite superior del rango garantizando que:
 
 $$
-\text{límite}_{\text{máximo}} \geq \text{límite}_{\text{mínimo}} \times (1 + \text{minRangeRatio})
+\text{límite}_{\text{máximo}} \geq \text{límite}_{\text{mínimo}} \times \text{minRangeRatio}
 $$
 
-El parámetro `minRangeRatio` forma parte de la configuración dinámica del motor de precios, permitiendo ajustar la amplitud mínima de la banda de negociación sin necesidad de modificar el código fuente.
+donde `minRangeRatio = 1.2`, equivalente a una banda mínima del **20 %** respecto al límite inferior.
 
-- **Seguimiento y Validación:** Se incorporaron coberturas de pruebas automatizadas sobre el motor para verificar que, incluso bajo condiciones de demanda cero o sin tarifa dinámica (*surge*), el rango siempre conserva una banda de negociación válida.
+El parámetro `minRangeRatio` forma parte de la configuración dinámica del motor de precios, permitiendo ajustar la amplitud mínima de la banda de negociación sin modificar el código fuente.
+
+- **Seguimiento y validación:** Se incorporaron pruebas automatizadas para verificar que, incluso bajo condiciones de demanda mínima o sin tarifa dinámica (*surge*), el rango siempre conserva una banda de negociación válida.
+
+---
+  
 ### CR-06 — Pasarela de Comunicación: Desacoplamiento de WebSockets en el Gateway sin adaptador centralizado (SOLICITUD RECHAZADA)
 
-- **Identificación:** Durante el diseño de las HUs de negociación en tiempo real (US-003/US-004), se evaluó una propuesta de cambio para mutar el `api-gateway` síncrono hacia un clúster distribuido de WebSockets independientes, con el fin de acelerar la transmisión de ofertas de los conductores sin pasar por la capa HTTP tradicional.
+- **Identificación:** Durante el diseño de las historias de usuario **US-003** y **US-004**, se evaluó una propuesta para migrar el Gateway de tiempo real hacia un clúster de múltiples instancias WebSocket sin un mecanismo de sincronización compartida, con el objetivo de mejorar la escalabilidad de la transmisión de ofertas.
 
-- **Análisis de Impacto:** Modificaba sustancialmente la pasarela de comunicación orientada a eventos e impactaba la topología de red de Docker Compose al requerir balanceadores con sesiones pegajosas (*sticky sessions*).
+- **Análisis de impacto:** La propuesta modificaba significativamente la arquitectura de comunicación en tiempo real, ya que requería balanceadores con *sticky sessions* y un mecanismo adicional para sincronizar el estado entre las distintas instancias del Gateway.
 
-- **Análisis Comparativo (Por qué PIERDE la propuesta frente al diseño base):** La opción propuesta obtuvo una calificación técnica crítica y deficiente (**08/20**). Al levantar múltiples réplicas físicas de la API Gateway para asegurar la disponibilidad, si un pasajero abría su socket en la Instancia A y el conductor enviaba una oferta que llegaba a la Instancia B, el sistema perdía el rastro del evento al carecer de memoria compartida. Para solucionar esto se requería un adaptador centralizado (*Redis WebSocket Adapter*), lo que introducía un riesgo severo al cronograma (IC: 2) y baja viabilidad (VT: 1) a pocos días del cierre de la iteración.
+- **Análisis comparativo (¿Por qué la propuesta fue rechazada?):** La alternativa obtuvo una calificación de **08/20** debido a su baja viabilidad técnica dentro del cronograma del MVP. En un escenario con múltiples instancias del Gateway, un pasajero podía mantener su conexión WebSocket en una instancia mientras el conductor enviaba una oferta a otra diferente. Al no existir un adaptador centralizado para compartir eventos (como un **Redis WebSocket Adapter**), las notificaciones podían perderse. Incorporar dicho componente implicaba aumentar considerablemente la complejidad de la infraestructura y el riesgo del proyecto.
 
-- **Resolución:** **Rechazado.** Ganó el diseño original síncrono/HTTP basado en arquitectura REST estándar. El control transaccional del flujo de negociación y ofertas se centralizó de forma consistente en la base de datos transaccional común de `ms-base`. La idea de comunicación por sockets distribuidos fue enviada formalmente al Roadmap tecnológico de largo plazo para mitigar riesgos en el MVP.
-
+- **Resolución:** Se mantuvo el diseño original basado en una **única instancia del Gateway WebSocket**, mientras que el estado de los viajes, las ofertas y las contraofertas continúa persistiendo de forma centralizada en la base de datos de `ms-base`. La evolución hacia un clúster distribuido de WebSockets con sincronización mediante Redis quedó planificada como una mejora para futuras versiones del sistema.
 ---
 
 # 4. Panorama Final de Desviaciones (Diseño Original vs. Entregado)
